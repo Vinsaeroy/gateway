@@ -12,7 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Badge } from "@/components/ui/badge";
 import { Plus, Trash2, Edit, Radio, Clock, Users } from "lucide-react";
 import { toast } from "sonner";
-import Cookies from "js-cookie";
+import { useSession } from "@/components/dashboard/session-provider";
 
 interface AutoBroadcast {
     id: string;
@@ -47,7 +47,7 @@ export default function AutoBroadcastPage() {
     const [targets, setTargets] = useState<string[]>(["ALL"]);
     const [intervalMin, setIntervalMin] = useState(60);
 
-    const sessionId = Cookies.get("selectedSession") || "";
+    const { sessionId } = useSession();
 
     useEffect(() => {
         if (sessionId) {
