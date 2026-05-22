@@ -5,10 +5,8 @@ COPY patches ./patches/
 COPY prisma ./prisma/
 RUN npm ci
 
-# Copy the rest of the application files
 COPY . .
 
-# Generate Prisma client and build Next.js application
 RUN npx prisma generate
 RUN npm run build
 
@@ -16,18 +14,23 @@ RUN npm run build
 FROM node:20-alpine AS runner
 WORKDIR /app
 
-# Copy production files
-COPY package*.json ./
-COPY node_modules ./node_modules
-COPY .next ./.next
-COPY src ./src
-COPY prisma ./prisma
-COPY public ./public
-COPY tsconfig.json ./
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/src ./src
+COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/patches ./patches
+COPY --from=builder /app/tsconfig.json ./
+COPY --from=builder /app/tsconfig.server.json ./
+COPY --from=builder /app/next.config.ts ./
+COPY --from=builder /app/middleware.ts ./
+COPY --from=builder /app/scripts ./scripts
+COPY --from=builder /app/data ./data
 
 ENV NODE_ENV=production
-ENV PORT=3000
+ENV PORT=3030
 ENV HOSTNAME=0.0.0.0
-EXPOSE 3000
+EXPOSE 3030
 
-CMD ["sh", "-c", "npx prisma db push && (if [ -n \"$ADMIN_EMAIL\" ] && [ -n \"$ADMIN_PASSWORD\" ]; then node scripts/setup-admin.js \"$ADMIN_EMAIL\" \"$ADMIN_PASSWORD\"; fi) && npx tsx src/server/index.ts"]
+CMD ["npx", "tsx", "src/server/index.ts"]
