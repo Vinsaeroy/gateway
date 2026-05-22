@@ -27,7 +27,8 @@ import {
     Tag,
     MessageCircleReply,
     Contact,
-    UserPlus
+    UserPlus,
+    Radio
 } from "lucide-react";
 import { useSidebar } from "./sidebar-context";
 import {
@@ -82,6 +83,7 @@ const navGroups: NavGroup[] = [
             { href: "/dashboard/autoreply", label: "Auto Reply", icon: MessageCircleReply },
             { href: "/dashboard/profile", label: "Bot Profile", icon: UserCircle },
             { href: "/dashboard/scheduler", label: "Scheduler", icon: CalendarClock },
+            { href: "/dashboard/auto-broadcast", label: "Auto Broadcast", icon: Radio },
             { href: "/dashboard/webhooks", label: "Webhooks & API", icon: Webhook },
         ],
     },

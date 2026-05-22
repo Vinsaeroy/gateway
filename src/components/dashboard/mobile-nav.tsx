@@ -27,6 +27,7 @@ import {
     Tag,
     MessageCircleReply,
     UserPlus,
+    Radio,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
@@ -69,6 +70,7 @@ const navGroups: NavGroup[] = [
             { href: "/dashboard/autoreply", label: "Auto Reply", icon: MessageCircleReply },
             { href: "/dashboard/profile", label: "Bot Profile", icon: UserCircle },
             { href: "/dashboard/scheduler", label: "Scheduler", icon: CalendarClock },
+            { href: "/dashboard/auto-broadcast", label: "Auto Broadcast", icon: Radio },
             { href: "/dashboard/webhooks", label: "Webhooks & API", icon: Webhook },
         ],
     },
