@@ -1,0 +1,265 @@
+import { prisma } from "@/lib/prisma";
+import { batchResolveToPhoneJid, normalizeJid } from "@/lib/jid-utils";
+import { waManager } from "@/modules/whatsapp/manager";
+import Sticker from "wa-sticker-formatter";
+
+export class ChatService {
+    /**
+     * Get the active chats list for a session, including last message preview.
+     */
+    static async getChatsList(dbSessionId: string) {
+        // 1. Get contacts
+        const contacts = await prisma.contact.findMany({
+            where: { sessionId: dbSessionId },
+            orderBy: { updatedAt: 'desc' },
+            select: { jid: true, name: true, notify: true, profilePic: true }
+        });
+
+        // 2. Get Groups for subjects
+        const groups = await prisma.group.findMany({
+            where: { sessionId: dbSessionId },
+            select: { jid: true, subject: true }
+        });
+
+        // 3. Get distinct remoteJids from messages (for chats without a saved contact)
+        const messagesWithDistinctJids = await prisma.message.findMany({
+            where: { sessionId: dbSessionId },
+            distinct: ['remoteJid'],
+            select: { remoteJid: true }
+        });
+
+        const allJids = new Set([
+            ...contacts.map(c => c.jid),
+            ...groups.map(g => g.jid),
+            ...messagesWithDistinctJids.map(m => m.remoteJid)
+        ]);
+
+        const jidMap = await batchResolveToPhoneJid(Array.from(allJids), dbSessionId);
+        
+        // Map contacts and groups for quick lookup
+        const contactMap = new Map();
+        contacts.forEach(c => contactMap.set(c.jid, c));
+        groups.forEach(g => contactMap.set(g.jid, { jid: g.jid, name: g.subject, notify: g.subject, profilePic: null }));
+
+        const chatList = await Promise.all(Array.from(allJids).map(async (originalJid) => {
+            const resolvedJid = jidMap.get(originalJid) || originalJid;
+            const normalizedJid = normalizeJid(resolvedJid);
+            const contactInfo = contactMap.get(originalJid) || contactMap.get(normalizedJid) || { jid: normalizedJid, name: null, notify: null, profilePic: null };
+
+            const lastMessage = await prisma.message.findFirst({
+                where: {
+                    sessionId: dbSessionId,
+                    OR: [{ remoteJid: originalJid }, { remoteJid: normalizedJid }]
+                },
+                orderBy: { timestamp: 'desc' },
+                select: { content: true, timestamp: true, type: true }
+            });
+
+            return {
+                ...contactInfo,
+                jid: normalizedJid,
+                lastMessage: lastMessage ? {
+                    content: lastMessage.content,
+                    timestamp: lastMessage.timestamp.toISOString(),
+                    type: lastMessage.type
+                } : undefined
+            };
+        }));
+
+        // Deduplicate unified list
+        const uniqueChats = new Map();
+        chatList.forEach(chat => {
+            const existing = uniqueChats.get(chat.jid);
+            if (!existing || (chat.lastMessage?.timestamp && (!existing.lastMessage?.timestamp || new Date(chat.lastMessage.timestamp) > new Date(existing.lastMessage.timestamp)))) {
+                uniqueChats.set(chat.jid, chat);
+            }
+        });
+
+        const finalChats = Array.from(uniqueChats.values());
+
+        finalChats.sort((a, b) => {
+            const tA = a.lastMessage?.timestamp ? new Date(a.lastMessage.timestamp).getTime() : 0;
+            const tB = b.lastMessage?.timestamp ? new Date(b.lastMessage.timestamp).getTime() : 0;
+            return tB - tA;
+        });
+
+        return finalChats;
+    }
+
+    /**
+     * Get recent messages for a specific chat.
+     */
+    static async getMessages(dbSessionId: string, jid: string, take: number = 100) {
+        // Query with normalized JID to handle @c.us / @s.whatsapp.net variations
+        const normalizedJid = normalizeJid(jid);
+        
+        // Find if this contact has both LID and Phone JID in the database
+        const contact = await prisma.contact.findFirst({
+            where: {
+                sessionId: dbSessionId,
+                OR: [{ jid: jid }, { lid: jid }, { remoteJidAlt: jid }, { jid: normalizedJid }]
+            },
+            select: { jid: true, lid: true, remoteJidAlt: true }
+        });
+
+        const queryJids = new Set([jid, normalizedJid]);
+        if (contact) {
+            if (contact.jid) queryJids.add(contact.jid);
+            if (contact.lid) queryJids.add(contact.lid);
+            if (contact.remoteJidAlt) queryJids.add(contact.remoteJidAlt);
+        }
+
+        const messages = await prisma.message.findMany({
+            where: {
+                sessionId: dbSessionId,
+                remoteJid: { in: Array.from(queryJids) }
+            },
+            orderBy: { timestamp: 'desc' },
+            take
+        });
+        return messages.reverse();
+    }
+
+    /**
+     * Send a text message, optionally with mentions and stickers if formatted as URL.
+     */
+    static async sendTextMessage(sessionId: string, jid: string, messagePayload: any, mentions?: string[]) {
+        const instance = waManager.getInstance(sessionId);
+        if (!instance || !instance.socket) {
+            throw new Error("WhatsApp session is disconnected or not found");
+        }
+
+        let msgPayload = { ...messagePayload };
+
+        // Normalize "text" to "caption" if a media message is sent with "text"
+        if (msgPayload.text && (msgPayload.image || msgPayload.video || msgPayload.document || msgPayload.audio)) {
+            if (!msgPayload.caption) {
+                msgPayload.caption = msgPayload.text;
+            }
+            delete msgPayload.text;
+        }
+
+        if (msgPayload.sticker && (msgPayload.sticker.url || typeof msgPayload.sticker === 'string')) {
+            const url = msgPayload.sticker.url || msgPayload.sticker;
+            // SSRF Protection
+            const parsedUrl = new URL(url);
+            if (!['http:', 'https:'].includes(parsedUrl.protocol)) throw new Error("Only http/https URLs allowed");
+            const hostname = parsedUrl.hostname;
+            if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '0.0.0.0' || hostname.startsWith('10.') || hostname.startsWith('192.168.') || hostname.startsWith('172.')) {
+                throw new Error("Internal URLs not allowed");
+            }
+            try {
+                const res = await fetch(url);
+                if (!res.ok) throw new Error(`Failed to fetch sticker media`);
+                const buffer = await res.arrayBuffer();
+                const sticker = new Sticker(Buffer.from(buffer), {
+                    pack: msgPayload.sticker.pack || "WA-AKG Bot",
+                    author: msgPayload.sticker.author || "WA-AKG",
+                    type: "full",
+                    quality: 50
+                });
+                msgPayload = { sticker: await sticker.toBuffer() };
+            } catch (e: any) {
+                throw new Error(`Failed to generate sticker from URL: ${e.message}`);
+            }
+        }
+
+        if (msgPayload.image && typeof msgPayload.image === 'object' && msgPayload.image.url) {
+            try {
+                const res = await fetch(msgPayload.image.url);
+                if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
+                const buffer = await res.arrayBuffer();
+                msgPayload.image = Buffer.from(buffer);
+            } catch (e: any) {
+                throw new Error(`Failed to fetch image from URL: ${e.message}`);
+            }
+        }
+
+        if (msgPayload.video && typeof msgPayload.video === 'object' && msgPayload.video.url) {
+            try {
+                const res = await fetch(msgPayload.video.url);
+                if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
+                const buffer = await res.arrayBuffer();
+                msgPayload.video = Buffer.from(buffer);
+            } catch (e: any) {
+                throw new Error(`Failed to fetch video from URL: ${e.message}`);
+            }
+        }
+
+        if (msgPayload.document && typeof msgPayload.document === 'object' && msgPayload.document.url) {
+            try {
+                const res = await fetch(msgPayload.document.url);
+                if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
+                const buffer = await res.arrayBuffer();
+                msgPayload.document = Buffer.from(buffer);
+            } catch (e: any) {
+                throw new Error(`Failed to fetch document from URL: ${e.message}`);
+            }
+        }
+
+        if (msgPayload.audio && typeof msgPayload.audio === 'object' && msgPayload.audio.url) {
+            try {
+                const res = await fetch(msgPayload.audio.url);
+                if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
+                const buffer = await res.arrayBuffer();
+                msgPayload.audio = Buffer.from(buffer);
+            } catch (e: any) {
+                throw new Error(`Failed to fetch audio from URL: ${e.message}`);
+            }
+        }
+
+        if (msgPayload.text && mentions && Array.isArray(mentions)) {
+            msgPayload.mentions = mentions;
+        }
+
+        return await instance.socket.sendMessage(jid, msgPayload, { mentions: mentions || [] } as any);
+    }
+
+    /**
+     * Send a media message locally from a buffer.
+     */
+    static async sendMediaMessage(
+        sessionId: string, 
+        jid: string, 
+        buffer: Buffer, 
+        type: string, 
+        mimetype: string,
+        fileName: string, 
+        caption: string
+    ) {
+        const instance = waManager.getInstance(sessionId);
+        if (!instance || !instance.socket) {
+            throw new Error("WhatsApp session is disconnected or not found");
+        }
+
+        const messageOptions: any = {};
+        if (caption) messageOptions.caption = caption;
+        messageOptions.mimetype = mimetype;
+        
+        let content: any = {};
+
+        if (type === 'image') {
+            content = { image: buffer, ...messageOptions };
+        } else if (type === 'video') {
+             content = { video: buffer, ...messageOptions };
+        } else if (type === 'audio') {
+             content = { audio: buffer, mimetype: 'audio/mp4', ptt: false };
+        } else if (type === 'voice') {
+             content = { audio: buffer, mimetype: 'audio/mp4', ptt: true };
+        } else if (type === 'document') {
+             content = { document: buffer, mimetype, fileName, ...messageOptions };
+        } else if (type === 'sticker') {
+            const sticker = new Sticker(buffer, {
+                pack: "WA-AKG Bot",
+                author: "WA-AKG",
+                type: "full",
+                quality: 50
+            });
+            content = { sticker: await sticker.toBuffer() };
+        } else {
+             content = { document: buffer, mimetype, fileName, ...messageOptions };
+        }
+
+        return await instance.socket.sendMessage(jid, content);
+    }
+}

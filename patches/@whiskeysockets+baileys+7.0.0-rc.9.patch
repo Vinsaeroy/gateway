@@ -1,0 +1,1250 @@
+diff --git a/node_modules/@whiskeysockets/baileys/LICENSE b/node_modules/@whiskeysockets/baileys/LICENSE
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/README.md b/node_modules/@whiskeysockets/baileys/README.md
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/WAProto/WAProto.proto b/node_modules/@whiskeysockets/baileys/WAProto/WAProto.proto
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/WAProto/fix-imports.js b/node_modules/@whiskeysockets/baileys/WAProto/fix-imports.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/WAProto/index.d.ts b/node_modules/@whiskeysockets/baileys/WAProto/index.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/WAProto/index.js b/node_modules/@whiskeysockets/baileys/WAProto/index.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/engine-requirements.js b/node_modules/@whiskeysockets/baileys/engine-requirements.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Defaults/index.d.ts b/node_modules/@whiskeysockets/baileys/lib/Defaults/index.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Defaults/index.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Defaults/index.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Defaults/index.js b/node_modules/@whiskeysockets/baileys/lib/Defaults/index.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Defaults/index.js.map b/node_modules/@whiskeysockets/baileys/lib/Defaults/index.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/Group/ciphertext-message.d.ts b/node_modules/@whiskeysockets/baileys/lib/Signal/Group/ciphertext-message.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/Group/ciphertext-message.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Signal/Group/ciphertext-message.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/Group/ciphertext-message.js b/node_modules/@whiskeysockets/baileys/lib/Signal/Group/ciphertext-message.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/Group/ciphertext-message.js.map b/node_modules/@whiskeysockets/baileys/lib/Signal/Group/ciphertext-message.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/Group/group-session-builder.d.ts b/node_modules/@whiskeysockets/baileys/lib/Signal/Group/group-session-builder.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/Group/group-session-builder.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Signal/Group/group-session-builder.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/Group/group-session-builder.js b/node_modules/@whiskeysockets/baileys/lib/Signal/Group/group-session-builder.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/Group/group-session-builder.js.map b/node_modules/@whiskeysockets/baileys/lib/Signal/Group/group-session-builder.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/Group/group_cipher.d.ts b/node_modules/@whiskeysockets/baileys/lib/Signal/Group/group_cipher.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/Group/group_cipher.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Signal/Group/group_cipher.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/Group/group_cipher.js b/node_modules/@whiskeysockets/baileys/lib/Signal/Group/group_cipher.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/Group/group_cipher.js.map b/node_modules/@whiskeysockets/baileys/lib/Signal/Group/group_cipher.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/Group/index.d.ts b/node_modules/@whiskeysockets/baileys/lib/Signal/Group/index.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/Group/index.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Signal/Group/index.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/Group/index.js b/node_modules/@whiskeysockets/baileys/lib/Signal/Group/index.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/Group/index.js.map b/node_modules/@whiskeysockets/baileys/lib/Signal/Group/index.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/Group/keyhelper.d.ts b/node_modules/@whiskeysockets/baileys/lib/Signal/Group/keyhelper.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/Group/keyhelper.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Signal/Group/keyhelper.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/Group/keyhelper.js b/node_modules/@whiskeysockets/baileys/lib/Signal/Group/keyhelper.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/Group/keyhelper.js.map b/node_modules/@whiskeysockets/baileys/lib/Signal/Group/keyhelper.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-chain-key.d.ts b/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-chain-key.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-chain-key.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-chain-key.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-chain-key.js b/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-chain-key.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-chain-key.js.map b/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-chain-key.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-key-distribution-message.d.ts b/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-key-distribution-message.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-key-distribution-message.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-key-distribution-message.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-key-distribution-message.js b/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-key-distribution-message.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-key-distribution-message.js.map b/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-key-distribution-message.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-key-message.d.ts b/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-key-message.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-key-message.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-key-message.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-key-message.js b/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-key-message.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-key-message.js.map b/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-key-message.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-key-name.d.ts b/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-key-name.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-key-name.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-key-name.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-key-name.js b/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-key-name.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-key-name.js.map b/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-key-name.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-key-record.d.ts b/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-key-record.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-key-record.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-key-record.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-key-record.js b/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-key-record.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-key-record.js.map b/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-key-record.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-key-state.d.ts b/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-key-state.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-key-state.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-key-state.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-key-state.js b/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-key-state.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-key-state.js.map b/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-key-state.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-message-key.d.ts b/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-message-key.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-message-key.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-message-key.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-message-key.js b/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-message-key.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-message-key.js.map b/node_modules/@whiskeysockets/baileys/lib/Signal/Group/sender-message-key.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/libsignal.d.ts b/node_modules/@whiskeysockets/baileys/lib/Signal/libsignal.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/libsignal.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Signal/libsignal.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/libsignal.js b/node_modules/@whiskeysockets/baileys/lib/Signal/libsignal.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/libsignal.js.map b/node_modules/@whiskeysockets/baileys/lib/Signal/libsignal.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/lid-mapping.d.ts b/node_modules/@whiskeysockets/baileys/lib/Signal/lid-mapping.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/lid-mapping.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Signal/lid-mapping.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/lid-mapping.js b/node_modules/@whiskeysockets/baileys/lib/Signal/lid-mapping.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Signal/lid-mapping.js.map b/node_modules/@whiskeysockets/baileys/lib/Signal/lid-mapping.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/Client/index.d.ts b/node_modules/@whiskeysockets/baileys/lib/Socket/Client/index.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/Client/index.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Socket/Client/index.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/Client/index.js b/node_modules/@whiskeysockets/baileys/lib/Socket/Client/index.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/Client/index.js.map b/node_modules/@whiskeysockets/baileys/lib/Socket/Client/index.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/Client/types.d.ts b/node_modules/@whiskeysockets/baileys/lib/Socket/Client/types.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/Client/types.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Socket/Client/types.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/Client/types.js b/node_modules/@whiskeysockets/baileys/lib/Socket/Client/types.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/Client/types.js.map b/node_modules/@whiskeysockets/baileys/lib/Socket/Client/types.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/Client/websocket.d.ts b/node_modules/@whiskeysockets/baileys/lib/Socket/Client/websocket.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/Client/websocket.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Socket/Client/websocket.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/Client/websocket.js b/node_modules/@whiskeysockets/baileys/lib/Socket/Client/websocket.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/Client/websocket.js.map b/node_modules/@whiskeysockets/baileys/lib/Socket/Client/websocket.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/business.d.ts b/node_modules/@whiskeysockets/baileys/lib/Socket/business.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/business.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Socket/business.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/business.js b/node_modules/@whiskeysockets/baileys/lib/Socket/business.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/business.js.map b/node_modules/@whiskeysockets/baileys/lib/Socket/business.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/chats.d.ts b/node_modules/@whiskeysockets/baileys/lib/Socket/chats.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/chats.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Socket/chats.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/chats.js b/node_modules/@whiskeysockets/baileys/lib/Socket/chats.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/chats.js.map b/node_modules/@whiskeysockets/baileys/lib/Socket/chats.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/communities.d.ts b/node_modules/@whiskeysockets/baileys/lib/Socket/communities.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/communities.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Socket/communities.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/communities.js b/node_modules/@whiskeysockets/baileys/lib/Socket/communities.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/communities.js.map b/node_modules/@whiskeysockets/baileys/lib/Socket/communities.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/groups.d.ts b/node_modules/@whiskeysockets/baileys/lib/Socket/groups.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/groups.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Socket/groups.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/groups.js b/node_modules/@whiskeysockets/baileys/lib/Socket/groups.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/groups.js.map b/node_modules/@whiskeysockets/baileys/lib/Socket/groups.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/index.d.ts b/node_modules/@whiskeysockets/baileys/lib/Socket/index.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/index.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Socket/index.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/index.js b/node_modules/@whiskeysockets/baileys/lib/Socket/index.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/index.js.map b/node_modules/@whiskeysockets/baileys/lib/Socket/index.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/messages-recv.d.ts b/node_modules/@whiskeysockets/baileys/lib/Socket/messages-recv.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/messages-recv.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Socket/messages-recv.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/messages-recv.js b/node_modules/@whiskeysockets/baileys/lib/Socket/messages-recv.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/messages-recv.js.map b/node_modules/@whiskeysockets/baileys/lib/Socket/messages-recv.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/messages-send.d.ts b/node_modules/@whiskeysockets/baileys/lib/Socket/messages-send.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/messages-send.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Socket/messages-send.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/messages-send.js b/node_modules/@whiskeysockets/baileys/lib/Socket/messages-send.js
+old mode 100644
+new mode 100755
+index 074978f..9dee197
+--- a/node_modules/@whiskeysockets/baileys/lib/Socket/messages-send.js
++++ b/node_modules/@whiskeysockets/baileys/lib/Socket/messages-send.js
+@@ -446,9 +446,11 @@ export const makeMessagesSocket = (config) => {
+             if (isNewsletter) {
+                 const patched = patchMessageBeforeSending ? await patchMessageBeforeSending(message, []) : message;
+                 const bytes = encodeNewsletterMessage(patched);
++                const pAttrs = {};
++                if (mediaType) pAttrs.mediatype = mediaType;
+                 binaryNodeContent.push({
+                     tag: 'plaintext',
+-                    attrs: {},
++                    attrs: pAttrs,
+                     content: bytes
+                 });
+                 const stanza = {
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/messages-send.js.map b/node_modules/@whiskeysockets/baileys/lib/Socket/messages-send.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/mex.d.ts b/node_modules/@whiskeysockets/baileys/lib/Socket/mex.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/mex.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Socket/mex.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/mex.js b/node_modules/@whiskeysockets/baileys/lib/Socket/mex.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/mex.js.map b/node_modules/@whiskeysockets/baileys/lib/Socket/mex.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/newsletter.d.ts b/node_modules/@whiskeysockets/baileys/lib/Socket/newsletter.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/newsletter.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Socket/newsletter.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/newsletter.js b/node_modules/@whiskeysockets/baileys/lib/Socket/newsletter.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/newsletter.js.map b/node_modules/@whiskeysockets/baileys/lib/Socket/newsletter.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/socket.d.ts b/node_modules/@whiskeysockets/baileys/lib/Socket/socket.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/socket.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Socket/socket.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/socket.js b/node_modules/@whiskeysockets/baileys/lib/Socket/socket.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Socket/socket.js.map b/node_modules/@whiskeysockets/baileys/lib/Socket/socket.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/Auth.d.ts b/node_modules/@whiskeysockets/baileys/lib/Types/Auth.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/Auth.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Types/Auth.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/Auth.js b/node_modules/@whiskeysockets/baileys/lib/Types/Auth.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/Auth.js.map b/node_modules/@whiskeysockets/baileys/lib/Types/Auth.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/Bussines.d.ts b/node_modules/@whiskeysockets/baileys/lib/Types/Bussines.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/Bussines.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Types/Bussines.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/Bussines.js b/node_modules/@whiskeysockets/baileys/lib/Types/Bussines.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/Bussines.js.map b/node_modules/@whiskeysockets/baileys/lib/Types/Bussines.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/Call.d.ts b/node_modules/@whiskeysockets/baileys/lib/Types/Call.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/Call.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Types/Call.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/Call.js b/node_modules/@whiskeysockets/baileys/lib/Types/Call.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/Call.js.map b/node_modules/@whiskeysockets/baileys/lib/Types/Call.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/Chat.d.ts b/node_modules/@whiskeysockets/baileys/lib/Types/Chat.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/Chat.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Types/Chat.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/Chat.js b/node_modules/@whiskeysockets/baileys/lib/Types/Chat.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/Chat.js.map b/node_modules/@whiskeysockets/baileys/lib/Types/Chat.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/Contact.d.ts b/node_modules/@whiskeysockets/baileys/lib/Types/Contact.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/Contact.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Types/Contact.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/Contact.js b/node_modules/@whiskeysockets/baileys/lib/Types/Contact.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/Contact.js.map b/node_modules/@whiskeysockets/baileys/lib/Types/Contact.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/Events.d.ts b/node_modules/@whiskeysockets/baileys/lib/Types/Events.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/Events.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Types/Events.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/Events.js b/node_modules/@whiskeysockets/baileys/lib/Types/Events.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/Events.js.map b/node_modules/@whiskeysockets/baileys/lib/Types/Events.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/GroupMetadata.d.ts b/node_modules/@whiskeysockets/baileys/lib/Types/GroupMetadata.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/GroupMetadata.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Types/GroupMetadata.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/GroupMetadata.js b/node_modules/@whiskeysockets/baileys/lib/Types/GroupMetadata.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/GroupMetadata.js.map b/node_modules/@whiskeysockets/baileys/lib/Types/GroupMetadata.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/Label.d.ts b/node_modules/@whiskeysockets/baileys/lib/Types/Label.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/Label.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Types/Label.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/Label.js b/node_modules/@whiskeysockets/baileys/lib/Types/Label.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/Label.js.map b/node_modules/@whiskeysockets/baileys/lib/Types/Label.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/LabelAssociation.d.ts b/node_modules/@whiskeysockets/baileys/lib/Types/LabelAssociation.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/LabelAssociation.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Types/LabelAssociation.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/LabelAssociation.js b/node_modules/@whiskeysockets/baileys/lib/Types/LabelAssociation.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/LabelAssociation.js.map b/node_modules/@whiskeysockets/baileys/lib/Types/LabelAssociation.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/Message.d.ts b/node_modules/@whiskeysockets/baileys/lib/Types/Message.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/Message.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Types/Message.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/Message.js b/node_modules/@whiskeysockets/baileys/lib/Types/Message.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/Message.js.map b/node_modules/@whiskeysockets/baileys/lib/Types/Message.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/Newsletter.d.ts b/node_modules/@whiskeysockets/baileys/lib/Types/Newsletter.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/Newsletter.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Types/Newsletter.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/Newsletter.js b/node_modules/@whiskeysockets/baileys/lib/Types/Newsletter.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/Newsletter.js.map b/node_modules/@whiskeysockets/baileys/lib/Types/Newsletter.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/Product.d.ts b/node_modules/@whiskeysockets/baileys/lib/Types/Product.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/Product.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Types/Product.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/Product.js b/node_modules/@whiskeysockets/baileys/lib/Types/Product.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/Product.js.map b/node_modules/@whiskeysockets/baileys/lib/Types/Product.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/Signal.d.ts b/node_modules/@whiskeysockets/baileys/lib/Types/Signal.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/Signal.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Types/Signal.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/Signal.js b/node_modules/@whiskeysockets/baileys/lib/Types/Signal.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/Signal.js.map b/node_modules/@whiskeysockets/baileys/lib/Types/Signal.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/Socket.d.ts b/node_modules/@whiskeysockets/baileys/lib/Types/Socket.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/Socket.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Types/Socket.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/Socket.js b/node_modules/@whiskeysockets/baileys/lib/Types/Socket.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/Socket.js.map b/node_modules/@whiskeysockets/baileys/lib/Types/Socket.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/State.d.ts b/node_modules/@whiskeysockets/baileys/lib/Types/State.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/State.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Types/State.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/State.js b/node_modules/@whiskeysockets/baileys/lib/Types/State.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/State.js.map b/node_modules/@whiskeysockets/baileys/lib/Types/State.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/USync.d.ts b/node_modules/@whiskeysockets/baileys/lib/Types/USync.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/USync.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Types/USync.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/USync.js b/node_modules/@whiskeysockets/baileys/lib/Types/USync.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/USync.js.map b/node_modules/@whiskeysockets/baileys/lib/Types/USync.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/index.d.ts b/node_modules/@whiskeysockets/baileys/lib/Types/index.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/index.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Types/index.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/index.js b/node_modules/@whiskeysockets/baileys/lib/Types/index.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Types/index.js.map b/node_modules/@whiskeysockets/baileys/lib/Types/index.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/auth-utils.d.ts b/node_modules/@whiskeysockets/baileys/lib/Utils/auth-utils.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/auth-utils.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Utils/auth-utils.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/auth-utils.js b/node_modules/@whiskeysockets/baileys/lib/Utils/auth-utils.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/auth-utils.js.map b/node_modules/@whiskeysockets/baileys/lib/Utils/auth-utils.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/browser-utils.d.ts b/node_modules/@whiskeysockets/baileys/lib/Utils/browser-utils.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/browser-utils.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Utils/browser-utils.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/browser-utils.js b/node_modules/@whiskeysockets/baileys/lib/Utils/browser-utils.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/browser-utils.js.map b/node_modules/@whiskeysockets/baileys/lib/Utils/browser-utils.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/business.d.ts b/node_modules/@whiskeysockets/baileys/lib/Utils/business.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/business.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Utils/business.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/business.js b/node_modules/@whiskeysockets/baileys/lib/Utils/business.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/business.js.map b/node_modules/@whiskeysockets/baileys/lib/Utils/business.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/chat-utils.d.ts b/node_modules/@whiskeysockets/baileys/lib/Utils/chat-utils.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/chat-utils.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Utils/chat-utils.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/chat-utils.js b/node_modules/@whiskeysockets/baileys/lib/Utils/chat-utils.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/chat-utils.js.map b/node_modules/@whiskeysockets/baileys/lib/Utils/chat-utils.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/crypto.d.ts b/node_modules/@whiskeysockets/baileys/lib/Utils/crypto.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/crypto.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Utils/crypto.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/crypto.js b/node_modules/@whiskeysockets/baileys/lib/Utils/crypto.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/crypto.js.map b/node_modules/@whiskeysockets/baileys/lib/Utils/crypto.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/decode-wa-message.d.ts b/node_modules/@whiskeysockets/baileys/lib/Utils/decode-wa-message.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/decode-wa-message.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Utils/decode-wa-message.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/decode-wa-message.js b/node_modules/@whiskeysockets/baileys/lib/Utils/decode-wa-message.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/decode-wa-message.js.map b/node_modules/@whiskeysockets/baileys/lib/Utils/decode-wa-message.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/event-buffer.d.ts b/node_modules/@whiskeysockets/baileys/lib/Utils/event-buffer.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/event-buffer.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Utils/event-buffer.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/event-buffer.js b/node_modules/@whiskeysockets/baileys/lib/Utils/event-buffer.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/event-buffer.js.map b/node_modules/@whiskeysockets/baileys/lib/Utils/event-buffer.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/generics.d.ts b/node_modules/@whiskeysockets/baileys/lib/Utils/generics.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/generics.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Utils/generics.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/generics.js b/node_modules/@whiskeysockets/baileys/lib/Utils/generics.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/generics.js.map b/node_modules/@whiskeysockets/baileys/lib/Utils/generics.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/history.d.ts b/node_modules/@whiskeysockets/baileys/lib/Utils/history.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/history.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Utils/history.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/history.js b/node_modules/@whiskeysockets/baileys/lib/Utils/history.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/history.js.map b/node_modules/@whiskeysockets/baileys/lib/Utils/history.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/index.d.ts b/node_modules/@whiskeysockets/baileys/lib/Utils/index.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/index.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Utils/index.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/index.js b/node_modules/@whiskeysockets/baileys/lib/Utils/index.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/index.js.map b/node_modules/@whiskeysockets/baileys/lib/Utils/index.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/link-preview.d.ts b/node_modules/@whiskeysockets/baileys/lib/Utils/link-preview.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/link-preview.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Utils/link-preview.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/link-preview.js b/node_modules/@whiskeysockets/baileys/lib/Utils/link-preview.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/link-preview.js.map b/node_modules/@whiskeysockets/baileys/lib/Utils/link-preview.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/logger.d.ts b/node_modules/@whiskeysockets/baileys/lib/Utils/logger.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/logger.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Utils/logger.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/logger.js b/node_modules/@whiskeysockets/baileys/lib/Utils/logger.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/logger.js.map b/node_modules/@whiskeysockets/baileys/lib/Utils/logger.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/lt-hash.d.ts b/node_modules/@whiskeysockets/baileys/lib/Utils/lt-hash.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/lt-hash.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Utils/lt-hash.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/lt-hash.js b/node_modules/@whiskeysockets/baileys/lib/Utils/lt-hash.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/lt-hash.js.map b/node_modules/@whiskeysockets/baileys/lib/Utils/lt-hash.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/make-mutex.d.ts b/node_modules/@whiskeysockets/baileys/lib/Utils/make-mutex.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/make-mutex.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Utils/make-mutex.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/make-mutex.js b/node_modules/@whiskeysockets/baileys/lib/Utils/make-mutex.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/make-mutex.js.map b/node_modules/@whiskeysockets/baileys/lib/Utils/make-mutex.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/message-retry-manager.d.ts b/node_modules/@whiskeysockets/baileys/lib/Utils/message-retry-manager.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/message-retry-manager.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Utils/message-retry-manager.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/message-retry-manager.js b/node_modules/@whiskeysockets/baileys/lib/Utils/message-retry-manager.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/message-retry-manager.js.map b/node_modules/@whiskeysockets/baileys/lib/Utils/message-retry-manager.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/messages-media.d.ts b/node_modules/@whiskeysockets/baileys/lib/Utils/messages-media.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/messages-media.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Utils/messages-media.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/messages-media.js b/node_modules/@whiskeysockets/baileys/lib/Utils/messages-media.js
+old mode 100644
+new mode 100755
+index 0d32dfb..4ed7cb4
+--- a/node_modules/@whiskeysockets/baileys/lib/Utils/messages-media.js
++++ b/node_modules/@whiskeysockets/baileys/lib/Utils/messages-media.js
+@@ -507,7 +507,7 @@ export function extensionForMediaMessage(message) {
+     return extension;
+ }
+ export const getWAUploadToServer = ({ customUploadHosts, fetchAgent, logger, options }, refreshMediaConn) => {
+-    return async (filePath, { mediaType, fileEncSha256B64, timeoutMs }) => {
++    return async (filePath, { mediaType, fileEncSha256B64, timeoutMs, newsletter }) => {
+         // send a query JSON to obtain the url & auth token to upload our media
+         let uploadInfo = await refreshMediaConn(false);
+         let urls;
+@@ -516,7 +516,16 @@ export const getWAUploadToServer = ({ customUploadHosts, fetchAgent, logger, opt
+         for (const { hostname } of hosts) {
+             logger.debug(`uploading to "${hostname}"`);
+             const auth = encodeURIComponent(uploadInfo.auth); // the auth token
+-            const url = `https://${hostname}${MEDIA_PATH_MAP[mediaType]}/${fileEncSha256B64}?auth=${auth}&token=${fileEncSha256B64}`;
++            const isNewsletterUrl = !!newsletter;
++            const newsletterPath = MEDIA_PATH_MAP[mediaType] ? MEDIA_PATH_MAP[mediaType].replace('/mms/', '/newsletter/newsletter-') : '/newsletter/newsletter-document';
++            let urlPath = isNewsletterUrl ? newsletterPath : MEDIA_PATH_MAP[mediaType];
++            let url = `https://${hostname}${urlPath}/${fileEncSha256B64}?auth=${auth}&token=${fileEncSha256B64}`;
++            if (isNewsletterUrl) {
++                url += "&server_thumb_gen=1";
++                if (mediaType === 'video' || mediaType === 'gif' || mediaType === 'ptv') {
++                    url += '&server_transcode=1';
++                }
++            }
+             // eslint-disable-next-line @typescript-eslint/no-explicit-any
+             let result;
+             try {
+@@ -547,10 +556,13 @@ export const getWAUploadToServer = ({ customUploadHosts, fetchAgent, logger, opt
+                     parsed = undefined;
+                 }
+                 result = parsed;
+-                if (result?.url || result?.directPath) {
++                if (result?.url || result?.direct_path) {
+                     urls = {
+                         mediaUrl: result.url,
+                         directPath: result.direct_path,
++                        thumbnailDirectPath: result.thumbnail_info?.thumbnail_direct_path,
++                        thumbnailSha256: result.thumbnail_info?.thumbnail_sha256,
++                        handle: result.handle,
+                         meta_hmac: result.meta_hmac,
+                         fbid: result.fbid,
+                         ts: result.ts
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/messages-media.js.map b/node_modules/@whiskeysockets/baileys/lib/Utils/messages-media.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/messages.d.ts b/node_modules/@whiskeysockets/baileys/lib/Utils/messages.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/messages.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Utils/messages.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/messages.js b/node_modules/@whiskeysockets/baileys/lib/Utils/messages.js
+old mode 100644
+new mode 100755
+index eff7a53..dec56fb
+--- a/node_modules/@whiskeysockets/baileys/lib/Utils/messages.js
++++ b/node_modules/@whiskeysockets/baileys/lib/Utils/messages.js
+@@ -100,22 +100,46 @@ export const prepareWAMessageMedia = async (message, options) => {
+         logger?.info({ key: cacheableKey }, 'Preparing raw media for newsletter');
+         const { filePath, fileSha256, fileLength } = await getRawMediaUploadData(uploadData.media, options.mediaTypeOverride || mediaType, logger);
+         const fileSha256B64 = fileSha256.toString('base64');
+-        const { mediaUrl, directPath } = await options.upload(filePath, {
++        const { mediaUrl, directPath: rawDirectPath, thumbnailDirectPath, thumbnailSha256, handle } = await options.upload(filePath, {
+             fileEncSha256B64: fileSha256B64,
+             mediaType: mediaType,
++            newsletter: isNewsletter,
+             timeoutMs: options.mediaUploadTimeoutMs
+         });
+         await fs.unlink(filePath);
++        const directPath = (isNewsletter && rawDirectPath && rawDirectPath.includes('/o1/')) ? rawDirectPath.replace('/o1/', '/m1/') : rawDirectPath;
++        
++        const mediaMsg = {
++            url: isNewsletter ? undefined : mediaUrl,
++            directPath,
++            thumbnailDirectPath: isNewsletter ? thumbnailDirectPath : undefined,
++            thumbnailSha256: (isNewsletter && thumbnailSha256) ? Buffer.from(thumbnailSha256, 'base64') : undefined,
++            fileSha256,
++            fileLength,
++            ...uploadData,
++            media: undefined,
++        };
++        if (isNewsletter) {
++            delete mediaMsg.mediaKey;
++            delete mediaMsg.mediaKeyTimestamp;
++            delete mediaMsg.fileEncSha256;
++        }
++        if (isNewsletter && handle) mediaMsg.mediaKeyDomain = handle;
++        
+         const obj = WAProto.Message.fromObject({
+             // todo: add more support here
+-            [`${mediaType}Message`]: MessageTypeProto[mediaType].fromObject({
+-                url: mediaUrl,
+-                directPath,
+-                fileSha256,
+-                fileLength,
+-                ...uploadData,
+-                media: undefined
+-            })
++            [`${mediaType}Message`]: MessageTypeProto[mediaType].fromObject((() => { 
++                if (isNewsletter) {
++                    console.log("=== WA-AKG NEWSLETTER MEDIA PAYLOAD DEBUG ===");
++                    console.log(JSON.stringify(mediaMsg, (key, value) => {
++                        if (Buffer.isBuffer(value) || (value && value.type === 'Buffer')) return `<Buffer len=${value.data ? value.data.length : value.length}>`;
++                        if (value instanceof Uint8Array) return `<Uint8Array len=${value.length}>`;
++                        return value;
++                    }, 2));
++                    console.log("==========================================");
++                }
++                return mediaMsg; 
++            })())
+         });
+         if (uploadData.ptv) {
+             obj.ptvMessage = obj.videoMessage;
+@@ -809,9 +833,27 @@ export const downloadMediaMessage = async (message, type, options, ctx) => {
+         const contentType = getContentType(mContent);
+         let mediaType = contentType?.replace('Message', '');
+         const media = mContent[contentType];
+-        if (!media || typeof media !== 'object' || (!('url' in media) && !('thumbnailDirectPath' in media))) {
++        if (!media || typeof media !== 'object' || (!('url' in media) && !('thumbnailDirectPath' in media) && !('directPath' in media))) {
+             throw new Boom(`"${contentType}" message is not a media message`);
+         }
++        // Detect newsletter media: no mediaKey means unencrypted
++        const isNewsletterMedia = !media.mediaKey && (media.directPath || media.thumbnailDirectPath);
++        if (isNewsletterMedia) {
++            const dp = media.directPath || media.thumbnailDirectPath;
++            const downloadUrl = dp.startsWith('http') ? dp : `https://mmg.whatsapp.net${dp}`;
++            const fetchRes = await fetch(downloadUrl, {
++                method: 'GET',
++                headers: { 'Origin': 'https://web.whatsapp.com' }
++            });
++            if (!fetchRes.ok) {
++                throw new Boom(`Newsletter media download failed: HTTP ${fetchRes.status} ${fetchRes.statusText}`, { statusCode: fetchRes.status });
++            }
++            if (type === 'buffer') {
++                return Buffer.from(await fetchRes.arrayBuffer());
++            }
++            const { Readable } = await import('stream');
++            return Readable.fromWeb(fetchRes.body);
++        }
+         let download;
+         if ('thumbnailDirectPath' in media && !('url' in media)) {
+             download = {
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/messages.js.map b/node_modules/@whiskeysockets/baileys/lib/Utils/messages.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/noise-handler.d.ts b/node_modules/@whiskeysockets/baileys/lib/Utils/noise-handler.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/noise-handler.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Utils/noise-handler.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/noise-handler.js b/node_modules/@whiskeysockets/baileys/lib/Utils/noise-handler.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/noise-handler.js.map b/node_modules/@whiskeysockets/baileys/lib/Utils/noise-handler.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/pre-key-manager.d.ts b/node_modules/@whiskeysockets/baileys/lib/Utils/pre-key-manager.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/pre-key-manager.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Utils/pre-key-manager.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/pre-key-manager.js b/node_modules/@whiskeysockets/baileys/lib/Utils/pre-key-manager.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/pre-key-manager.js.map b/node_modules/@whiskeysockets/baileys/lib/Utils/pre-key-manager.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/process-message.d.ts b/node_modules/@whiskeysockets/baileys/lib/Utils/process-message.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/process-message.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Utils/process-message.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/process-message.js b/node_modules/@whiskeysockets/baileys/lib/Utils/process-message.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/process-message.js.map b/node_modules/@whiskeysockets/baileys/lib/Utils/process-message.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/signal.d.ts b/node_modules/@whiskeysockets/baileys/lib/Utils/signal.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/signal.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Utils/signal.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/signal.js b/node_modules/@whiskeysockets/baileys/lib/Utils/signal.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/signal.js.map b/node_modules/@whiskeysockets/baileys/lib/Utils/signal.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/use-multi-file-auth-state.d.ts b/node_modules/@whiskeysockets/baileys/lib/Utils/use-multi-file-auth-state.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/use-multi-file-auth-state.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Utils/use-multi-file-auth-state.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/use-multi-file-auth-state.js b/node_modules/@whiskeysockets/baileys/lib/Utils/use-multi-file-auth-state.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/use-multi-file-auth-state.js.map b/node_modules/@whiskeysockets/baileys/lib/Utils/use-multi-file-auth-state.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/validate-connection.d.ts b/node_modules/@whiskeysockets/baileys/lib/Utils/validate-connection.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/validate-connection.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/Utils/validate-connection.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/validate-connection.js b/node_modules/@whiskeysockets/baileys/lib/Utils/validate-connection.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/validate-connection.js.map b/node_modules/@whiskeysockets/baileys/lib/Utils/validate-connection.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WABinary/constants.d.ts b/node_modules/@whiskeysockets/baileys/lib/WABinary/constants.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WABinary/constants.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/WABinary/constants.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WABinary/constants.js b/node_modules/@whiskeysockets/baileys/lib/WABinary/constants.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WABinary/constants.js.map b/node_modules/@whiskeysockets/baileys/lib/WABinary/constants.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WABinary/decode.d.ts b/node_modules/@whiskeysockets/baileys/lib/WABinary/decode.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WABinary/decode.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/WABinary/decode.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WABinary/decode.js b/node_modules/@whiskeysockets/baileys/lib/WABinary/decode.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WABinary/decode.js.map b/node_modules/@whiskeysockets/baileys/lib/WABinary/decode.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WABinary/encode.d.ts b/node_modules/@whiskeysockets/baileys/lib/WABinary/encode.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WABinary/encode.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/WABinary/encode.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WABinary/encode.js b/node_modules/@whiskeysockets/baileys/lib/WABinary/encode.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WABinary/encode.js.map b/node_modules/@whiskeysockets/baileys/lib/WABinary/encode.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WABinary/generic-utils.d.ts b/node_modules/@whiskeysockets/baileys/lib/WABinary/generic-utils.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WABinary/generic-utils.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/WABinary/generic-utils.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WABinary/generic-utils.js b/node_modules/@whiskeysockets/baileys/lib/WABinary/generic-utils.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WABinary/generic-utils.js.map b/node_modules/@whiskeysockets/baileys/lib/WABinary/generic-utils.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WABinary/index.d.ts b/node_modules/@whiskeysockets/baileys/lib/WABinary/index.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WABinary/index.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/WABinary/index.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WABinary/index.js b/node_modules/@whiskeysockets/baileys/lib/WABinary/index.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WABinary/index.js.map b/node_modules/@whiskeysockets/baileys/lib/WABinary/index.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WABinary/jid-utils.d.ts b/node_modules/@whiskeysockets/baileys/lib/WABinary/jid-utils.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WABinary/jid-utils.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/WABinary/jid-utils.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WABinary/jid-utils.js b/node_modules/@whiskeysockets/baileys/lib/WABinary/jid-utils.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WABinary/jid-utils.js.map b/node_modules/@whiskeysockets/baileys/lib/WABinary/jid-utils.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WABinary/types.d.ts b/node_modules/@whiskeysockets/baileys/lib/WABinary/types.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WABinary/types.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/WABinary/types.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WABinary/types.js b/node_modules/@whiskeysockets/baileys/lib/WABinary/types.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WABinary/types.js.map b/node_modules/@whiskeysockets/baileys/lib/WABinary/types.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAM/BinaryInfo.d.ts b/node_modules/@whiskeysockets/baileys/lib/WAM/BinaryInfo.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAM/BinaryInfo.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/WAM/BinaryInfo.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAM/BinaryInfo.js b/node_modules/@whiskeysockets/baileys/lib/WAM/BinaryInfo.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAM/BinaryInfo.js.map b/node_modules/@whiskeysockets/baileys/lib/WAM/BinaryInfo.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAM/constants.d.ts b/node_modules/@whiskeysockets/baileys/lib/WAM/constants.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAM/constants.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/WAM/constants.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAM/constants.js b/node_modules/@whiskeysockets/baileys/lib/WAM/constants.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAM/constants.js.map b/node_modules/@whiskeysockets/baileys/lib/WAM/constants.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAM/encode.d.ts b/node_modules/@whiskeysockets/baileys/lib/WAM/encode.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAM/encode.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/WAM/encode.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAM/encode.js b/node_modules/@whiskeysockets/baileys/lib/WAM/encode.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAM/encode.js.map b/node_modules/@whiskeysockets/baileys/lib/WAM/encode.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAM/index.d.ts b/node_modules/@whiskeysockets/baileys/lib/WAM/index.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAM/index.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/WAM/index.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAM/index.js b/node_modules/@whiskeysockets/baileys/lib/WAM/index.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAM/index.js.map b/node_modules/@whiskeysockets/baileys/lib/WAM/index.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/USyncContactProtocol.d.ts b/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/USyncContactProtocol.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/USyncContactProtocol.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/USyncContactProtocol.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/USyncContactProtocol.js b/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/USyncContactProtocol.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/USyncContactProtocol.js.map b/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/USyncContactProtocol.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/USyncDeviceProtocol.d.ts b/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/USyncDeviceProtocol.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/USyncDeviceProtocol.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/USyncDeviceProtocol.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/USyncDeviceProtocol.js b/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/USyncDeviceProtocol.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/USyncDeviceProtocol.js.map b/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/USyncDeviceProtocol.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/USyncDisappearingModeProtocol.d.ts b/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/USyncDisappearingModeProtocol.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/USyncDisappearingModeProtocol.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/USyncDisappearingModeProtocol.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/USyncDisappearingModeProtocol.js b/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/USyncDisappearingModeProtocol.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/USyncDisappearingModeProtocol.js.map b/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/USyncDisappearingModeProtocol.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/USyncStatusProtocol.d.ts b/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/USyncStatusProtocol.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/USyncStatusProtocol.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/USyncStatusProtocol.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/USyncStatusProtocol.js b/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/USyncStatusProtocol.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/USyncStatusProtocol.js.map b/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/USyncStatusProtocol.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/UsyncBotProfileProtocol.d.ts b/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/UsyncBotProfileProtocol.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/UsyncBotProfileProtocol.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/UsyncBotProfileProtocol.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/UsyncBotProfileProtocol.js b/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/UsyncBotProfileProtocol.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/UsyncBotProfileProtocol.js.map b/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/UsyncBotProfileProtocol.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/UsyncLIDProtocol.d.ts b/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/UsyncLIDProtocol.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/UsyncLIDProtocol.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/UsyncLIDProtocol.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/UsyncLIDProtocol.js b/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/UsyncLIDProtocol.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/UsyncLIDProtocol.js.map b/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/UsyncLIDProtocol.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/index.d.ts b/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/index.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/index.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/index.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/index.js b/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/index.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/index.js.map b/node_modules/@whiskeysockets/baileys/lib/WAUSync/Protocols/index.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAUSync/USyncQuery.d.ts b/node_modules/@whiskeysockets/baileys/lib/WAUSync/USyncQuery.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAUSync/USyncQuery.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/WAUSync/USyncQuery.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAUSync/USyncQuery.js b/node_modules/@whiskeysockets/baileys/lib/WAUSync/USyncQuery.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAUSync/USyncQuery.js.map b/node_modules/@whiskeysockets/baileys/lib/WAUSync/USyncQuery.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAUSync/USyncUser.d.ts b/node_modules/@whiskeysockets/baileys/lib/WAUSync/USyncUser.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAUSync/USyncUser.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/WAUSync/USyncUser.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAUSync/USyncUser.js b/node_modules/@whiskeysockets/baileys/lib/WAUSync/USyncUser.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAUSync/USyncUser.js.map b/node_modules/@whiskeysockets/baileys/lib/WAUSync/USyncUser.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAUSync/index.d.ts b/node_modules/@whiskeysockets/baileys/lib/WAUSync/index.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAUSync/index.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/WAUSync/index.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAUSync/index.js b/node_modules/@whiskeysockets/baileys/lib/WAUSync/index.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/WAUSync/index.js.map b/node_modules/@whiskeysockets/baileys/lib/WAUSync/index.js.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/index.d.ts b/node_modules/@whiskeysockets/baileys/lib/index.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/index.d.ts.map b/node_modules/@whiskeysockets/baileys/lib/index.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/index.js b/node_modules/@whiskeysockets/baileys/lib/index.js
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@whiskeysockets/baileys/lib/index.js.map b/node_modules/@whiskeysockets/baileys/lib/index.js.map
+old mode 100644
+new mode 100755

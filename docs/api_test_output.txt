@@ -1,0 +1,25 @@
+1. GET /sessions
+[{"id":"cmkcmowwg0lf4bdz8eezr4w1p","userId":"cmkcmkcqt000056ywj49l5k7x","name":"API Test Session","sessionId":"fklndtd","status":"SCAN_QR","qr":"2@ZtOJ2yDKoMSVfmKQPIGHkhjyDE2uF6VbUONvzSz7SyZkmpwaPbzRzzgUKhWUqicFFVoeOC6ptzgEuHKofOY+Izn/Cs+UGCQLaMU=,JiXIiKKif3mL1WOny5i1koFdW9QY/seelnBXNKHMw0E=,4vaLXHb7GLLvIb1tDYk4W8Tw2NuSGWXDKFkIgQ/gBFk=,GrbGoaZ8Qo3eDPZP8DiDaKPMgf86uwhuNiIKGe4wfRE=","config":null,"createdAt":"2026-01-13T13:29:24.807Z","updatedAt":"2026-01-13T13:29:26.244Z"},{"id":"cmkcmkd85000256y...
+
+
+2. POST /sessions
+{"id":"cmkcmpu910lfabdz8ykeviwe1","userId":"cmkcmkcqt000056ywj49l5k7x","name":"API Test Session","sessionId":"wfclzdg","status":"DISCONNECTED","qr":null,"config":null,"createdAt":"2026-01-13T13:30:08.102Z","updatedAt":"2026-01-13T13:30:08.102Z"}...
+
+
+3. GET /groups/api-test-1
+<!DOCTYPE html><!--UsHrUGEQmVrkW6OrWev_F--><html lang="en"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="/_next/static/chunks/4972f5b5d2ad53d9.css" data-precedence="next"/><link rel="preload" as="script" fetchPriority="low" href="/_next/static/chunks/d59f830a2b8e768c.js"/><script src="/_next/static/chunks/d6bc27f77d8cb84a.js" async=""></script><script src="/_next/static/chunks/ff58e90a6c8ba4c5.js" async=""></script>...
+
+
+4. POST /autoreplies
+{"error":"Session not found"}...
+
+
+5. POST /webhooks
+{"id":"cmkcmq3j20lfcbdz8msxdbfd4","userId":"cmkcmkcqt000056ywj49l5k7x","sessionId":null,"name":"Test Webhook","url":"https://example.com/webhook","secret":null,"events":["message.upsert"],"isActive":true,"createdAt":"2026-01-13T13:30:20.126Z","updatedAt":"2026-01-13T13:30:20.126Z"}...
+
+
+6. POST /chat/send
+{"error":"Session not found or disconnected"}...
+
+
+Done.
