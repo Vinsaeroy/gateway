@@ -12,6 +12,8 @@ export async function getLatestRelease(owner: string, repo: string) {
         });
         
         if (!res.ok) {
+            // 404 is expected if repo has no releases yet — don't log as error
+            if (res.status === 404) return null;
             const errorText = await res.text();
             logger.error("GitHub", `API Error: ${res.status} ${res.statusText} - ${errorText}`);
             return null;
