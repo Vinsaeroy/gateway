@@ -73,6 +73,7 @@ model Session {
   webhooks    Webhook[]
   botConfig   BotConfig?
   sessionAccesses SessionAccess[]
+  autoBroadcasts AutoBroadcast[]
 }
 
 model Contact {
@@ -331,5 +332,25 @@ model SessionAccess {
 
   @@unique([sessionId, userId])
   @@index([userId])
+  @@index([sessionId])
+}
+
+// Auto Broadcast — recurring messages to groups on a schedule
+model AutoBroadcast {
+  id          String   @id @default(cuid())
+  sessionId   String
+  name        String   // e.g. "Promo Pagi"
+  message     String   @db.Text // Text message or caption
+  mediaUrl    String?  @db.Text // Image/media URL (optional)
+  mediaType   String?  // image, video, document
+  targets     Json     // Array of group JIDs, or ["ALL"] for all groups
+  intervalMin Int      @default(60) // Interval in minutes (60 = every hour)
+  isActive    Boolean  @default(true)
+  lastSentAt  DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  session     Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
   @@index([sessionId])
 }
