@@ -175,11 +175,15 @@ export class WhatsAppInstance {
                     logger.error("Instance", "Group sync failed:", e);
                 }
 
-                // Bind Auto Reply
-                bindAutoReply(this.socket as WASocket, this.sessionId);
+                // Bind Auto Reply (only if socket still exists)
+                if (this.socket) {
+                    bindAutoReply(this.socket as WASocket, this.sessionId);
+                }
 
-                // Bind PP Guard
-                bindPpGuard(this.socket as WASocket, this.sessionId);
+                // Bind PP Guard (only if socket still exists)
+                if (this.socket) {
+                    bindPpGuard(this.socket as WASocket, this.sessionId);
+                }
 
                 await prisma.session.update({
                     where: { sessionId: this.sessionId },

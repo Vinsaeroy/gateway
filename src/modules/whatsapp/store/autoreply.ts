@@ -52,6 +52,9 @@ function canAutoReply(config: any, fromMe: boolean, senderJid: string): boolean 
 }
 
 export async function bindAutoReply(sock: WASocket, sessionId: string) {
+    if (!sock || !sock.ev) {
+        return;
+    }
     sock.ev.on('messages.upsert', async ({ messages, type }) => {
         if (type !== 'notify') return;
 
