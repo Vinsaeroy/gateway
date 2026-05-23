@@ -256,20 +256,7 @@ export class WhatsAppInstance {
         });
         if (!session) return;
 
-        // Find newsletter JIDs without names
-        const newsletterContacts = await prisma.contact.findMany({
-            where: {
-                sessionId: session.id,
-                jid: { endsWith: "@newsletter" },
-                OR: [
-                    { name: null },
-                    { name: "" }
-                ]
-            },
-            select: { jid: true }
-        });
-
-        // Also find newsletter JIDs from messages that don't have a contact entry
+        // Find all newsletter JIDs from messages
         const newsletterMessages = await prisma.message.findMany({
             where: {
                 sessionId: session.id,
@@ -279,47 +266,77 @@ export class WhatsAppInstance {
             select: { remoteJid: true }
         });
 
+        // Also check contacts table for newsletters without names
+        const newsletterContacts = await prisma.contact.findMany({
+            where: {
+                sessionId: session.id,
+                jid: { endsWith: "@newsletter" }
+            },
+            select: { jid: true, name: true }
+        });
+
+        const contactNameMap = new Map(newsletterContacts.map(c => [c.jid, c.name]));
+
+        // Collect all newsletter JIDs that need names
         const allNewsletterJids = new Set([
-            ...newsletterContacts.map(c => c.jid),
-            ...newsletterMessages.map(m => m.remoteJid)
+            ...newsletterMessages.map(m => m.remoteJid),
+            ...newsletterContacts.filter(c => !c.name).map(c => c.jid)
         ]);
 
-        if (allNewsletterJids.size === 0) return;
+        // Filter out ones that already have names
+        const jidsNeedingNames = Array.from(allNewsletterJids).filter(jid => !contactNameMap.get(jid));
 
-        logger.info("Instance", `Syncing ${allNewsletterJids.size} newsletter names for session ${this.sessionId}`);
+        if (jidsNeedingNames.length === 0) {
+            logger.info("Instance", `All ${allNewsletterJids.size} newsletters already have names`);
+            return;
+        }
+
+        logger.info("Instance", `Fetching names for ${jidsNeedingNames.length} newsletters (session: ${this.sessionId})`);
 
         let synced = 0;
-        for (const jid of allNewsletterJids) {
+        for (const jid of jidsNeedingNames) {
             try {
                 const metadata = await this.socket.newsletterMetadata("jid", jid);
-                if (metadata?.name) {
+                // Handle different response formats from Baileys
+                let channelName: string | null = null;
+                if (metadata) {
+                    if (typeof metadata.name === 'string' && metadata.name) {
+                        channelName = metadata.name;
+                    } else if ((metadata as any).thread_metadata?.name?.text) {
+                        channelName = (metadata as any).thread_metadata.name.text;
+                    } else if ((metadata as any).thread_metadata?.name && typeof (metadata as any).thread_metadata.name === 'string') {
+                        channelName = (metadata as any).thread_metadata.name;
+                    }
+                }
+
+                if (channelName) {
                     await prisma.contact.upsert({
                         where: { sessionId_jid: { sessionId: session.id, jid } },
                         create: {
                             sessionId: session.id,
                             jid,
-                            name: metadata.name,
-                            notify: metadata.name,
-                            profilePic: metadata.picture?.url || null
+                            name: channelName,
+                            notify: channelName,
+                            profilePic: metadata?.picture?.url || (metadata?.picture as any)?.directPath || null
                         },
                         update: {
-                            name: metadata.name,
-                            notify: metadata.name,
-                            profilePic: metadata.picture?.url || undefined
+                            name: channelName,
+                            notify: channelName,
+                            profilePic: metadata?.picture?.url || (metadata?.picture as any)?.directPath || undefined
                         }
                     });
                     synced++;
+                    logger.debug("Instance", `Newsletter ${jid} → "${channelName}"`);
+                } else {
+                    logger.warn("Instance", `Newsletter ${jid}: no name found in response: ${JSON.stringify(metadata).slice(0, 200)}`);
                 }
                 // Small delay to avoid rate limiting
-                await new Promise(resolve => setTimeout(resolve, 500));
-            } catch (e) {
-                // Silently skip failed ones
-                logger.debug("Instance", `Failed to fetch newsletter metadata for ${jid}`);
+                await new Promise(resolve => setTimeout(resolve, 300));
+            } catch (e: any) {
+                logger.warn("Instance", `Newsletter ${jid} metadata fetch failed: ${e.message || e}`);
             }
         }
 
-        if (synced > 0) {
-            logger.success("Instance", `Synced ${synced} newsletter names for session ${this.sessionId}`);
-        }
+        logger.success("Instance", `Newsletter sync done: ${synced}/${jidsNeedingNames.length} names fetched`);
     }
 }
