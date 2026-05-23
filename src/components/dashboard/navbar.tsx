@@ -11,7 +11,8 @@ import { useRouter } from "next/navigation";
 import { formatDistanceToNow } from "date-fns";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
-import { io, Socket } from "socket.io-client";
+import { createAppSocket } from "@/lib/socket-client";
+import type { Socket } from "socket.io-client";
 
 interface NavbarProps {
     appName?: string;
@@ -60,9 +61,7 @@ export function Navbar({ appName }: NavbarProps) {
 
         // Setup Socket.IO connection
         if (session?.user?.id) {
-            const socketInstance = io({
-                path: "/api/socket/io",
-            });
+            const socketInstance = createAppSocket();
 
             socketInstance.on("connect", () => {
                 console.log("Socket connected for notifications");

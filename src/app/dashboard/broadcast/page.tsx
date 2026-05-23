@@ -9,7 +9,8 @@ import { Slider } from "@/components/ui/slider";
 import { Progress } from "@/components/ui/progress";
 import { RefreshCw, Send, CheckCircle2, XCircle, Radio, Clock, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
-import { io, Socket } from "socket.io-client";
+import { createAppSocket } from "@/lib/socket-client";
+import type { Socket } from "socket.io-client";
 
 import { useSession } from "@/components/dashboard/session-provider";
 import { SessionGuard } from "@/components/dashboard/session-guard";
@@ -39,10 +40,7 @@ export default function BroadcastPage() {
     useEffect(() => {
         if (!sessionId) return;
 
-        const socket = io({
-            path: "/api/socket/io",
-            addTrailingSlash: false,
-        });
+        const socket = createAppSocket();
 
         socket.on("connect", () => {
             socket.emit("join-session", sessionId);

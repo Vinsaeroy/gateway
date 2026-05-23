@@ -90,6 +90,9 @@ app.prepare().then(() => {
   const io = new Server(server, {
     path: "/api/socket/io",
     addTrailingSlash: false,
+    // Prefer WebSocket; allow polling as fallback for legacy clients,
+    // but new clients now request `transports: ['websocket']` directly.
+    transports: ["websocket", "polling"],
     cors: {
       origin: "*",
       methods: ["GET", "POST"]

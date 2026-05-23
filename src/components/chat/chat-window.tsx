@@ -8,7 +8,8 @@ import { Send, Paperclip, ArrowLeft, Phone, MoreVertical } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Image as ImageIcon, FileText, Music, Sticker as StickerIcon, Video, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { io, Socket } from "socket.io-client";
+import { createAppSocket } from "@/lib/socket-client";
+import type { Socket } from "socket.io-client";
 import { toast } from "sonner";
 import { getChatMessages, sendChatMessage, sendMediaMessage } from "@/app/dashboard/chat/actions";
 
@@ -64,10 +65,7 @@ export function ChatWindow({ sessionId, jid, name, onBack }: ChatWindowProps) {
         setMessages([]);
         fetchMessages();
 
-        const newSocket = io({
-            path: "/api/socket/io",
-            addTrailingSlash: false,
-        });
+        const newSocket = createAppSocket();
 
         newSocket.on("connect", () => {
             newSocket.emit("join-session", sessionId);

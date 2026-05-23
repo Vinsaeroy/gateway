@@ -8,7 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { toast } from "sonner";
 import { ArrowLeft, Play, Square, RotateCcw, LogOut, Power, Trash2, QrCode, Activity, HardDrive, Wifi, MemoryStick, Copy, Check } from "lucide-react";
 import Link from "next/link";
-import { io, Socket } from "socket.io-client";
+import { createAppSocket } from "@/lib/socket-client";
+import type { Socket } from "socket.io-client";
 import { QRCodeSVG } from "qrcode.react";
 import {
     AlertDialog,
@@ -92,10 +93,7 @@ export default function SessionDetailPage() {
     useEffect(() => {
         fetchSession();
 
-        const socketInstance = io({
-            path: "/api/socket/io",
-            addTrailingSlash: false,
-        });
+        const socketInstance = createAppSocket();
 
         socketInstance.on("connect", () => {
             console.log("Connected to socket");

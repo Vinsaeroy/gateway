@@ -9,7 +9,7 @@ import { MessageSquarePlus, Search, MessageCircle, X } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 import { cn } from "@/lib/utils";
-import { io } from "socket.io-client";
+import { createAppSocket } from "@/lib/socket-client";
 import { getChatsStatus } from "@/app/dashboard/chat/actions";
 
 interface ChatContact {
@@ -64,10 +64,7 @@ export function ChatList({ sessionId, onSelectChat, selectedJid }: ChatListProps
         if (sessionId) {
             fetchChats();
 
-            const socket = io({
-                path: "/api/socket/io",
-                addTrailingSlash: false,
-            });
+            const socket = createAppSocket();
 
             socket.on("connect", () => {
                 socket.emit("join-session", sessionId);

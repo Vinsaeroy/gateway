@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { io, Socket } from 'socket.io-client';
+import { createAppSocket } from "@/lib/socket-client";
+import type { Socket } from 'socket.io-client';
 import QRCode from 'qrcode';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,10 +33,7 @@ export function SessionManager({ user }: { user: any }) {
         fetchSessions();
 
         // Init Socket
-        const socketInstance = io({
-            path: "/api/socket/io",
-            addTrailingSlash: false,
-        });
+        const socketInstance = createAppSocket();
 
         socketInstance.on('connect', () => {
             console.log('Socket connected');
