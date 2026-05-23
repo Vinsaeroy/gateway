@@ -43,6 +43,14 @@ export async function proxy(request: NextRequest) {
         return NextResponse.next();
     }
 
+    // Redirect old /login path to /auth/login (in case of stale links)
+    if (pathname === "/login") {
+        return NextResponse.redirect(buildPublicUrl("/auth/login", request));
+    }
+    if (pathname === "/register") {
+        return NextResponse.redirect(buildPublicUrl("/auth/register", request));
+    }
+
     // Allow known static asset extensions in root path only (e.g. /vercel.svg)
     const staticExtensions = [".svg", ".ico", ".png", ".jpg", ".jpeg", ".webp", ".woff", ".woff2", ".ttf"];
     if (pathname.lastIndexOf("/") === 0 && staticExtensions.some(ext => pathname.endsWith(ext))) {
