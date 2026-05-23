@@ -8,7 +8,11 @@ RUN npm ci
 
 COPY . .
 
+# Prisma generate doesn't need DATABASE_URL, only schema
 RUN npx prisma generate
+
+# Build needs a dummy DATABASE_URL for static pages that import prisma
+ARG DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
 RUN npm run build
 
 # Production image
@@ -30,9 +34,11 @@ COPY --from=builder /app/middleware.ts ./
 COPY --from=builder /app/scripts ./scripts
 COPY --from=builder /app/data ./data
 
+# Railway injects env vars at runtime - no need to hardcode
 ENV NODE_ENV=production
 ENV PORT=3030
 ENV HOSTNAME=0.0.0.0
 EXPOSE 3030
 
-CMD ["npx", "tsx", "src/server/index.ts"]
+# Use shell form so env vars are expanded at runtime
+CMD npx tsx src/server/index.ts
