@@ -2,6 +2,25 @@ import { auth } from "@/lib/auth";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+// Get the canonical public URL from env vars (no trailing slash)
+function getPublicBase(request: NextRequest): string {
+    const envUrl = process.env.NEXTAUTH_URL || process.env.BASE_URL;
+    if (envUrl) return envUrl.replace(/\/$/, "");
+    
+    // Fallback: use forwarded headers if available
+    const forwardedHost = request.headers.get("x-forwarded-host");
+    const forwardedProto = request.headers.get("x-forwarded-proto") || "https";
+    if (forwardedHost) return `${forwardedProto}://${forwardedHost}`;
+    
+    // Last resort
+    return new URL(request.url).origin;
+}
+
+// Build a URL using the public base (avoids 0.0.0.0/127.0.0.1 leakage)
+function buildPublicUrl(path: string, request: NextRequest): URL {
+    return new URL(path, getPublicBase(request));
+}
+
 export async function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
@@ -35,7 +54,6 @@ export async function proxy(request: NextRequest) {
         // Check for API key in header
         const apiKey = request.headers.get("x-api-key");
         if (apiKey) {
-            // API key auth will be validated in the route handler
             return NextResponse.next();
         }
 
@@ -53,7 +71,7 @@ export async function proxy(request: NextRequest) {
         const session = await auth();
 
         if (!session?.user) {
-            const loginUrl = new URL("/auth/login", request.url);
+            const loginUrl = buildPublicUrl("/auth/login", request);
             loginUrl.searchParams.set("callbackUrl", pathname);
             return NextResponse.redirect(loginUrl);
         }
@@ -65,7 +83,7 @@ export async function proxy(request: NextRequest) {
     if (pathname === "/") {
         const session = await auth();
         if (session?.user) {
-            return NextResponse.redirect(new URL("/dashboard", request.url));
+            return NextResponse.redirect(buildPublicUrl("/dashboard", request));
         }
         return NextResponse.next();
     }
@@ -74,7 +92,7 @@ export async function proxy(request: NextRequest) {
     if (isPublicRoute) {
         const session = await auth();
         if (session?.user && (pathname.startsWith("/auth/login") || pathname.startsWith("/auth/register"))) {
-            return NextResponse.redirect(new URL("/dashboard", request.url));
+            return NextResponse.redirect(buildPublicUrl("/dashboard", request));
         }
         return NextResponse.next();
     }
@@ -82,7 +100,7 @@ export async function proxy(request: NextRequest) {
     // Default: require auth for everything else
     const session = await auth();
     if (!session?.user) {
-        const loginUrl = new URL("/auth/login", request.url);
+        const loginUrl = buildPublicUrl("/auth/login", request);
         loginUrl.searchParams.set("callbackUrl", pathname);
         return NextResponse.redirect(loginUrl);
     }
