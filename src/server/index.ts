@@ -9,14 +9,43 @@ import pkg from "../../package.json";
 
 // Suppress noisy debug logs in production to prevent Railway log rate limit
 if (process.env.NODE_ENV === "production") {
-    const noop = () => {};
     // Filter console.log/info — keep error and warn
     const originalLog = console.log;
-    console.log = (...args: any[]) => {
+    const originalInfo = console.info;
+    
+    const shouldBlock = (args: any[]) => {
         const msg = String(args[0] || "");
-        // Block Baileys raw debug dumps (large objects with Buffer data)
-        if (msg.includes("Buffer ") || msg.includes("pubKey") || msg.includes("privKey") || msg.includes("rootKey")) return;
+        const fullMsg = args.map(a => typeof a === "string" ? a : JSON.stringify(a).slice(0, 200)).join(" ");
+        // Block Baileys raw debug dumps
+        return (
+            msg.includes("Buffer ") ||
+            msg.includes("pubKey") ||
+            msg.includes("privKey") ||
+            msg.includes("rootKey") ||
+            msg.includes("ephemeralKeyPair") ||
+            msg.includes("currentRatchet") ||
+            msg.includes("Closing session") ||
+            msg.includes("Closing open session") ||
+            msg.includes("indexInfo") ||
+            msg.includes("pendingPreKey") ||
+            msg.includes("registrationId") ||
+            msg.includes("_chains") ||
+            msg.includes("baseKey") ||
+            msg.includes("chainKey") ||
+            msg.includes("messageKeys") ||
+            fullMsg.includes("Buffer ") ||
+            fullMsg.includes("pubKey:") ||
+            fullMsg.includes("privKey:")
+        );
+    };
+    
+    console.log = (...args: any[]) => {
+        if (shouldBlock(args)) return;
         originalLog(...args);
+    };
+    console.info = (...args: any[]) => {
+        if (shouldBlock(args)) return;
+        originalInfo(...args);
     };
 }
 
