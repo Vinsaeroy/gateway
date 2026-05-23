@@ -38,6 +38,11 @@ export async function proxy(request: NextRequest) {
         return NextResponse.next();
     }
 
+    // CRITICAL: Always pass through NextAuth API routes - never intercept
+    if (pathname.startsWith("/api/auth")) {
+        return NextResponse.next();
+    }
+
     // Allow known static asset extensions in root path only (e.g. /vercel.svg)
     const staticExtensions = [".svg", ".ico", ".png", ".jpg", ".jpeg", ".webp", ".woff", ".woff2", ".ttf"];
     if (pathname.lastIndexOf("/") === 0 && staticExtensions.some(ext => pathname.endsWith(ext))) {
