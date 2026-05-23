@@ -21,7 +21,13 @@ export class ChatService {
             select: { jid: true, subject: true }
         });
 
-        // 3. Get all messages grouped by remoteJid with last message info (single query)
+        // 3. Get the session's sessionId for WhatsApp instance access
+        const sessionRecord = await prisma.session.findUnique({
+            where: { id: dbSessionId },
+            select: { sessionId: true }
+        });
+
+        // 4. Get all messages grouped by remoteJid with last message info (single query)
         const lastMessages = await prisma.$queryRaw<Array<{ remoteJid: string; content: string | null; timestamp: Date; type: string }>>`
             SELECT DISTINCT ON ("remoteJid") "remoteJid", "content", "timestamp", "type"
             FROM "Message"
@@ -45,12 +51,16 @@ export class ChatService {
         groups.forEach(g => contactMap.set(g.jid, { jid: g.jid, name: g.subject, notify: g.subject, profilePic: null }));
 
         // For newsletter/channel JIDs without a name, try to get pushName from their messages
-        const newsletterJids = Array.from(allJids).filter(jid => jid.endsWith("@newsletter") && !contactMap.has(jid));
-        if (newsletterJids.length > 0) {
+        const allNewsletterJids = Array.from(allJids).filter(jid => jid.endsWith("@newsletter"));
+        const newsletterJidsWithoutName = allNewsletterJids.filter(jid => {
+            const info = contactMap.get(jid);
+            return !info || !info.name;
+        });
+        if (newsletterJidsWithoutName.length > 0) {
             const newsletterNames = await prisma.message.findMany({
                 where: {
                     sessionId: dbSessionId,
-                    remoteJid: { in: newsletterJids },
+                    remoteJid: { in: newsletterJidsWithoutName },
                     pushName: { not: null }
                 },
                 distinct: ['remoteJid'],
@@ -58,8 +68,14 @@ export class ChatService {
                 orderBy: { timestamp: 'desc' }
             });
             newsletterNames.forEach(m => {
-                if (m.pushName && !contactMap.has(m.remoteJid)) {
-                    contactMap.set(m.remoteJid, { jid: m.remoteJid, name: m.pushName, notify: m.pushName, profilePic: null });
+                if (m.pushName) {
+                    const existing = contactMap.get(m.remoteJid);
+                    if (existing) {
+                        existing.name = m.pushName;
+                        existing.notify = m.pushName;
+                    } else {
+                        contactMap.set(m.remoteJid, { jid: m.remoteJid, name: m.pushName, notify: m.pushName, profilePic: null });
+                    }
                 }
             });
         }
@@ -89,6 +105,47 @@ export class ChatService {
                     }
                 }
             });
+        }
+
+        // Fetch newsletter metadata from WhatsApp for channels still without names
+        const stillNamelessNewsletters = Array.from(allJids).filter(jid => {
+            if (!jid.endsWith("@newsletter")) return false;
+            const info = contactMap.get(jid);
+            return !info || !info.name;
+        });
+
+        if (stillNamelessNewsletters.length > 0 && sessionRecord?.sessionId) {
+            const instance = waManager.getInstance(sessionRecord.sessionId);
+            if (instance?.socket) {
+                // Fetch metadata in parallel (max 5 at a time to avoid rate limiting)
+                const batchSize = 5;
+                for (let i = 0; i < stillNamelessNewsletters.length; i += batchSize) {
+                    const batch = stillNamelessNewsletters.slice(i, i + batchSize);
+                    const results = await Promise.allSettled(
+                        batch.map(jid => instance.socket!.newsletterMetadata("jid", jid))
+                    );
+
+                    results.forEach((result, idx) => {
+                        if (result.status === "fulfilled" && result.value?.name) {
+                            const jid = batch[idx];
+                            const name = result.value.name;
+                            contactMap.set(jid, { 
+                                jid, 
+                                name, 
+                                notify: name, 
+                                profilePic: result.value.picture?.url || null 
+                            });
+
+                            // Also save to DB for future use
+                            prisma.contact.upsert({
+                                where: { sessionId_jid: { sessionId: dbSessionId, jid } },
+                                create: { sessionId: dbSessionId, jid, name, notify: name },
+                                update: { name, notify: name }
+                            }).catch(() => {}); // fire and forget
+                        }
+                    });
+                }
+            }
         }
 
         const chatList = Array.from(allJids).map((originalJid) => {
