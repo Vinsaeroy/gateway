@@ -7,7 +7,12 @@ import { UpdateChecker } from "@/components/dashboard/update-checker";
 import { RegistrationWarning } from "@/components/dashboard/registration-warning";
 import { prisma } from "@/lib/prisma";
 import { Toaster } from "sonner";
+import { redirect } from "next/navigation";
 import pkg from "../../../package.json";
+
+// Disable caching for all dashboard pages — prevents back button from showing stale logged-in pages
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 
 export default async function DashboardLayout({
@@ -16,6 +21,12 @@ export default async function DashboardLayout({
     children: React.ReactNode;
 }) {
     const session = await auth();
+    
+    // Redirect to login if no valid session
+    if (!session?.user) {
+        redirect("/auth/login");
+    }
+    
     // @ts-ignore
     const systemConfig = await prisma.systemConfig.findUnique({ where: { id: "default" } });
     const appName = systemConfig?.appName || "WA-AKG";
