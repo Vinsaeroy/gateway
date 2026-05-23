@@ -193,12 +193,12 @@ export default function AutoBroadcastPage() {
 
     return (
         <div className="p-4 md:p-6 space-y-6">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
-                    <h1 className="text-2xl font-bold">Auto Broadcast</h1>
-                    <p className="text-muted-foreground">Send recurring messages to groups automatically</p>
+                    <h1 className="text-xl sm:text-2xl font-bold">Auto Broadcast</h1>
+                    <p className="text-sm text-muted-foreground">Send recurring messages to groups automatically</p>
                 </div>
-                <Button onClick={() => { resetForm(); setShowForm(true); }}>
+                <Button onClick={() => { resetForm(); setShowForm(true); }} className="w-full sm:w-auto">
                     <Plus className="h-4 w-4 mr-2" /> New Broadcast
                 </Button>
             </div>
@@ -261,7 +261,7 @@ export default function AutoBroadcastPage() {
 
             {/* Create/Edit Dialog */}
             <Dialog open={showForm} onOpenChange={setShowForm}>
-                <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+                <DialogContent className="w-[95vw] max-w-lg max-h-[90vh] overflow-y-auto p-4 sm:p-6">
                     <DialogHeader>
                         <DialogTitle>{editingId ? "Edit" : "New"} Auto Broadcast</DialogTitle>
                     </DialogHeader>
