@@ -131,6 +131,9 @@ export async function bindAutoReply(sock: WASocket, sessionId: string) {
                         case 'CONTAINS':
                             match = incoming.includes(keyword);
                             break;
+                        case 'STARTS_WITH':
+                            match = incoming.startsWith(keyword);
+                            break;
                         case 'REGEX':
                             try {
                                 const regex = new RegExp(rule.keyword, 'i');
@@ -138,6 +141,10 @@ export async function bindAutoReply(sock: WASocket, sessionId: string) {
                             } catch (e) {
                                 logger.error("AutoReply", "Invalid regex in auto-reply", rule.keyword);
                             }
+                            break;
+                        default:
+                            // Unknown match type — fall back to contains (most forgiving)
+                            match = incoming.includes(keyword);
                             break;
                     }
 

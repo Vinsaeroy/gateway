@@ -67,9 +67,24 @@ export default function AutoReplyPage() {
     const [editMatchType, setEditMatchType] = useState("EXACT");
     const [editTriggerType, setEditTriggerType] = useState("ALL");
 
+    const [botStatus, setBotStatus] = useState<{ enabled: boolean; autoReplyMode: string } | null>(null);
+
     useEffect(() => {
         if (sessionId) {
             fetchRules();
+            // Also fetch bot config to show status
+            fetch(`/api/sessions/${sessionId}/bot-config`)
+                .then(r => r.ok ? r.json() : null)
+                .then(res => {
+                    const data = res?.data;
+                    if (data) {
+                        setBotStatus({
+                            enabled: data.enabled !== false,
+                            autoReplyMode: data.autoReplyMode || "ALL",
+                        });
+                    }
+                })
+                .catch(() => { });
         }
     }, [sessionId]);
 
@@ -182,8 +197,8 @@ export default function AutoReplyPage() {
             <div className="max-w-5xl space-y-6">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight">Auto Replies Builder</h1>
-                    <p className="text-muted-foreground">Setup rules to automatically respond to incoming messages.</p>
+                    <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Auto Replies Builder</h1>
+                    <p className="text-muted-foreground text-sm">Setup rules to automatically respond to incoming messages.</p>
                 </div>
 
                 <Dialog open={isCreateOpen} onOpenChange={(open) => {
@@ -196,6 +211,35 @@ export default function AutoReplyPage() {
                             New Rule
                         </Button>
                     </DialogTrigger>
+
+            {/* Status banner — warns when auto-reply will not fire */}
+            {botStatus && !botStatus.enabled && (
+                <div className="rounded-lg border border-amber-300/60 bg-amber-50 dark:bg-amber-500/10 p-3 text-sm flex flex-col sm:flex-row sm:items-center gap-2">
+                    <span className="font-medium text-amber-800 dark:text-amber-200">
+                        ⚠️ Bot is currently disabled — auto-replies will not be sent.
+                    </span>
+                    <a
+                        href="/dashboard/bot-settings"
+                        className="text-amber-700 dark:text-amber-300 underline underline-offset-2 sm:ml-auto"
+                    >
+                        Enable in Bot Settings →
+                    </a>
+                </div>
+            )}
+            {botStatus?.enabled && botStatus.autoReplyMode === "OWNER" && (
+                <div className="rounded-lg border border-blue-300/60 bg-blue-50 dark:bg-blue-500/10 p-3 text-sm">
+                    <span className="font-medium text-blue-800 dark:text-blue-200">
+                        ℹ️ Auto-Reply mode is set to <strong>OWNER</strong> — rules only trigger on messages YOU send (Self / macros).
+                    </span>
+                </div>
+            )}
+            {botStatus?.enabled && botStatus.autoReplyMode === "SPECIFIC" && (
+                <div className="rounded-lg border border-blue-300/60 bg-blue-50 dark:bg-blue-500/10 p-3 text-sm">
+                    <span className="font-medium text-blue-800 dark:text-blue-200">
+                        ℹ️ Auto-Reply mode is <strong>SPECIFIC</strong> — only allowed JIDs will trigger replies. Configure in Bot Settings.
+                    </span>
+                </div>
+            )}
                     <DialogContent className="sm:max-w-[500px]">
                         <DialogHeader>
                             <DialogTitle>Create Auto-Reply Rule</DialogTitle>
@@ -261,6 +305,35 @@ export default function AutoReplyPage() {
                     </DialogContent>
                 </Dialog>
             </div>
+
+            {/* Status banner — warns when auto-reply will not fire */}
+            {botStatus && !botStatus.enabled && (
+                <div className="rounded-lg border border-amber-300/60 bg-amber-50 dark:bg-amber-500/10 p-3 text-sm flex flex-col sm:flex-row sm:items-center gap-2">
+                    <span className="font-medium text-amber-800 dark:text-amber-200">
+                        ⚠️ Bot is currently disabled — auto-replies will not be sent.
+                    </span>
+                    <a
+                        href="/dashboard/bot-settings"
+                        className="text-amber-700 dark:text-amber-300 underline underline-offset-2 sm:ml-auto"
+                    >
+                        Enable in Bot Settings →
+                    </a>
+                </div>
+            )}
+            {botStatus?.enabled && botStatus.autoReplyMode === "OWNER" && (
+                <div className="rounded-lg border border-blue-300/60 bg-blue-50 dark:bg-blue-500/10 p-3 text-sm">
+                    <span className="font-medium text-blue-800 dark:text-blue-200">
+                        ℹ️ Auto-Reply mode is set to <strong>OWNER</strong> — rules only trigger on messages YOU send (self mode / macros).
+                    </span>
+                </div>
+            )}
+            {botStatus?.enabled && botStatus.autoReplyMode === "SPECIFIC" && (
+                <div className="rounded-lg border border-blue-300/60 bg-blue-50 dark:bg-blue-500/10 p-3 text-sm">
+                    <span className="font-medium text-blue-800 dark:text-blue-200">
+                        ℹ️ Auto-Reply mode is <strong>SPECIFIC</strong> — only allowed JIDs will trigger replies. Configure in Bot Settings.
+                    </span>
+                </div>
+            )}
 
             {loading ? (
                 <div className="flex items-center justify-center p-12">
