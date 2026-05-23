@@ -92,12 +92,10 @@ export const bindSessionStore = (sock: WASocket, sessionId: string, io: Server |
 
     // Handle Message History Sync (when connecting for the first time or syncing)
     sock.ev.on('messaging-history.set', async ({ messages, chats, contacts, isLatest }) => {
-        logger.info("Store", `History sync: ${messages?.length || 0} messages, ${chats?.length || 0} chats, ${contacts?.length || 0} contacts, latest: ${isLatest}`);
-
-        // Ensure we have the database session ID
-        if (!dbSessionId) {
-            const session = await prisma.session.findUnique({ where: { sessionId }, select: { id: true } });
-            if (!session) return;
+        // Skip heavy history sync to prevent Railway log rate limit crash
+        // Messages will be saved as they come in real-time via messages.upsert
+        logger.info("Store", `History sync received: ${messages?.length || 0} messages, ${chats?.length || 0} chats (skipping bulk save to prevent overload)`);
+        return;
             dbSessionId = session.id;
         }
 
