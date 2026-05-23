@@ -57,25 +57,9 @@ export async function proxy(request: NextRequest) {
         return NextResponse.next();
     }
 
-    // API routes: Check for API key or session
+    // API routes: Let each route handle its own auth via getAuthenticatedUser()
+    // (proxy double-check causes false 401 due to middleware timing)
     if (pathname.startsWith("/api/")) {
-        // Skip auth endpoints
-        if (pathname.startsWith("/api/auth") || pathname.startsWith("/api/test")) {
-            return NextResponse.next();
-        }
-
-        // Check for API key in header
-        const apiKey = request.headers.get("x-api-key");
-        if (apiKey) {
-            return NextResponse.next();
-        }
-
-        // Check for session auth
-        const session = await auth();
-        if (!session?.user) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        }
-
         return NextResponse.next();
     }
 
