@@ -182,7 +182,17 @@ export function MobileNav({ appName = "WA-AKG" }: { appName?: string }) {
                         className="w-full flex items-center justify-center gap-2 text-xs h-8"
                         onClick={async () => {
                             setOpen(false);
-                            await signOut({ callbackUrl: "/auth/login" });
+                            try {
+                                await signOut({ redirect: false });
+                            } catch {}
+                            document.cookie.split(";").forEach((c) => {
+                                const eqPos = c.indexOf("=");
+                                const name = eqPos > -1 ? c.substr(0, eqPos).trim() : c.trim();
+                                if (name.includes("auth") || name.includes("session")) {
+                                    document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+                                }
+                            });
+                            window.location.replace("/auth/login");
                         }}
                     >
                         <LogOut size={14} /> Sign Out
