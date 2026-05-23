@@ -11,11 +11,34 @@ export const authConfig = {
             
             if (isOnDashboard) {
                 if (isLoggedIn) return true;
-                return false; // Redirect unauthenticated users to login page
+                return false;
             } else if (isLoggedIn && nextUrl.pathname === '/auth/login') {
                 return Response.redirect(new URL('/dashboard', nextUrl));
             }
             return true;
+        },
+        async redirect({ url, baseUrl }) {
+            // Force use of NEXTAUTH_URL/BASE_URL instead of internal hostname
+            const targetBase = process.env.NEXTAUTH_URL || process.env.BASE_URL || baseUrl;
+            
+            // If url is relative, prepend the proper base
+            if (url.startsWith("/")) return `${targetBase}${url}`;
+            
+            // If url contains 0.0.0.0 or localhost, replace with proper base
+            if (url.includes("0.0.0.0") || url.includes("localhost")) {
+                try {
+                    const u = new URL(url);
+                    return `${targetBase}${u.pathname}${u.search}`;
+                } catch {
+                    return targetBase;
+                }
+            }
+            
+            // If url is on same origin as targetBase, allow
+            if (url.startsWith(targetBase)) return url;
+            
+            // Default: go to base
+            return targetBase;
         },
         async jwt({ token, user }) {
             if (user) {
