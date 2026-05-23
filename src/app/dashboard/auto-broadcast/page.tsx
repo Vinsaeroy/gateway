@@ -215,11 +215,11 @@ export default function AutoBroadcastPage() {
 
                 {broadcasts.map(b => (
                     <Card key={b.id}>
-                        <CardContent className="p-4">
-                            <div className="flex items-start justify-between">
-                                <div className="space-y-1 flex-1">
-                                    <div className="flex items-center gap-2">
-                                        <h3 className="font-semibold">{b.name}</h3>
+                        <CardContent className="p-3 sm:p-4">
+                            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 sm:gap-4">
+                                <div className="space-y-1 flex-1 min-w-0">
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                        <h3 className="font-semibold truncate max-w-full">{b.name}</h3>
                                         <Badge variant={b.isActive ? "default" : "secondary"}>
                                             {b.isActive ? "Active" : "Paused"}
                                         </Badge>
@@ -227,8 +227,8 @@ export default function AutoBroadcastPage() {
                                             <Badge variant="outline">{b.mediaType}</Badge>
                                         )}
                                     </div>
-                                    <p className="text-sm text-muted-foreground line-clamp-2">{b.message}</p>
-                                    <div className="flex items-center gap-4 text-xs text-muted-foreground mt-2">
+                                    <p className="text-sm text-muted-foreground line-clamp-2 break-words">{b.message}</p>
+                                    <div className="flex items-center flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground mt-2">
                                         <span className="flex items-center gap-1">
                                             <Clock className="h-3 w-3" /> Every {b.intervalMin} min
                                         </span>
@@ -237,19 +237,19 @@ export default function AutoBroadcastPage() {
                                             {b.targets.includes("ALL") ? "All Groups" : `${b.targets.length} groups`}
                                         </span>
                                         {b.lastSentAt && (
-                                            <span>Last sent: {new Date(b.lastSentAt).toLocaleString()}</span>
+                                            <span className="break-all">Last sent: {new Date(b.lastSentAt).toLocaleString()}</span>
                                         )}
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-1 sm:gap-2 self-end sm:self-start shrink-0">
                                     <Switch
                                         checked={b.isActive}
                                         onCheckedChange={(checked) => handleToggle(b.id, checked)}
                                     />
-                                    <Button size="icon" variant="ghost" onClick={() => handleEdit(b)}>
+                                    <Button size="icon" variant="ghost" onClick={() => handleEdit(b)} className="h-8 w-8">
                                         <Edit className="h-4 w-4" />
                                     </Button>
-                                    <Button size="icon" variant="ghost" onClick={() => handleDelete(b.id)}>
+                                    <Button size="icon" variant="ghost" onClick={() => handleDelete(b.id)} className="h-8 w-8">
                                         <Trash2 className="h-4 w-4 text-destructive" />
                                     </Button>
                                 </div>
@@ -261,7 +261,7 @@ export default function AutoBroadcastPage() {
 
             {/* Create/Edit Dialog */}
             <Dialog open={showForm} onOpenChange={setShowForm}>
-                <DialogContent className="w-[95vw] max-w-lg max-h-[90vh] overflow-y-auto p-4 sm:p-6">
+                <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>{editingId ? "Edit" : "New"} Auto Broadcast</DialogTitle>
                     </DialogHeader>
@@ -283,6 +283,7 @@ export default function AutoBroadcastPage() {
                                 <Input
                                     type="file"
                                     accept="image/jpeg,image/png,image/webp,video/mp4"
+                                    className="text-xs sm:text-sm file:text-xs file:mr-2"
                                     onChange={async (e) => {
                                         const file = e.target.files?.[0];
                                         if (!file) return;
