@@ -61,7 +61,13 @@ export async function GET(
         }
 
         if (!existsSync(filePath)) {
-            return NextResponse.json({ status: false, message: "File not found", error: "File not found" }, { status: 404 });
+            return NextResponse.json(
+                { status: false, message: "File not found" },
+                { 
+                    status: 404,
+                    headers: { 'Cache-Control': 'public, max-age=86400' } // Cache 404 for 1 day to prevent retry spam
+                }
+            );
         }
 
         const fileBuffer = await readFile(filePath);

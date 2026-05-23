@@ -281,7 +281,12 @@ export function ChatWindow({ sessionId, jid, name, onBack }: ChatWindowProps) {
                                         {/* Media */}
                                         {msg.type === 'IMAGE' && msg.mediaUrl && (
                                             <div className="relative group/media mb-1.5">
-                                                <img src={msg.mediaUrl} alt="Image" className="rounded-lg max-h-60 object-cover w-full cursor-pointer hover:opacity-95 transition-opacity" />
+                                                <img 
+                                                    src={msg.mediaUrl} 
+                                                    alt="Image" 
+                                                    className="rounded-lg max-h-60 object-cover w-full cursor-pointer hover:opacity-95 transition-opacity"
+                                                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                                                />
                                                 <Button
                                                     size="icon"
                                                     variant="secondary"
@@ -320,7 +325,12 @@ export function ChatWindow({ sessionId, jid, name, onBack }: ChatWindowProps) {
                                         )}
                                         {msg.type === 'STICKER' && msg.mediaUrl && (
                                             <div className="relative group/media mb-1">
-                                                <img src={msg.mediaUrl} alt="Sticker" className="rounded-lg max-h-32 object-contain" />
+                                                <img 
+                                                    src={msg.mediaUrl} 
+                                                    alt="Sticker" 
+                                                    className="rounded-lg max-h-32 object-contain"
+                                                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                                                />
                                                 <Button
                                                     size="icon"
                                                     variant="secondary"
