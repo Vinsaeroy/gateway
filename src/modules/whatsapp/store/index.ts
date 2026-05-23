@@ -92,37 +92,33 @@ export const bindSessionStore = (sock: WASocket, sessionId: string, io: Server |
 
     // Handle Message History Sync (when connecting for the first time or syncing)
     sock.ev.on('messaging-history.set', async ({ messages, chats, contacts, isLatest }) => {
-        // Skip heavy history sync to prevent Railway log rate limit crash
-        // Messages will be saved as they come in real-time via messages.upsert
-        logger.info("Store", `History sync received: ${messages?.length || 0} messages, ${chats?.length || 0} chats (skipping bulk save to prevent overload)`);
-        return;
+        logger.info("Store", `History sync: ${messages?.length || 0} msgs, ${contacts?.length || 0} contacts`);
+
+        // Ensure we have the database session ID
+        if (!dbSessionId) {
+            const session = await prisma.session.findUnique({ where: { sessionId }, select: { id: true } });
+            if (!session) return;
             dbSessionId = session.id;
         }
 
-        // Save all historical messages (batched to avoid log spam and rate limits)
+        // Process only the most recent 200 messages to avoid overloading
         if (messages && messages.length > 0) {
-            logger.info("Store", `Syncing ${messages.length} historical messages (batched)...`);
-            const BATCH_SIZE = 10;
-            let processed = 0;
+            const recentMessages = messages.slice(0, 200);
+            logger.info("Store", `Processing ${recentMessages.length} of ${messages.length} messages...`);
             
-            for (let i = 0; i < messages.length; i += BATCH_SIZE) {
-                const batch = messages.slice(i, i + BATCH_SIZE);
+            // Process in small batches of 5 with delay
+            for (let i = 0; i < recentMessages.length; i += 5) {
+                const batch = recentMessages.slice(i, i + 5);
                 await Promise.allSettled(
                     batch.map(msg => processAndSaveMessage(msg, dbSessionId, sessionId, false, sock).catch(() => {}))
                 );
-                processed += batch.length;
-                
-                // Small delay between batches to avoid overwhelming DB and logs
-                if (i + BATCH_SIZE < messages.length) {
-                    await new Promise(r => setTimeout(r, 100));
-                }
+                // 200ms delay between batches
+                await new Promise(r => setTimeout(r, 200));
             }
-            logger.success("Store", `Finished syncing ${processed} historical messages`);
+            logger.info("Store", `History sync complete: ${recentMessages.length} messages processed`);
         }
 
-
         // Note: Contacts and Chats are synced by src/modules/whatsapp/store/contacts.ts
-        // We only handle messages here to avoid P2002 Unique Constraint Race Conditions.
         logger.debug("Store", `Finished syncing messages`);
     });
 

@@ -58,7 +58,7 @@ export class WhatsAppInstance {
             },
             browser: ["Ubuntu", "Chrome", "20.0.04"],
             markOnlineOnConnect: botConfig?.alwaysOnline ?? true,
-            syncFullHistory: false, // Disabled to prevent Railway log rate limit crash
+            syncFullHistory: false, // Use partial sync only
         });
 
         // Apply Anti-Spam Wrapper to sendMessage
