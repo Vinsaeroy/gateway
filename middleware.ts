@@ -1,48 +1,61 @@
 import NextAuth from "next-auth";
-import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { authConfig } from "./src/auth.config";
 
 const authMiddleware = NextAuth(authConfig).auth;
 
+// Get the canonical public URL (without trailing slash)
+function getPublicUrl(): string {
+    const url = process.env.NEXTAUTH_URL || process.env.BASE_URL || "https://rifalos.shop";
+    return url.replace(/\/$/, "");
+}
+
 export default async function middleware(request: NextRequest) {
     const response = await (authMiddleware as any)(request, {});
 
-    // After NextAuth runs, fix any redirect that contains internal hostnames
     if (response?.headers) {
         const location = response.headers.get("location");
         if (location) {
-            const publicHost = process.env.NEXTAUTH_URL || process.env.BASE_URL;
-            
-            if (publicHost) {
-                // Detect bad internal hostnames in the location
-                const badHostsRegex = /(0\.0\.0\.0|127\.0\.0\.1|localhost)(:\d+)?/;
-                
-                if (badHostsRegex.test(location)) {
+            const publicUrl = getPublicUrl();
+
+            try {
+                let publicHost: URL;
+                try {
+                    publicHost = new URL(publicUrl);
+                } catch {
+                    return response;
+                }
+
+                // Try to parse the location URL — it may be absolute or relative
+                let targetUrl: URL;
+                if (location.startsWith("http://") || location.startsWith("https://")) {
+                    targetUrl = new URL(location);
+                } else {
+                    targetUrl = new URL(location, publicUrl);
+                }
+
+                // Force the host to be the public host (no matter what)
+                targetUrl.protocol = publicHost.protocol;
+                targetUrl.hostname = publicHost.hostname;
+                targetUrl.port = publicHost.port;
+
+                // Also fix nested callbackUrl
+                const cb = targetUrl.searchParams.get("callbackUrl");
+                if (cb) {
                     try {
-                        const fixedUrl = new URL(location);
-                        const publicUrl = new URL(publicHost);
-                        fixedUrl.protocol = publicUrl.protocol;
-                        fixedUrl.host = publicUrl.host;
-                        fixedUrl.port = publicUrl.port;
-                        
-                        // Also fix nested callbackUrl
-                        const cb = fixedUrl.searchParams.get("callbackUrl");
-                        if (cb && badHostsRegex.test(cb)) {
-                            try {
-                                const cbUrl = new URL(cb);
-                                cbUrl.protocol = publicUrl.protocol;
-                                cbUrl.host = publicUrl.host;
-                                cbUrl.port = publicUrl.port;
-                                fixedUrl.searchParams.set("callbackUrl", cbUrl.toString());
-                            } catch {}
-                        }
-                        
-                        response.headers.set("location", fixedUrl.toString());
+                        const cbUrl = cb.startsWith("http") ? new URL(cb) : new URL(cb, publicUrl);
+                        cbUrl.protocol = publicHost.protocol;
+                        cbUrl.hostname = publicHost.hostname;
+                        cbUrl.port = publicHost.port;
+                        targetUrl.searchParams.set("callbackUrl", cbUrl.toString());
                     } catch {
                         // ignore
                     }
                 }
+
+                response.headers.set("location", targetUrl.toString());
+            } catch {
+                // ignore parse errors
             }
         }
     }
