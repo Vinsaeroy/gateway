@@ -21,39 +21,36 @@ export class ChatService {
             select: { jid: true, subject: true }
         });
 
-        // 3. Get distinct remoteJids from messages (for chats without a saved contact)
-        const messagesWithDistinctJids = await prisma.message.findMany({
-            where: { sessionId: dbSessionId },
-            distinct: ['remoteJid'],
-            select: { remoteJid: true }
-        });
+        // 3. Get all messages grouped by remoteJid with last message info (single query)
+        const lastMessages = await prisma.$queryRaw<Array<{ remoteJid: string; content: string | null; timestamp: Date; type: string }>>`
+            SELECT DISTINCT ON ("remoteJid") "remoteJid", "content", "timestamp", "type"
+            FROM "Message"
+            WHERE "sessionId" = ${dbSessionId}
+            ORDER BY "remoteJid", "timestamp" DESC
+        `;
+
+        const lastMessageMap = new Map<string, { content: string | null; timestamp: Date; type: string }>();
+        lastMessages.forEach(m => lastMessageMap.set(m.remoteJid, m));
 
         const allJids = new Set([
             ...contacts.map(c => c.jid),
             ...groups.map(g => g.jid),
-            ...messagesWithDistinctJids.map(m => m.remoteJid)
+            ...lastMessages.map(m => m.remoteJid)
         ]);
 
         const jidMap = await batchResolveToPhoneJid(Array.from(allJids), dbSessionId);
-        
-        // Map contacts and groups for quick lookup
+
         const contactMap = new Map();
         contacts.forEach(c => contactMap.set(c.jid, c));
         groups.forEach(g => contactMap.set(g.jid, { jid: g.jid, name: g.subject, notify: g.subject, profilePic: null }));
 
-        const chatList = await Promise.all(Array.from(allJids).map(async (originalJid) => {
+        const chatList = Array.from(allJids).map((originalJid) => {
             const resolvedJid = jidMap.get(originalJid) || originalJid;
             const normalizedJid = normalizeJid(resolvedJid);
             const contactInfo = contactMap.get(originalJid) || contactMap.get(normalizedJid) || { jid: normalizedJid, name: null, notify: null, profilePic: null };
 
-            const lastMessage = await prisma.message.findFirst({
-                where: {
-                    sessionId: dbSessionId,
-                    OR: [{ remoteJid: originalJid }, { remoteJid: normalizedJid }]
-                },
-                orderBy: { timestamp: 'desc' },
-                select: { content: true, timestamp: true, type: true }
-            });
+            // Use the pre-fetched last message map instead of running findFirst per chat
+            const lastMessage = lastMessageMap.get(originalJid) || lastMessageMap.get(normalizedJid);
 
             return {
                 ...contactInfo,
@@ -64,7 +61,7 @@ export class ChatService {
                     type: lastMessage.type
                 } : undefined
             };
-        }));
+        });
 
         // Deduplicate unified list
         const uniqueChats = new Map();
