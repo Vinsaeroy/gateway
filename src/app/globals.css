@@ -329,3 +329,12 @@ kbd,
     overflow-wrap: anywhere;
     word-break: break-word;
 }
+
+/* Hide scrollbar but keep scroll functionality (for horizontal tab filters) */
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}

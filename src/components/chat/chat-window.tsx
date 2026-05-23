@@ -38,6 +38,7 @@ export function ChatWindow({ sessionId, jid, name, onBack }: ChatWindowProps) {
     const scrollRef = useRef<HTMLDivElement>(null);
     const [socket, setSocket] = useState<Socket | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const uploadTypeRef = useRef<string>("image");
     const [uploadType, setUploadType] = useState<string>("image");
     const [isDragging, setIsDragging] = useState(false);
 
@@ -135,7 +136,8 @@ export function ChatWindow({ sessionId, jid, name, onBack }: ChatWindowProps) {
         const file = e.target.files?.[0];
         if (!file) return;
 
-        await processFileUpload(file, uploadType);
+        // Use ref value which is always up-to-date (state may be stale on mobile)
+        await processFileUpload(file, uploadTypeRef.current);
         
         if (fileInputRef.current) {
             fileInputRef.current.value = "";
@@ -188,7 +190,10 @@ export function ChatWindow({ sessionId, jid, name, onBack }: ChatWindowProps) {
 
     const triggerUpload = (type: string) => {
         setUploadType(type);
+        uploadTypeRef.current = type;
         if (fileInputRef.current) {
+            // Reset value to allow re-selecting the same file
+            fileInputRef.current.value = "";
             fileInputRef.current.accept = type === 'image' ? "image/*" : type === 'video' ? "video/*" : type === 'audio' ? "audio/*" : type === 'sticker' ? "image/*" : "*/*";
             fileInputRef.current.click();
         }
@@ -288,7 +293,7 @@ export function ChatWindow({ sessionId, jid, name, onBack }: ChatWindowProps) {
                                                 <Button
                                                     size="icon"
                                                     variant="secondary"
-                                                    className="absolute top-2 right-2 h-8 w-8 rounded-full opacity-0 group-hover/media:opacity-100 transition-opacity bg-background/80 backdrop-blur-sm"
+                                                    className="absolute top-2 right-2 h-8 w-8 rounded-full opacity-100 sm:opacity-0 sm:group-hover/media:opacity-100 transition-opacity bg-background/80 backdrop-blur-sm"
                                                     onClick={() => handleDownload(msg.mediaUrl!, `IMAGE-${msg.keyId}.jpg`)}
                                                 >
                                                     <Download className="h-4 w-4" />
@@ -301,7 +306,7 @@ export function ChatWindow({ sessionId, jid, name, onBack }: ChatWindowProps) {
                                                 <Button
                                                     size="icon"
                                                     variant="secondary"
-                                                    className="absolute top-2 right-2 h-8 w-8 rounded-full opacity-0 group-hover/media:opacity-100 transition-opacity bg-background/80 backdrop-blur-sm z-10"
+                                                    className="absolute top-2 right-2 h-8 w-8 rounded-full opacity-100 sm:opacity-0 sm:group-hover/media:opacity-100 transition-opacity bg-background/80 backdrop-blur-sm z-10"
                                                     onClick={() => handleDownload(msg.mediaUrl!, `VIDEO-${msg.keyId}.mp4`)}
                                                 >
                                                     <Download className="h-4 w-4" />
@@ -310,11 +315,11 @@ export function ChatWindow({ sessionId, jid, name, onBack }: ChatWindowProps) {
                                         )}
                                         {msg.type === 'AUDIO' && msg.mediaUrl && (
                                             <div className="flex items-center gap-2 mb-1.5">
-                                                <audio src={msg.mediaUrl} controls className="h-8 max-w-[200px]" />
+                                                <audio src={msg.mediaUrl} controls className="h-10 w-full max-w-[220px] sm:max-w-[200px]" />
                                                 <Button
                                                     size="icon"
                                                     variant="ghost"
-                                                    className="h-8 w-8 rounded-full"
+                                                    className="h-8 w-8 rounded-full flex-shrink-0"
                                                     onClick={() => handleDownload(msg.mediaUrl!, `AUDIO-${msg.keyId}.mp3`)}
                                                 >
                                                     <Download className="h-4 w-4" />
@@ -381,8 +386,8 @@ export function ChatWindow({ sessionId, jid, name, onBack }: ChatWindowProps) {
             </div>
 
             {/* Input Area */}
-            <div className="px-3 py-2.5 bg-background/80 backdrop-blur-sm border-t flex-shrink-0">
-                <div className="flex items-center gap-2 max-w-3xl mx-auto">
+            <div className="px-3 py-2.5 pb-[max(0.625rem,env(safe-area-inset-bottom))] bg-background/80 backdrop-blur-sm border-t flex-shrink-0">
+                <div className="flex items-center gap-1.5 sm:gap-2 max-w-3xl mx-auto">
                     <input
                         type="file"
                         ref={fileInputRef}

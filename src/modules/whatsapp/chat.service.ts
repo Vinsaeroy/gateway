@@ -44,6 +44,53 @@ export class ChatService {
         contacts.forEach(c => contactMap.set(c.jid, c));
         groups.forEach(g => contactMap.set(g.jid, { jid: g.jid, name: g.subject, notify: g.subject, profilePic: null }));
 
+        // For newsletter/channel JIDs without a name, try to get pushName from their messages
+        const newsletterJids = Array.from(allJids).filter(jid => jid.endsWith("@newsletter") && !contactMap.has(jid));
+        if (newsletterJids.length > 0) {
+            const newsletterNames = await prisma.message.findMany({
+                where: {
+                    sessionId: dbSessionId,
+                    remoteJid: { in: newsletterJids },
+                    pushName: { not: null }
+                },
+                distinct: ['remoteJid'],
+                select: { remoteJid: true, pushName: true },
+                orderBy: { timestamp: 'desc' }
+            });
+            newsletterNames.forEach(m => {
+                if (m.pushName && !contactMap.has(m.remoteJid)) {
+                    contactMap.set(m.remoteJid, { jid: m.remoteJid, name: m.pushName, notify: m.pushName, profilePic: null });
+                }
+            });
+        }
+
+        // Also enrich existing contacts that have no name with pushName from messages
+        const namelessJids = Array.from(allJids).filter(jid => {
+            const info = contactMap.get(jid);
+            return info && !info.name && !info.notify;
+        });
+        if (namelessJids.length > 0) {
+            const fallbackNames = await prisma.message.findMany({
+                where: {
+                    sessionId: dbSessionId,
+                    remoteJid: { in: namelessJids },
+                    pushName: { not: null }
+                },
+                distinct: ['remoteJid'],
+                select: { remoteJid: true, pushName: true },
+                orderBy: { timestamp: 'desc' }
+            });
+            fallbackNames.forEach(m => {
+                if (m.pushName) {
+                    const existing = contactMap.get(m.remoteJid);
+                    if (existing) {
+                        existing.name = m.pushName;
+                        existing.notify = m.pushName;
+                    }
+                }
+            });
+        }
+
         const chatList = Array.from(allJids).map((originalJid) => {
             const resolvedJid = jidMap.get(originalJid) || originalJid;
             const normalizedJid = normalizeJid(resolvedJid);

@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { MessageSquarePlus, Search, MessageCircle, X } from "lucide-react";
+import { MessageSquarePlus, Search, MessageCircle, X, Users, User, Radio } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 import { cn } from "@/lib/utils";
@@ -36,6 +36,7 @@ export function ChatList({ sessionId, onSelectChat, selectedJid }: ChatListProps
     const [searchQuery, setSearchQuery] = useState("");
     const [isNewChatOpen, setIsNewChatOpen] = useState(false);
     const [newChatNumber, setNewChatNumber] = useState("");
+    const [activeTab, setActiveTab] = useState<"all" | "personal" | "groups" | "channels">("all");
     
     // Track JIDs in a ref for reliable real-time updates without depending on state closure
     const jidsInList = useRef<Set<string>>(new Set());
@@ -124,16 +125,31 @@ export function ChatList({ sessionId, onSelectChat, selectedJid }: ChatListProps
         jidsInList.current = new Set(chats.map(c => c.jid));
     }, [chats]);
 
-    // Filter chats based on search query
+    // Filter chats based on search query and active tab
     const filteredChats = useMemo(() => {
-        if (!searchQuery.trim()) return chats;
-        const q = searchQuery.toLowerCase();
-        return chats.filter(chat => {
-            const name = (chat.name || chat.notify || "").toLowerCase();
-            const jid = chat.jid.toLowerCase();
-            return name.includes(q) || jid.includes(q);
-        });
-    }, [chats, searchQuery]);
+        let result = chats;
+
+        // Filter by tab
+        if (activeTab === "personal") {
+            result = result.filter(chat => chat.jid.endsWith("@s.whatsapp.net"));
+        } else if (activeTab === "groups") {
+            result = result.filter(chat => chat.jid.endsWith("@g.us"));
+        } else if (activeTab === "channels") {
+            result = result.filter(chat => chat.jid.endsWith("@newsletter"));
+        }
+
+        // Filter by search query
+        if (searchQuery.trim()) {
+            const q = searchQuery.toLowerCase();
+            result = result.filter(chat => {
+                const name = (chat.name || chat.notify || "").toLowerCase();
+                const jid = chat.jid.toLowerCase();
+                return name.includes(q) || jid.includes(q);
+            });
+        }
+
+        return result;
+    }, [chats, searchQuery, activeTab]);
 
     const getContactDisplayName = (chat: ChatContact): string => {
         return chat.name || chat.notify || chat.jid.split('@')[0];
@@ -221,6 +237,46 @@ export function ChatList({ sessionId, onSelectChat, selectedJid }: ChatListProps
                     />
                 </div>
 
+                {/* Filter Tabs */}
+                <div className="flex items-center gap-1 overflow-x-auto no-scrollbar">
+                    <Button
+                        variant={activeTab === "all" ? "default" : "ghost"}
+                        size="sm"
+                        className={cn("h-7 px-2 text-[11px] rounded-full gap-1 flex-shrink-0", activeTab === "all" && "shadow-sm")}
+                        onClick={() => setActiveTab("all")}
+                    >
+                        <MessageCircle className="h-3 w-3" />
+                        All
+                    </Button>
+                    <Button
+                        variant={activeTab === "personal" ? "default" : "ghost"}
+                        size="sm"
+                        className={cn("h-7 px-2 text-[11px] rounded-full gap-1 flex-shrink-0", activeTab === "personal" && "shadow-sm")}
+                        onClick={() => setActiveTab("personal")}
+                    >
+                        <User className="h-3 w-3" />
+                        Personal
+                    </Button>
+                    <Button
+                        variant={activeTab === "groups" ? "default" : "ghost"}
+                        size="sm"
+                        className={cn("h-7 px-2 text-[11px] rounded-full gap-1 flex-shrink-0", activeTab === "groups" && "shadow-sm")}
+                        onClick={() => setActiveTab("groups")}
+                    >
+                        <Users className="h-3 w-3" />
+                        Groups
+                    </Button>
+                    <Button
+                        variant={activeTab === "channels" ? "default" : "ghost"}
+                        size="sm"
+                        className={cn("h-7 px-2 text-[11px] rounded-full gap-1 flex-shrink-0", activeTab === "channels" && "shadow-sm")}
+                        onClick={() => setActiveTab("channels")}
+                    >
+                        <Radio className="h-3 w-3" />
+                        Channels
+                    </Button>
+                </div>
+
                 {/* New Chat Form */}
                 {isNewChatOpen && (
                     <div className="p-2.5 bg-muted/30 rounded-lg space-y-2 border border-border/40">
@@ -244,10 +300,26 @@ export function ChatList({ sessionId, onSelectChat, selectedJid }: ChatListProps
                 {filteredChats.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
                         <div className="h-12 w-12 rounded-full bg-muted/50 flex items-center justify-center mb-3">
-                            <MessageCircle className="h-6 w-6 text-muted-foreground/50" />
+                            {activeTab === "groups" ? (
+                                <Users className="h-6 w-6 text-muted-foreground/50" />
+                            ) : activeTab === "channels" ? (
+                                <Radio className="h-6 w-6 text-muted-foreground/50" />
+                            ) : activeTab === "personal" ? (
+                                <User className="h-6 w-6 text-muted-foreground/50" />
+                            ) : (
+                                <MessageCircle className="h-6 w-6 text-muted-foreground/50" />
+                            )}
                         </div>
                         <p className="text-sm text-muted-foreground">
-                            {searchQuery ? "No chats match your search" : "No chats yet"}
+                            {searchQuery
+                                ? "No chats match your search"
+                                : activeTab === "groups"
+                                ? "No group chats"
+                                : activeTab === "channels"
+                                ? "No channels"
+                                : activeTab === "personal"
+                                ? "No personal chats"
+                                : "No chats yet"}
                         </p>
                     </div>
                 ) : (

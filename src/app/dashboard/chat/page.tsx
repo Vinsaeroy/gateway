@@ -34,7 +34,7 @@ export default async function ChatPage() {
     }
 
     return (
-        <div className="h-[calc(100vh-6.5rem)] sm:h-[calc(100vh-6rem)]">
+        <div className="h-[calc(100dvh-6.5rem)] sm:h-[calc(100dvh-6rem)]">
             <ChatLayoutClient key={validSessionId} sessionId={validSessionId} />
         </div>
     );

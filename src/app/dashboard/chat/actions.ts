@@ -77,6 +77,12 @@ export async function sendMediaMessage(formData: FormData) {
         throw new Error("Missing required fields");
     }
 
+    // Check file size limit (50MB)
+    const MAX_SIZE = 50 * 1024 * 1024;
+    if (file.size > MAX_SIZE) {
+        throw new Error(`File too large (${(file.size / 1024 / 1024).toFixed(1)}MB). Maximum allowed is 50MB.`);
+    }
+
     const canAccess = await canAccessSession(user.id, user.role, sessionId);
     if (!canAccess) throw new Error("Forbidden");
 

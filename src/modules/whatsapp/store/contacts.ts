@@ -78,21 +78,21 @@ export function bindContactSync(sock: WASocket, sessionId: string) {
         
         logger.info("Store", `Received messaging history: ${chats.length} chats, ${contacts?.length || 0} contacts, ${messages.length} messages`);
         
-        // Sync chats as contacts (for personal chats)
+        // Sync chats as contacts (for personal chats and newsletters/channels)
         for (const chat of chats) {
             try {
-                if (!chat.id || chat.id.includes('@g.us') || chat.id.includes('@broadcast')) continue;
+                if (!chat.id || chat.id.includes('@g.us') || chat.id === 'status@broadcast') continue;
                 
                 await prisma.contact.upsert({
                     where: { sessionId_jid: { sessionId: dbSessionId, jid: chat.id } },
                     create: {
                         sessionId: dbSessionId,
                         jid: chat.id,
-                        name: chat.name || undefined,
-                        notify: (chat as any).notify || undefined
+                        name: chat.name || (chat as any).subject || undefined,
+                        notify: (chat as any).notify || chat.name || undefined
                     },
                     update: {
-                        name: chat.name || undefined
+                        name: chat.name || (chat as any).subject || undefined
                     }
                 });
             } catch (e) {
