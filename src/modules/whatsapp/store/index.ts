@@ -4,6 +4,7 @@ import { normalizeMessageContent } from "@whiskeysockets/baileys";
 import { onMessageReceived, onMessageSent, dispatchWebhook, downloadAndSaveMedia } from "@/lib/webhook";
 import { handleBotCommand, setSessionStartTime } from "../bot/command-handler";
 import { resolveToPhoneJid, isLidJid, normalizeJid } from "@/lib/jid-utils";
+import { waManager } from "../manager";
 
 import { Server } from "socket.io";
 import { logger } from "@/lib/logger";
@@ -14,6 +15,7 @@ export const bindSessionStore = (sock: WASocket, sessionId: string, io: Server |
 
     // First, get the database Session ID (cuid)
     let dbSessionId: string | null = null;
+    let sessionMissing = false;
 
     // Initialize by fetching the session ID
     (async () => {
@@ -25,12 +27,18 @@ export const bindSessionStore = (sock: WASocket, sessionId: string, io: Server |
             dbSessionId = session.id;
             logger.info("Store", `Message store initialized for session ${sessionId} (db: ${dbSessionId})`);
         } else {
-            logger.error("Store", `Session ${sessionId} not found for message store`);
+            sessionMissing = true;
+            logger.warn("Store", `Session ${sessionId} not found in DB — cleaning up orphan socket`);
+            // The DB session was deleted but the in-memory instance is still emitting
+            // events. Clean it up so we don't keep logging the same error every minute.
+            try { waManager.cleanupOrphanInstance(sessionId); } catch { /* ignore */ }
         }
     })();
 
     // Handle Messages
     sock.ev.on('messages.upsert', async ({ messages, type }) => {
+        if (sessionMissing) return; // orphan socket — wait for cleanup
+
         // Process all message types: notify, append, and history sync
         if (type !== 'notify' && type !== 'append') {
             // For history sync, we still want to save messages
@@ -45,7 +53,11 @@ export const bindSessionStore = (sock: WASocket, sessionId: string, io: Server |
         // Ensure we have the database session ID
         if (!dbSessionId) {
             const session = await prisma.session.findUnique({ where: { sessionId }, select: { id: true } });
-            if (!session) return;
+            if (!session) {
+                sessionMissing = true;
+                try { waManager.cleanupOrphanInstance(sessionId); } catch { /* ignore */ }
+                return;
+            }
             dbSessionId = session.id;
         }
 

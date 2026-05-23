@@ -196,8 +196,14 @@ export class WhatsAppInstance {
             // Catch global errors in handler (like Record Not Found if session deleted mid-process)
             if (error.code === 'P2025') {
                 logger.warn("Instance", `Session ${this.sessionId} record not found during update. Stopping instance.`);
-                this.socket?.end(undefined);
-                this.socket = null;
+                try {
+                    // Defer to break circular import — manager already imports from instance
+                    const { waManager } = await import("./manager");
+                    waManager.cleanupOrphanInstance(this.sessionId);
+                } catch {
+                    this.socket?.end(undefined);
+                    this.socket = null;
+                }
             } else {
                 logger.error("Instance", "Error in handleConnectionUpdate:", error);
             }

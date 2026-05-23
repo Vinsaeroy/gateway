@@ -89,6 +89,23 @@ export class WhatsAppManager {
         await prisma.session.delete({ where: { sessionId } });
     }
 
+    /**
+     * Cleanup an in-memory instance without touching the DB.
+     * Used when the DB session has already been deleted but a zombie
+     * Baileys socket is still emitting events.
+     */
+    cleanupOrphanInstance(sessionId: string) {
+        const instance = this.sessions.get(sessionId);
+        if (instance) {
+            try {
+                instance.isStopped = true;
+                instance.socket?.end(undefined);
+                instance.socket = null as any;
+            } catch { /* ignore */ }
+            this.sessions.delete(sessionId);
+        }
+    }
+
     async stopSession(sessionId: string) {
         const instance = this.sessions.get(sessionId);
         if (instance) {

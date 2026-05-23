@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import type { WASocket } from "@whiskeysockets/baileys";
 import { logger } from "@/lib/logger";
+import { waManager } from "../manager";
 
 /**
  * Sync contacts from WhatsApp to database.
@@ -9,7 +10,8 @@ import { logger } from "@/lib/logger";
 export function bindContactSync(sock: WASocket, sessionId: string) {
     // First, get the database Session ID (cuid)
     let dbSessionId: string | null = null;
-    
+    let sessionMissing = false;
+
     // Initialize by fetching the session ID
     (async () => {
         const session = await prisma.session.findUnique({
@@ -20,15 +22,23 @@ export function bindContactSync(sock: WASocket, sessionId: string) {
             dbSessionId = session.id;
             logger.info("Store", `Contact sync initialized for session ${sessionId} (db: ${dbSessionId})`);
         } else {
-            logger.error("Store", `Session ${sessionId} not found for contact sync`);
+            sessionMissing = true;
+            logger.warn("Store", `Session ${sessionId} not found in DB — cleaning up orphan socket`);
+            try { waManager.cleanupOrphanInstance(sessionId); } catch { /* ignore */ }
         }
     })();
 
     // Handle contacts.update event (fires when contacts are updated)
     sock.ev.on('contacts.update', async (updates) => {
+        if (sessionMissing) return; // socket about to be cleaned up
+
         if (!dbSessionId) {
             const session = await prisma.session.findUnique({ where: { sessionId }, select: { id: true } });
-            if (!session) return;
+            if (!session) {
+                sessionMissing = true;
+                try { waManager.cleanupOrphanInstance(sessionId); } catch { /* ignore */ }
+                return;
+            }
             dbSessionId = session.id;
         }
         
