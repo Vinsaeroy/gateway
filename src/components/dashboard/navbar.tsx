@@ -29,7 +29,7 @@ interface Notification {
 
 export function Navbar({ appName }: NavbarProps) {
     const router = useRouter();
-    const { data: session } = useSession();
+    const { data: session, status } = useSession();
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [unreadCount, setUnreadCount] = useState(0);
     const [isOpen, setIsOpen] = useState(false);
@@ -44,12 +44,17 @@ export function Navbar({ appName }: NavbarProps) {
                 setNotifications(items);
                 setUnreadCount(items.filter((n: Notification) => !n.read).length);
             }
-        } catch (e) {
-            console.error("Failed to fetch notifications");
+            // Silently ignore 401/403 — session may still be loading
+        } catch {
+            // Silent fail — don't spam console
         }
     };
 
     useEffect(() => {
+        // Wait until session is fully authenticated before fetching
+        // This prevents 401 errors when cookie is still being set
+        if (status !== "authenticated" || !session?.user?.id) return;
+
         // Initial fetch
         fetchNotifications();
 
@@ -88,7 +93,7 @@ export function Navbar({ appName }: NavbarProps) {
                 socketInstance.disconnect();
             };
         }
-    }, [session?.user?.id]);
+    }, [status, session?.user?.id]);
 
     const markAsRead = async (id?: string) => {
         try {
