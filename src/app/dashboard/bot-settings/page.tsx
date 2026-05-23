@@ -24,6 +24,7 @@ export default function BotSettingsPage() {
     const { sessionId } = useSessionProvider();
 
     const [botConfig, setBotConfig] = useState({
+        enabled: true,
         botName: "WA-AKG Bot",
         prefix: "#",
         enableSticker: true,
@@ -192,6 +193,23 @@ export default function BotSettingsPage() {
                         <CardDescription>Configure who can interact with the bot and use commands.</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6">
+                            {/* Master toggle — when off, ALL bot features (commands, auto-reply) are paused */}
+                            <div className="flex items-center justify-between gap-4 rounded-lg border p-3 bg-muted/20">
+                                <div className="space-y-0.5">
+                                    <Label htmlFor="bot-enabled" className="text-sm font-semibold cursor-pointer">
+                                        Bot Enabled
+                                    </Label>
+                                    <p className="text-xs text-muted-foreground">
+                                        Master switch — when off, the bot ignores all commands and auto-replies for this session.
+                                    </p>
+                                </div>
+                                <Switch
+                                    id="bot-enabled"
+                                    checked={botConfig.enabled}
+                                    onCheckedChange={c => setBotConfig(prev => ({ ...prev, enabled: c }))}
+                                />
+                            </div>
+
                             <div className="grid gap-2">
                                 <Label>Bot Name</Label>
                                 <Input

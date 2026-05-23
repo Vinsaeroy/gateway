@@ -86,6 +86,41 @@ export async function POST(
 
         if (!session) return NextResponse.json({ status: false, message: "Session not found", error: "Session not found" }, { status: 404 });
 
+        // Build update payload from only provided keys so partial saves
+        // (e.g. just toggling `enabled`) don't wipe other fields.
+        const updateFields: Record<string, unknown> = {};
+        const passthrough = [
+            "enabled",
+            "botMode",
+            "botAllowedJids",
+            "botBlockedJids",
+            "autoReplyMode",
+            "autoReplyAllowedJids",
+            "autoReplyBlockedJids",
+            "botName",
+            "enableSticker",
+            "enableVideoSticker",
+            "maxStickerDuration",
+            "enablePing",
+            "enableUptime",
+            "prefix",
+            "antiSpamEnabled",
+            "spamLimit",
+            "spamInterval",
+            "spamDelayMin",
+            "spamDelayMax",
+            "welcomeMessage",
+            "autoRead",
+            "alwaysOnline",
+        ];
+        for (const key of passthrough) {
+            if (body[key] !== undefined) updateFields[key] = body[key];
+        }
+        // removeBgApiKey: only update if explicitly provided (allow null to clear)
+        if (Object.prototype.hasOwnProperty.call(body, "removeBgApiKey")) {
+            updateFields.removeBgApiKey = body.removeBgApiKey || null;
+        }
+
         // Upsert Config
         // @ts-ignore
         const config = await (prisma as any).botConfig.upsert({
@@ -116,30 +151,7 @@ export async function POST(
                 autoRead: body.autoRead ?? false,
                 alwaysOnline: body.alwaysOnline ?? false,
             },
-            update: {
-                botMode: body.botMode,
-                botAllowedJids: body.botAllowedJids,
-                botBlockedJids: body.botBlockedJids,
-                autoReplyMode: body.autoReplyMode,
-                autoReplyAllowedJids: body.autoReplyAllowedJids,
-                autoReplyBlockedJids: body.autoReplyBlockedJids,
-                botName: body.botName,
-                enableSticker: body.enableSticker,
-                enableVideoSticker: body.enableVideoSticker,
-                maxStickerDuration: body.maxStickerDuration,
-                enablePing: body.enablePing,
-                enableUptime: body.enableUptime,
-                removeBgApiKey: body.removeBgApiKey || null,
-                prefix: body.prefix,
-                antiSpamEnabled: body.antiSpamEnabled,
-                spamLimit: body.spamLimit,
-                spamInterval: body.spamInterval,
-                spamDelayMin: body.spamDelayMin,
-                spamDelayMax: body.spamDelayMax,
-                welcomeMessage: body.welcomeMessage,
-                autoRead: body.autoRead,
-                alwaysOnline: body.alwaysOnline,
-            }
+            update: updateFields,
         });
 
         return NextResponse.json({ status: true, message: "Bot config updated successfully", data: config });
