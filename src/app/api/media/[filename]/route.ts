@@ -61,11 +61,32 @@ export async function GET(
         }
 
         if (!existsSync(filePath)) {
+            // File missing (e.g. after Railway redeploy clears ephemeral disk).
+            // For images: return transparent 1x1 placeholder so <img> doesn't show broken icon
+            // For other media: return 410 Gone with long cache so browser stops retrying
+            const ext = path.extname(filename).toLowerCase();
+            const isImage = ['.jpg', '.jpeg', '.png', '.gif', '.webp'].includes(ext);
+
+            if (isImage) {
+                const transparentPixel = Buffer.from(
+                    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=",
+                    "base64"
+                );
+                return new NextResponse(new Uint8Array(transparentPixel), {
+                    status: 200,
+                    headers: {
+                        'Content-Type': 'image/png',
+                        'Cache-Control': 'public, max-age=86400, immutable',
+                        'X-Media-Status': 'missing',
+                    },
+                });
+            }
+
             return NextResponse.json(
-                { status: false, message: "File not found" },
-                { 
-                    status: 404,
-                    headers: { 'Cache-Control': 'public, max-age=86400' } // Cache 404 for 1 day to prevent retry spam
+                { status: false, message: "File not found", error: "File not found" },
+                {
+                    status: 410, // Gone — semantically clearer than 404
+                    headers: { 'Cache-Control': 'public, max-age=86400, immutable' }
                 }
             );
         }
