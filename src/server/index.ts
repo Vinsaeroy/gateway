@@ -7,6 +7,19 @@ import { waManager } from "../modules/whatsapp/manager";
 import { logger } from "../lib/logger";
 import pkg from "../../package.json";
 
+// Suppress noisy debug logs in production to prevent Railway log rate limit
+if (process.env.NODE_ENV === "production") {
+    const noop = () => {};
+    // Filter console.log/info — keep error and warn
+    const originalLog = console.log;
+    console.log = (...args: any[]) => {
+        const msg = String(args[0] || "");
+        // Block Baileys raw debug dumps (large objects with Buffer data)
+        if (msg.includes("Buffer ") || msg.includes("pubKey") || msg.includes("privKey") || msg.includes("rootKey")) return;
+        originalLog(...args);
+    };
+}
+
 const dev = process.env.NODE_ENV !== "production";
 const hostname = process.env.HOSTNAME || "localhost";
 const port = parseInt(process.env.PORT || "3030", 10);

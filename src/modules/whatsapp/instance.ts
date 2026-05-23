@@ -48,13 +48,16 @@ export class WhatsAppInstance {
         const { state, saveCreds } = await usePrismaAuthState(this.sessionId);
         const { version } = await fetchLatestBaileysVersion();
 
+        // Force silent logger to prevent Baileys debug spam (Railway log rate limit)
+        const silentLogger = pino({ level: "silent" }) as any;
+
         this.socket = makeWASocket({
             version,
-            logger: pino({ level: process.env.BAILEYS_LOG_LEVEL || "silent" }) as any,
+            logger: silentLogger,
             printQRInTerminal: false,
             auth: {
                 creds: state.creds,
-                keys: makeCacheableSignalKeyStore(state.keys, pino({ level: process.env.BAILEYS_LOG_LEVEL || "silent" }) as any),
+                keys: makeCacheableSignalKeyStore(state.keys, silentLogger),
             },
             browser: ["Ubuntu", "Chrome", "20.0.04"],
             markOnlineOnConnect: botConfig?.alwaysOnline ?? true,
