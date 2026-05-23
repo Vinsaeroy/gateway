@@ -102,15 +102,16 @@ export const bindSessionStore = (sock: WASocket, sessionId: string, io: Server |
         }
 
         // Process only the most recent 200 messages to avoid overloading
-        if (messages && messages.length > 0) {
+        if (messages && messages.length > 0 && dbSessionId) {
             const recentMessages = messages.slice(0, 200);
+            const finalDbSessionId = dbSessionId; // Capture non-null value for closure
             logger.info("Store", `Processing ${recentMessages.length} of ${messages.length} messages...`);
             
             // Process in small batches of 5 with delay
             for (let i = 0; i < recentMessages.length; i += 5) {
                 const batch = recentMessages.slice(i, i + 5);
                 await Promise.allSettled(
-                    batch.map(msg => processAndSaveMessage(msg, dbSessionId, sessionId, false, sock).catch(() => {}))
+                    batch.map(msg => processAndSaveMessage(msg, finalDbSessionId, sessionId, false, sock).catch(() => {}))
                 );
                 // 200ms delay between batches
                 await new Promise(r => setTimeout(r, 200));
