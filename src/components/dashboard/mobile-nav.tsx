@@ -182,7 +182,8 @@ export function MobileNav({ appName = "WA-AKG" }: { appName?: string }) {
                         className="w-full flex items-center justify-center gap-2 text-xs h-8"
                         onClick={async () => {
                             setOpen(false);
-                            await signOut({ callbackUrl: "/auth/login" });
+                            await signOut({ redirect: false });
+                            window.location.href = "/auth/login";
                         }}
                     >
                         <LogOut size={14} /> Sign Out
