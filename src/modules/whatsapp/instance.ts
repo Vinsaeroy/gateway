@@ -175,6 +175,11 @@ export class WhatsAppInstance {
                     logger.error("Instance", "Group sync failed:", e);
                 }
 
+                // Sync Newsletter/Channel names
+                this.syncNewsletterNames().catch(e => {
+                    logger.error("Instance", "Newsletter sync failed:", e);
+                });
+
                 // Bind Auto Reply (only if socket still exists)
                 if (this.socket) {
                     bindAutoReply(this.socket as WASocket, this.sessionId);
@@ -235,6 +240,86 @@ export class WhatsAppInstance {
         } catch (error) {
             logger.error("Instance", "Pairing code error:", error);
             throw error;
+        }
+    }
+
+    /**
+     * Sync newsletter/channel names from WhatsApp.
+     * Fetches metadata for all newsletter JIDs that don't have a name in the database.
+     */
+    private async syncNewsletterNames() {
+        if (!this.socket) return;
+
+        const session = await prisma.session.findUnique({
+            where: { sessionId: this.sessionId },
+            select: { id: true }
+        });
+        if (!session) return;
+
+        // Find newsletter JIDs without names
+        const newsletterContacts = await prisma.contact.findMany({
+            where: {
+                sessionId: session.id,
+                jid: { endsWith: "@newsletter" },
+                OR: [
+                    { name: null },
+                    { name: "" }
+                ]
+            },
+            select: { jid: true }
+        });
+
+        // Also find newsletter JIDs from messages that don't have a contact entry
+        const newsletterMessages = await prisma.message.findMany({
+            where: {
+                sessionId: session.id,
+                remoteJid: { endsWith: "@newsletter" }
+            },
+            distinct: ['remoteJid'],
+            select: { remoteJid: true }
+        });
+
+        const allNewsletterJids = new Set([
+            ...newsletterContacts.map(c => c.jid),
+            ...newsletterMessages.map(m => m.remoteJid)
+        ]);
+
+        if (allNewsletterJids.size === 0) return;
+
+        logger.info("Instance", `Syncing ${allNewsletterJids.size} newsletter names for session ${this.sessionId}`);
+
+        let synced = 0;
+        for (const jid of allNewsletterJids) {
+            try {
+                const metadata = await this.socket.newsletterMetadata("jid", jid);
+                if (metadata?.name) {
+                    await prisma.contact.upsert({
+                        where: { sessionId_jid: { sessionId: session.id, jid } },
+                        create: {
+                            sessionId: session.id,
+                            jid,
+                            name: metadata.name,
+                            notify: metadata.name,
+                            profilePic: metadata.picture?.url || null
+                        },
+                        update: {
+                            name: metadata.name,
+                            notify: metadata.name,
+                            profilePic: metadata.picture?.url || undefined
+                        }
+                    });
+                    synced++;
+                }
+                // Small delay to avoid rate limiting
+                await new Promise(resolve => setTimeout(resolve, 500));
+            } catch (e) {
+                // Silently skip failed ones
+                logger.debug("Instance", `Failed to fetch newsletter metadata for ${jid}`);
+            }
+        }
+
+        if (synced > 0) {
+            logger.success("Instance", `Synced ${synced} newsletter names for session ${this.sessionId}`);
         }
     }
 }
