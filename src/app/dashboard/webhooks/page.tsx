@@ -403,7 +403,7 @@ export default function WebhooksPage() {
                                     <CardTitle>New Webhook</CardTitle>
                                 </CardHeader>
                                 <CardContent className="pt-4 space-y-4">
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div className="space-y-2">
                                             <Label>Name</Label>
                                             <Input
@@ -431,7 +431,7 @@ export default function WebhooksPage() {
                                     </div>
                                     <div className="space-y-2">
                                         <Label>Events</Label>
-                                        <div className="grid grid-cols-2 gap-2">
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                             {AVAILABLE_EVENTS.map(event => (
                                                 <div key={event.id} className="flex items-center gap-2 p-2 rounded border">
                                                     <Switch

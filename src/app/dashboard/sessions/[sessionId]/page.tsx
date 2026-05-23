@@ -231,8 +231,8 @@ export default function SessionDetailPage() {
                         <CardDescription>Real-time connection status and uptime.</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="p-4 bg-gray-50 rounded-lg">
+                        <div className="grid grid-cols-2 sm:grid-cols-2 gap-3 sm:gap-4">
+                            <div className="p-3 sm:p-4 bg-gray-50 rounded-lg">
                                 <span className="text-sm text-gray-500 block">Uptime</span>
                                 <span className="text-xl font-mono font-medium">{formatUptime(uptime)}</span>
                             </div>
@@ -295,7 +295,7 @@ export default function SessionDetailPage() {
                                             <div className="mt-4 p-4 bg-slate-900 rounded-lg w-full max-w-[320px] text-center border-2 border-slate-700 shadow-xl relative group/code">
                                                 <div className="text-[10px] text-slate-400 uppercase tracking-[0.2em] mb-2 font-semibold">Your Pairing Code</div>
                                                 <div
-                                                    className="text-3xl font-mono font-bold text-white tracking-[0.3em] flex justify-center cursor-pointer hover:text-blue-400 transition-colors py-2"
+                                                    className="text-2xl sm:text-3xl font-mono font-bold text-white tracking-[0.2em] sm:tracking-[0.3em] flex justify-center cursor-pointer hover:text-blue-400 transition-colors py-2 break-all"
                                                     onClick={() => copyToClipboard(pairingCode)}
                                                     title="Click to copy"
                                                 >

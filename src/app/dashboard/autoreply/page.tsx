@@ -202,7 +202,7 @@ export default function AutoReplyPage() {
                             <DialogDescription>Add a new keyword-based response.</DialogDescription>
                         </DialogHeader>
                         <div className="space-y-4 py-4">
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                                 <div className="space-y-2">
                                     <Label>Keyword</Label>
                                     <Input 
@@ -344,7 +344,7 @@ export default function AutoReplyPage() {
                         <DialogDescription>Modify the keyword-based response rule.</DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                             <div className="space-y-2">
                                 <Label>Keyword</Label>
                                 <Input 

@@ -277,3 +277,55 @@ body {
 .styled-scrollbar::-webkit-scrollbar-thumb:hover {
     background: var(--muted-foreground);
 }
+
+/* ============================================================
+ * Mobile-friendly defaults for common patterns
+ * ============================================================ */
+
+/* Prevent dialogs from being wider than viewport on small screens.
+ * Radix DialogContent applies fixed width — these rules ensure it
+ * never exceeds the available width. */
+[data-slot="dialog-content"] {
+    max-width: calc(100vw - 1.5rem) !important;
+    max-height: calc(100vh - 2rem) !important;
+}
+
+/* On very small screens, allow dialog to use almost full viewport */
+@media (max-width: 480px) {
+    [data-slot="dialog-content"] {
+        max-width: calc(100vw - 1rem) !important;
+        padding: 1rem !important;
+    }
+}
+
+/* Cards should never overflow their parent on mobile */
+@media (max-width: 640px) {
+    [data-slot="card"] {
+        max-width: 100%;
+    }
+}
+
+/* File inputs render inconsistently on mobile — make them shrinkable */
+input[type="file"] {
+    max-width: 100%;
+}
+
+/* Long unbreakable strings (URLs, JIDs, hashes) should wrap inside cards */
+.break-anywhere,
+.card-content {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+/* Tables in dashboards should scroll horizontally on mobile, not overflow page */
+.dashboard-table-wrapper {
+    @apply w-full overflow-x-auto -mx-3 px-3 sm:mx-0 sm:px-0;
+}
+
+/* Code/JID/URL spans should always be selectable & wrappable */
+code,
+kbd,
+.font-mono {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}

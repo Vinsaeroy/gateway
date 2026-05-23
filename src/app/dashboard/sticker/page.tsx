@@ -124,7 +124,7 @@ export default function StickerPage() {
                                             <Input value={author} onChange={e => setAuthor(e.target.value)} />
                                         </div>
                                     </div>
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                                         <div className="space-y-2">
                                             <Label>Quality (1-100)</Label>
                                             <Input type="number" min={1} max={100} value={quality} onChange={e => setQuality(parseInt(e.target.value))} />
