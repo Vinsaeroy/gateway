@@ -14,12 +14,10 @@ export const authConfig = {
     callbacks: {
         authorized({ auth, request: { nextUrl } }) {
             const isLoggedIn = !!auth?.user;
-            const isOnDashboard = nextUrl.pathname.startsWith('/dashboard');
-
-            if (isOnDashboard) {
-                if (isLoggedIn) return true;
-                return false;
-            } else if (isLoggedIn && nextUrl.pathname === '/auth/login') {
+            
+            // Only handle redirect from /auth/login when already logged in
+            // Dashboard auth is handled by proxy.ts to avoid duplicate callbackUrl
+            if (isLoggedIn && nextUrl.pathname === '/auth/login') {
                 return Response.redirect(new URL('/dashboard', nextUrl));
             }
             return true;
