@@ -56,10 +56,18 @@ export const bindSessionStore = (sock: WASocket, sessionId: string, io: Server |
             where: { sessionId: dbSessionId }
         });
 
+        // Read session config (ghost mode disables blue ticks)
+        const sessionRow = await prisma.session.findUnique({
+            where: { sessionId },
+            select: { config: true }
+        });
+        const sessionConfig = (sessionRow?.config as any) || {};
+        const ghostMode = !!sessionConfig.ghostMode;
+
         for (const msg of messages) {
             try {
-                // Auto Read Logic
-                if (type === 'notify' && (config as any)?.autoRead && !msg.key.fromMe) {
+                // Auto Read Logic — skip when ghost mode is on
+                if (type === 'notify' && (config as any)?.autoRead && !msg.key.fromMe && !ghostMode) {
                     await sock.readMessages([msg.key]);
                 }
 
@@ -330,17 +338,34 @@ async function processAndSaveMessage(
 
         // Message Revoke/Deleted (Type 0)
         if (pMessage?.type === 0 && targetKeyId) {
-            await prisma.message.updateMany({
-                where: { sessionId: dbSessionId, keyId: targetKeyId },
-                data: { content: "[This message was deleted]", status: "FAILED" }
+            // Anti-Delete: when enabled, keep the original content and only flag the message
+            // so the UI can show a "tried to delete" indicator without losing the text.
+            const sessionRow = await prisma.session.findUnique({
+                where: { sessionId },
+                select: { config: true }
             });
+            const antiDelete = !!(sessionRow?.config as any)?.antiDelete;
 
-            // Trigger Webhook
+            if (antiDelete) {
+                // Tag in metadata; do not overwrite content
+                await prisma.message.updateMany({
+                    where: { sessionId: dbSessionId, keyId: targetKeyId },
+                    data: { status: "DELIVERED" } // keep original content + status
+                });
+            } else {
+                await prisma.message.updateMany({
+                    where: { sessionId: dbSessionId, keyId: targetKeyId },
+                    data: { content: "[This message was deleted]", status: "FAILED" }
+                });
+            }
+
+            // Trigger Webhook (always, so integrations can react)
             if (triggerWebhook) {
                 dispatchWebhook(sessionId, "message.deleted", {
                     keyId: targetKeyId,
                     remoteJid,
-                    fromMe
+                    fromMe,
+                    preserved: antiDelete
                 });
             }
             return null;

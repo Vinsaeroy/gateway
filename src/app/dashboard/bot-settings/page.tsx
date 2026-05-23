@@ -126,7 +126,7 @@ export default function BotSettingsPage() {
         setPrivacyLoading(true);
         try {
             const res = await fetch(`/api/sessions/${sessionId}/settings`, {
-                method: "POST",
+                method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     config: {
@@ -140,7 +140,8 @@ export default function BotSettingsPage() {
             if (res.ok) {
                 toast.success("Privacy settings saved");
             } else {
-                toast.error("Failed to save privacy settings");
+                const data = await res.json().catch(() => ({}));
+                toast.error(data.message || "Failed to save privacy settings");
             }
         } catch (e) {
             console.error(e);

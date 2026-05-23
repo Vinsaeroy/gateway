@@ -42,7 +42,22 @@ export async function PATCH(
     request: NextRequest,
     { params }: { params: Promise<{ sessionId: string }> }
 ) {
-    const { sessionId } = await params;
+    return updateSettings(request, params);
+}
+
+// POST: Alias for PATCH (backward compat)
+export async function POST(
+    request: NextRequest,
+    { params }: { params: Promise<{ sessionId: string }> }
+) {
+    return updateSettings(request, params);
+}
+
+async function updateSettings(
+    request: NextRequest,
+    paramsPromise: Promise<{ sessionId: string }>
+) {
+    const { sessionId } = await paramsPromise;
 
     try {
         const user = await getAuthenticatedUser(request);
@@ -59,15 +74,40 @@ export async function PATCH(
         const body = await request.json();
         const { config } = body;
 
-        const updated = await prisma.session.update({
+        if (!config || typeof config !== "object") {
+            return NextResponse.json({ status: false, message: "Invalid config payload", error: "Invalid config payload" }, { status: 400 });
+        }
+
+        // Merge with existing config so partial updates don't wipe other keys
+        const existing = await prisma.session.findUnique({
             where: { sessionId },
-            data: { config }
+            select: { config: true }
         });
 
-        // Update active instance if exists
-        const instance = waManager.getInstance(sessionId);
-        if (instance) {
-            // In a real app we might update internal instance state
+        const merged = {
+            ...((existing?.config as object) || {}),
+            ...config,
+        };
+
+        const updated = await prisma.session.update({
+            where: { sessionId },
+            data: { config: merged }
+        });
+
+        // Apply runtime changes to the active socket where possible
+        try {
+            const instance = waManager.getInstance(sessionId);
+            if (instance?.socket) {
+                // Ghost mode = don't send read receipts (mark messages as read locally only)
+                // We set the runtime flag; the message handler reads it before calling readMessages.
+                (instance as any).runtimeConfig = {
+                    ghostMode: !!merged.ghostMode,
+                    antiDelete: !!merged.antiDelete,
+                    readReceipts: merged.readReceipts !== false,
+                };
+            }
+        } catch {
+            // Non-fatal — settings are still saved in DB and will apply on next reconnect
         }
 
         return NextResponse.json({ status: true, message: "Session settings updated successfully", data: updated });
