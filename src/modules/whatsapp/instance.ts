@@ -50,11 +50,11 @@ export class WhatsAppInstance {
 
         this.socket = makeWASocket({
             version,
-            logger: pino({ level: process.env.BAILEYS_LOG_LEVEL || "error" }) as any,
+            logger: pino({ level: process.env.BAILEYS_LOG_LEVEL || "silent" }) as any,
             printQRInTerminal: false,
             auth: {
                 creds: state.creds,
-                keys: makeCacheableSignalKeyStore(state.keys, pino({ level: process.env.BAILEYS_LOG_LEVEL || "error" }) as any),
+                keys: makeCacheableSignalKeyStore(state.keys, pino({ level: process.env.BAILEYS_LOG_LEVEL || "silent" }) as any),
             },
             browser: ["Ubuntu", "Chrome", "20.0.04"],
             markOnlineOnConnect: botConfig?.alwaysOnline ?? true,
