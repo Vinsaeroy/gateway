@@ -102,11 +102,11 @@ export default function RegisterPage() {
 
             <div className="relative z-10 w-full max-w-md p-4 animate-in fade-in zoom-in-95 duration-500">
                 <div className="flex flex-col items-center mb-8">
-                    <div className="relative flex h-16 w-16 mb-4 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-400 to-primary text-white shadow-lg shadow-primary/30">
+                    <Link href="/" className="relative flex h-16 w-16 mb-4 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-400 to-primary text-white shadow-lg shadow-primary/30 hover:scale-105 transition-transform cursor-pointer">
                         <Bot className="h-8 w-8" />
-                    </div>
+                    </Link>
                     <h1 className="text-3xl font-bold tracking-tight text-foreground">Create Account</h1>
-                    <p className="text-muted-foreground mt-2">Join WA-AKG today</p>
+                    <p className="text-muted-foreground mt-2">Join us today</p>
                 </div>
 
                 <div className="glass-panel rounded-3xl p-8 shadow-2xl shadow-black/5 dark:shadow-black/40">
