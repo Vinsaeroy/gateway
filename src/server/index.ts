@@ -60,6 +60,22 @@ app.prepare().then(() => {
   const server = createServer(async (req, res) => {
     try {
       if (!req.url) return;
+
+      // Trust proxy headers (x-forwarded-host, x-forwarded-proto)
+      // This is critical for Railway/Render/etc. so Next.js sees the public URL
+      const forwardedHost = req.headers["x-forwarded-host"];
+      const forwardedProto = req.headers["x-forwarded-proto"];
+
+      if (forwardedHost && typeof forwardedHost === "string") {
+        // Override host header so Next.js generates correct absolute URLs
+        req.headers.host = forwardedHost;
+      }
+
+      // Some Next.js internals check x-forwarded-* — make sure they're set
+      if (!forwardedProto && process.env.NODE_ENV === "production") {
+        req.headers["x-forwarded-proto"] = "https";
+      }
+
       const parsedUrl = parse(req.url, true);
       await handle(req, res, parsedUrl);
     } catch (err) {
