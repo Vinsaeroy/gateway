@@ -2,13 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Trash2, Edit, Radio, Clock, Users } from "lucide-react";
 import { toast } from "sonner";
@@ -30,6 +30,7 @@ interface AutoBroadcast {
 interface Group {
     jid: string;
     subject: string | null;
+    isCommunity?: boolean;
 }
 
 export default function AutoBroadcastPage() {
@@ -38,6 +39,7 @@ export default function AutoBroadcastPage() {
     const [showForm, setShowForm] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
+    const [groupSearch, setGroupSearch] = useState("");
 
     // Form state
     const [name, setName] = useState("");
@@ -82,6 +84,7 @@ export default function AutoBroadcastPage() {
         setTargets(["ALL"]);
         setIntervalMin(60);
         setEditingId(null);
+        setGroupSearch("");
     };
 
     const handleSave = async () => {
@@ -312,7 +315,13 @@ export default function AutoBroadcastPage() {
 
                         <div>
                             <Label>Target Groups</Label>
-                            <div className="mt-2 space-y-2 max-h-48 overflow-y-auto border rounded p-2">
+                            <Input
+                                placeholder="Search groups..."
+                                value={groupSearch}
+                                onChange={e => setGroupSearch(e.target.value)}
+                                className="mt-2 mb-2"
+                            />
+                            <div className="mt-2 space-y-1 max-h-56 overflow-y-auto border rounded p-2">
                                 <div
                                     className={`flex items-center gap-2 p-2 rounded cursor-pointer ${targets.includes("ALL") ? "bg-primary/10 border border-primary" : "hover:bg-muted"}`}
                                     onClick={() => setTargets(["ALL"])}
@@ -320,17 +329,56 @@ export default function AutoBroadcastPage() {
                                     <Radio className="h-4 w-4" />
                                     <span className="text-sm font-medium">All Groups</span>
                                 </div>
-                                {groups.map(g => (
-                                    <div
-                                        key={g.jid}
-                                        className={`flex items-center gap-2 p-2 rounded cursor-pointer ${targets.includes(g.jid) ? "bg-primary/10 border border-primary" : "hover:bg-muted"}`}
-                                        onClick={() => toggleGroupTarget(g.jid)}
-                                    >
-                                        <Users className="h-4 w-4" />
-                                        <span className="text-sm">{g.subject || g.jid}</span>
-                                    </div>
-                                ))}
+
+                                {/* Regular Groups */}
+                                {(() => {
+                                    const filtered = groups.filter(g => !g.isCommunity && (g.subject || g.jid).toLowerCase().includes(groupSearch.toLowerCase()));
+                                    if (filtered.length === 0 && !groupSearch) return null;
+                                    return (
+                                        <>
+                                            <div className="text-xs font-semibold text-muted-foreground mt-3 mb-1 px-2 uppercase tracking-wide">Groups</div>
+                                            {filtered.map(g => (
+                                                <div
+                                                    key={g.jid}
+                                                    className={`flex items-center gap-2 p-2 rounded cursor-pointer text-sm ${targets.includes(g.jid) ? "bg-primary/10 border border-primary" : "hover:bg-muted"}`}
+                                                    onClick={() => toggleGroupTarget(g.jid)}
+                                                >
+                                                    <Users className="h-3.5 w-3.5 shrink-0" />
+                                                    <span className="truncate">{g.subject || g.jid}</span>
+                                                </div>
+                                            ))}
+                                        </>
+                                    );
+                                })()}
+
+                                {/* Communities */}
+                                {(() => {
+                                    const filtered = groups.filter(g => g.isCommunity && (g.subject || g.jid).toLowerCase().includes(groupSearch.toLowerCase()));
+                                    if (filtered.length === 0) return null;
+                                    return (
+                                        <>
+                                            <div className="text-xs font-semibold text-muted-foreground mt-3 mb-1 px-2 uppercase tracking-wide">Communities</div>
+                                            {filtered.map(g => (
+                                                <div
+                                                    key={g.jid}
+                                                    className={`flex items-center gap-2 p-2 rounded cursor-pointer text-sm ${targets.includes(g.jid) ? "bg-primary/10 border border-primary" : "hover:bg-muted"}`}
+                                                    onClick={() => toggleGroupTarget(g.jid)}
+                                                >
+                                                    <Radio className="h-3.5 w-3.5 shrink-0" />
+                                                    <span className="truncate">{g.subject || g.jid}</span>
+                                                </div>
+                                            ))}
+                                        </>
+                                    );
+                                })()}
+
+                                {groups.filter(g => (g.subject || g.jid).toLowerCase().includes(groupSearch.toLowerCase())).length === 0 && groupSearch && (
+                                    <p className="text-xs text-muted-foreground text-center py-2">No groups found</p>
+                                )}
                             </div>
+                            {!targets.includes("ALL") && targets.length > 0 && (
+                                <p className="text-xs text-muted-foreground mt-1">{targets.length} group(s) selected</p>
+                            )}
                         </div>
 
                         <Button onClick={handleSave} disabled={loading} className="w-full">
