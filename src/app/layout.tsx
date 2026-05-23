@@ -42,15 +42,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className="scroll-smooth">
+    <html lang="en" translate="no" suppressHydrationWarning className="scroll-smooth notranslate">
+      <head>
+        {/* Disable browser translators (Google Translate, Edge Translate, etc.).
+            App content includes dynamic data (WhatsApp JIDs, session names,
+            message content) that must NOT be translated. Translators also
+            mutate the DOM, breaking React reconciliation. */}
+        <meta name="google" content="notranslate" />
+      </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased text-foreground bg-background selection:bg-primary/30 selection:text-primary-foreground min-h-screen flex flex-col`}
+        className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased text-foreground bg-background selection:bg-primary/30 selection:text-primary-foreground min-h-screen flex flex-col notranslate`}
         suppressHydrationWarning
       >
-        {/* Patch DOM mutation methods to survive Google Translate.
-            Translators replace text with <font> wrappers, which makes
-            React's removeChild/insertBefore throw NotFoundError and
-            crash the page. Fail-soft so reconciliation can continue. */}
+        {/* Belt-and-suspenders DOM patch: even if a translator bypasses
+            the meta tags above (some extensions ignore them), we make
+            DOM mutations fail-soft so React keeps rendering. */}
         <script
           dangerouslySetInnerHTML={{
             __html: `(function(){if(typeof Node==='undefined')return;var p=Node.prototype;if(p.__translateFixApplied)return;p.__translateFixApplied=true;var origRemove=p.removeChild;p.removeChild=function(child){if(child.parentNode!==this)return child;return origRemove.apply(this,arguments);};var origInsert=p.insertBefore;p.insertBefore=function(newNode,refNode){if(refNode&&refNode.parentNode!==this)return origInsert.call(this,newNode,null);return origInsert.apply(this,arguments);};})();`,
