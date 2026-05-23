@@ -101,17 +101,25 @@ export const bindSessionStore = (sock: WASocket, sessionId: string, io: Server |
             dbSessionId = session.id;
         }
 
-        // Save all historical messages
+        // Save all historical messages (batched to avoid log spam and rate limits)
         if (messages && messages.length > 0) {
-            logger.info("Store", `Syncing ${messages.length} historical messages...`);
-            for (const msg of messages) {
-                try {
-                    await processAndSaveMessage(msg, dbSessionId, sessionId, false, sock);
-                } catch (error) {
-                    logger.error("Store", "Error saving historical message", error);
+            logger.info("Store", `Syncing ${messages.length} historical messages (batched)...`);
+            const BATCH_SIZE = 10;
+            let processed = 0;
+            
+            for (let i = 0; i < messages.length; i += BATCH_SIZE) {
+                const batch = messages.slice(i, i + BATCH_SIZE);
+                await Promise.allSettled(
+                    batch.map(msg => processAndSaveMessage(msg, dbSessionId, sessionId, false, sock).catch(() => {}))
+                );
+                processed += batch.length;
+                
+                // Small delay between batches to avoid overwhelming DB and logs
+                if (i + BATCH_SIZE < messages.length) {
+                    await new Promise(r => setTimeout(r, 100));
                 }
             }
-            logger.success("Store", `Finished syncing ${messages.length} historical messages`);
+            logger.success("Store", `Finished syncing ${processed} historical messages`);
         }
 
 
