@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Trash2, Edit, Radio, Clock, Users } from "lucide-react";
@@ -279,38 +278,58 @@ export default function AutoBroadcastPage() {
                         </div>
 
                         <div>
-                            <Label>Media URL (optional)</Label>
-                            <Input value={mediaUrl} onChange={e => setMediaUrl(e.target.value)} placeholder="https://example.com/image.jpg" />
-                        </div>
-
-                        {mediaUrl && (
-                            <div>
-                                <Label>Media Type</Label>
-                                <Select value={mediaType} onValueChange={setMediaType}>
-                                    <SelectTrigger><SelectValue placeholder="Select type" /></SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="image">Image</SelectItem>
-                                        <SelectItem value="video">Video</SelectItem>
-                                        <SelectItem value="document">Document</SelectItem>
-                                    </SelectContent>
-                                </Select>
+                            <Label>Media (optional)</Label>
+                            <div className="mt-2 space-y-2">
+                                <Input
+                                    type="file"
+                                    accept="image/jpeg,image/png,image/webp,video/mp4"
+                                    onChange={async (e) => {
+                                        const file = e.target.files?.[0];
+                                        if (!file) return;
+                                        const formData = new FormData();
+                                        formData.append("file", file);
+                                        try {
+                                            const res = await fetch("/api/autobroadcast/upload", {
+                                                method: "POST",
+                                                body: formData
+                                            });
+                                            const data = await res.json();
+                                            if (data.status) {
+                                                setMediaUrl(data.data.url);
+                                                setMediaType(data.data.type);
+                                                toast.success("Image uploaded");
+                                            } else {
+                                                toast.error(data.message);
+                                            }
+                                        } catch (_err) {
+                                            toast.error("Upload failed");
+                                        }
+                                    }}
+                                />
+                                {mediaUrl && (
+                                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                        <span>✅ {mediaType}: {mediaUrl.split("/").pop()}</span>
+                                        <Button size="sm" variant="ghost" onClick={() => { setMediaUrl(""); setMediaType(""); }}>
+                                            Remove
+                                        </Button>
+                                    </div>
+                                )}
                             </div>
-                        )}
+                        </div>
 
                         <div>
                             <Label>Interval (minutes)</Label>
-                            <Select value={String(intervalMin)} onValueChange={v => setIntervalMin(Number(v))}>
-                                <SelectTrigger><SelectValue /></SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="30">Every 30 minutes</SelectItem>
-                                    <SelectItem value="60">Every 1 hour</SelectItem>
-                                    <SelectItem value="120">Every 2 hours</SelectItem>
-                                    <SelectItem value="180">Every 3 hours</SelectItem>
-                                    <SelectItem value="360">Every 6 hours</SelectItem>
-                                    <SelectItem value="720">Every 12 hours</SelectItem>
-                                    <SelectItem value="1440">Every 24 hours</SelectItem>
-                                </SelectContent>
-                            </Select>
+                            <Input
+                                type="number"
+                                min={10}
+                                max={1440}
+                                value={intervalMin}
+                                onChange={e => setIntervalMin(Number(e.target.value))}
+                                className="mt-1"
+                            />
+                            <p className="text-xs text-muted-foreground mt-1">
+                                {intervalMin >= 60 ? `Every ${Math.floor(intervalMin / 60)}h ${intervalMin % 60 > 0 ? `${intervalMin % 60}m` : ""}` : `Every ${intervalMin} minutes`}
+                            </p>
                         </div>
 
                         <div>

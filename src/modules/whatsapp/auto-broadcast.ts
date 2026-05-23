@@ -110,15 +110,32 @@ async function sendBroadcast(broadcast: any) {
             try {
                 if (broadcast.mediaUrl && broadcast.mediaType) {
                     const mediaContent: any = {};
+                    let mediaSource: any;
+
+                    // Check if media is local file or URL
+                    if (broadcast.mediaUrl.startsWith("/api/media/")) {
+                        // Local file — read from disk
+                        const filename = broadcast.mediaUrl.replace("/api/media/", "");
+                        const filePath = require("path").join(process.cwd(), "data", "media", filename);
+                        const fs = require("fs");
+                        if (fs.existsSync(filePath)) {
+                            mediaSource = fs.readFileSync(filePath);
+                        } else {
+                            logger.warn("AutoBroadcast", `Media file not found: ${filePath}`);
+                            mediaSource = { url: broadcast.mediaUrl };
+                        }
+                    } else {
+                        mediaSource = { url: broadcast.mediaUrl };
+                    }
 
                     if (broadcast.mediaType === "image") {
-                        mediaContent.image = { url: broadcast.mediaUrl };
+                        mediaContent.image = mediaSource;
                         mediaContent.caption = broadcast.message;
                     } else if (broadcast.mediaType === "video") {
-                        mediaContent.video = { url: broadcast.mediaUrl };
+                        mediaContent.video = mediaSource;
                         mediaContent.caption = broadcast.message;
                     } else if (broadcast.mediaType === "document") {
-                        mediaContent.document = { url: broadcast.mediaUrl };
+                        mediaContent.document = mediaSource;
                         mediaContent.caption = broadcast.message;
                     }
 
