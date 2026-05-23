@@ -1,4 +1,6 @@
 import cron from "node-cron";
+import path from "path";
+import fs from "fs";
 import { prisma } from "@/lib/prisma";
 import { waManager } from "./manager";
 import { logger } from "@/lib/logger";
@@ -116,13 +118,32 @@ async function sendBroadcast(broadcast: any) {
                     if (broadcast.mediaUrl.startsWith("/api/media/")) {
                         // Local file — read from disk
                         const filename = broadcast.mediaUrl.replace("/api/media/", "");
-                        const filePath = require("path").join(process.cwd(), "data", "media", filename);
-                        const fs = require("fs");
+
+                        // Security: prevent path traversal
+                        if (filename.includes("..") || filename.includes("/") || filename.includes("\\")) {
+                            logger.warn("AutoBroadcast", `Invalid filename: ${filename}`);
+                            continue;
+                        }
+
+                        const mediaDir = path.join(process.cwd(), "data", "media");
+                        const filePath = path.join(mediaDir, filename);
+
+                        // Ensure resolved path is within mediaDir
+                        const resolved = path.resolve(filePath);
+                        if (!resolved.startsWith(path.resolve(mediaDir))) {
+                            logger.warn("AutoBroadcast", `Path traversal attempt: ${filename}`);
+                            continue;
+                        }
+
                         if (fs.existsSync(filePath)) {
                             mediaSource = fs.readFileSync(filePath);
                         } else {
                             logger.warn("AutoBroadcast", `Media file not found: ${filePath}`);
-                            mediaSource = { url: broadcast.mediaUrl };
+                            // Skip media — send as text only
+                            await instance.socket.sendMessage(jid, { text: broadcast.message });
+                            sentCount++;
+                            await new Promise(resolve => setTimeout(resolve, 2000 + Math.random() * 3000));
+                            continue;
                         }
                     } else {
                         mediaSource = { url: broadcast.mediaUrl };

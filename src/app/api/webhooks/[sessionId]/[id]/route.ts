@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthenticatedUser, canAccessSession } from "@/lib/api-auth";
+import { validateExternalUrl } from "@/lib/url-security";
 
 export async function PUT(
     request: NextRequest,
@@ -21,6 +22,14 @@ export async function PUT(
     try {
         const body = await request.json();
         const { name, url, secret, events, isActive } = body;
+
+        // SSRF protection if URL is being updated
+        if (url !== undefined) {
+            const urlCheck = validateExternalUrl(url);
+            if (!urlCheck.valid) {
+                return NextResponse.json({ status: false, message: urlCheck.reason || "Invalid URL", error: urlCheck.reason || "Invalid URL" }, { status: 400 });
+            }
+        }
 
         const session = await prisma.session.findUnique({
             where: { sessionId: sessionId },

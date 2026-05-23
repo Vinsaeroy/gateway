@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
 
             } catch (e) {
                 console.error("Sticker generation from URL failed:", e);
-                return NextResponse.json({ status: false, message: "Failed to generate sticker", error: `Failed to generate sticker from URL: ${(e as any).message}` }, { status: 400 });
+                return NextResponse.json({ status: false, message: "Failed to generate sticker", error: "Failed to generate sticker from URL" }, { status: 400 });
             }
         }
 

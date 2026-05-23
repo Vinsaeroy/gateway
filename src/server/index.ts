@@ -57,6 +57,8 @@ const app = next({ dev, hostname, port });
 const handle = app.getRequestHandler();
 
 app.prepare().then(() => {
+  let heartbeatInterval: NodeJS.Timeout | null = null;
+
   const server = createServer(async (req, res) => {
     try {
       if (!req.url) return;
@@ -149,7 +151,50 @@ app.prepare().then(() => {
     // Initial ping
     sendHeartbeat();
     // Interval ping
-    setInterval(sendHeartbeat, 30000);
+    heartbeatInterval = setInterval(sendHeartbeat, 30000);
     // --------------------------------
+  });
+
+  // --- Graceful Shutdown ---
+  // Important for Railway/production: close DB pools, sockets, and server cleanly
+  // so in-flight requests finish and resources are released before container exits
+  let isShuttingDown = false;
+  const shutdown = async (signal: string) => {
+    if (isShuttingDown) return;
+    isShuttingDown = true;
+    logger.info("Server", `Received ${signal}, shutting down gracefully...`);
+
+    // Stop accepting new connections
+    server.close(() => {
+      logger.info("Server", "HTTP server closed");
+    });
+
+    // Clear heartbeat
+    if (heartbeatInterval) clearInterval(heartbeatInterval);
+
+    // Close socket.io connections
+    try {
+      io.close();
+    } catch { /* ignore */ }
+
+    // Force exit after 10s if cleanup hangs
+    setTimeout(() => {
+      logger.warn("Server", "Forced exit after timeout");
+      process.exit(0);
+    }, 10000).unref();
+
+    // Allow normal exit when all listeners closed
+    setTimeout(() => process.exit(0), 2000).unref();
+  };
+
+  process.on("SIGTERM", () => shutdown("SIGTERM"));
+  process.on("SIGINT", () => shutdown("SIGINT"));
+
+  // Handle uncaught errors so process doesn't crash silently
+  process.on("uncaughtException", (err) => {
+    logger.error("Server", "Uncaught exception:", err);
+  });
+  process.on("unhandledRejection", (reason) => {
+    logger.error("Server", "Unhandled rejection:", reason);
   });
 });

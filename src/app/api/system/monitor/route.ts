@@ -78,6 +78,6 @@ export async function GET(req: NextRequest) {
 
     } catch (error: any) {
         console.error("Monitor API Error:", error);
-        return NextResponse.json({ status: false, message: error.message }, { status: 500 });
+        return NextResponse.json({ status: false, message: "Failed to fetch system metrics", error: "Failed to fetch system metrics" }, { status: 500 });
     }
 }

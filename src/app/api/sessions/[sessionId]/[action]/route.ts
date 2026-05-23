@@ -68,6 +68,6 @@ export async function POST(
 
     } catch (error) {
         console.error("Session action error:", error);
-        return NextResponse.json({ error: `Failed to ${(error as any).message || "perform action"}` }, { status: 500 });
+        return NextResponse.json({ status: false, message: "Failed to perform session action", error: "Failed to perform session action" }, { status: 500 });
     }
 }

@@ -94,6 +94,6 @@ export async function GET(
 
     } catch (error: any) {
         console.error("Session Monitor API Error:", error);
-        return NextResponse.json({ status: false, message: error.message }, { status: 500 });
+        return NextResponse.json({ status: false, message: "Failed to fetch session metrics", error: "Failed to fetch session metrics" }, { status: 500 });
     }
 }

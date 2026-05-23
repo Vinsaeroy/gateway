@@ -145,8 +145,7 @@ export async function POST(request: NextRequest) {
             cause: e.cause
         });
         return NextResponse.json({ 
-            error: "Failed to post status", 
-            details: e.message 
+            error: "Failed to post status"
         }, { status: 500 });
     }
 }

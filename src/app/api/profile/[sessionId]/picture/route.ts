@@ -39,7 +39,7 @@ export async function PUT(
 
     } catch (error: any) {
         console.error("Update profile picture error:", error);
-        return NextResponse.json({ status: false, message: error.message }, { status: 500 });
+        return NextResponse.json({ status: false, message: "Failed to update profile picture", error: "Failed to update profile picture" }, { status: 500 });
     }
 }
 
@@ -71,6 +71,6 @@ export async function DELETE(
 
     } catch (error: any) {
         console.error("Remove profile picture error:", error);
-        return NextResponse.json({ status: false, message: error.message }, { status: 500 });
+        return NextResponse.json({ status: false, message: "Failed to remove profile picture", error: "Failed to remove profile picture" }, { status: 500 });
     }
 }

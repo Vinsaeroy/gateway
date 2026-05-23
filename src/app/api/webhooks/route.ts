@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthenticatedUser, canAccessSession } from "@/lib/api-auth";
+import { validateExternalUrl } from "@/lib/url-security";
 
 export async function GET(request: NextRequest) {
     console.warn('[DEPRECATED] GET /api/webhooks is deprecated. Use GET /api/webhooks/{sessionId} instead.');
@@ -36,6 +37,12 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ status: false, message: "Name, URL, and at least one event are required", error: "Name, URL, and at least one event are required" }, { status: 400 });
         }
 
+        // SSRF protection — block internal/private URLs
+        const urlCheck = validateExternalUrl(url);
+        if (!urlCheck.valid) {
+            return NextResponse.json({ status: false, message: urlCheck.reason || "Invalid URL", error: urlCheck.reason || "Invalid URL" }, { status: 400 });
+        }
+
         let targetSessionId = null;
         if (sessionId) {
             const canAccess = await canAccessSession(user.id, user.role, sessionId);
@@ -68,6 +75,6 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ status: true, message: "Webhook created successfully", data: webhook });
     } catch (error: any) {
         console.error("Create webhook error detailed:", error);
-        return NextResponse.json({ status: false, message: "Failed to create webhook", error: "Failed to create webhook", details: error.message }, { status: 500 });
+        return NextResponse.json({ status: false, message: "Failed to create webhook", error: "Failed to create webhook" }, { status: 500 });
     }
 }
