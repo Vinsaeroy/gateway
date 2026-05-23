@@ -27,7 +27,11 @@ const formSchema = z.object({
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
+  // Sanitize callbackUrl: only accept relative paths, reject any with full URLs (prevents 0.0.0.0:3030 redirect)
+  const rawCallbackUrl = searchParams.get('callbackUrl') || '/dashboard';
+  const callbackUrl = rawCallbackUrl.startsWith('/') && !rawCallbackUrl.startsWith('//') 
+    ? rawCallbackUrl 
+    : '/dashboard';
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
