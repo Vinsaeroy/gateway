@@ -4,8 +4,6 @@ import React, { useState, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import Link from "next/link";
-import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
-import { atomOneDark } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import { Menu, X, Search, ChevronRight } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -244,15 +242,9 @@ export function DocsClient({ content, toc }: DocsClientProps) {
                                         <div className="bg-gray-800 px-4 py-2 flex items-center justify-between">
                                             <span className="text-xs font-mono text-gray-400 capitalize">{match[1]}</span>
                                         </div>
-                                        <SyntaxHighlighter
-                                            style={atomOneDark}
-                                            language={match[1]}
-                                            PreTag="div"
-                                            customStyle={{ margin: 0, padding: '1rem', borderRadius: 0, fontSize: '0.9em' }}
-                                            {...props}
-                                        >
-                                            {String(children).replace(/\n$/, '')}
-                                        </SyntaxHighlighter>
+                                        <pre className="bg-[#282c34] text-[#abb2bf] p-4 overflow-x-auto text-sm font-mono" style={{ margin: 0, borderRadius: 0 }}>
+                                            <code>{String(children).replace(/\n$/, '')}</code>
+                                        </pre>
                                     </div>
                                 ) : (
                                     <code className="bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-sm font-mono border border-gray-200 break-all" {...props}> {/* break-all for inline code */}
