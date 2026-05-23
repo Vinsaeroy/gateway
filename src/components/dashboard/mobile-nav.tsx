@@ -172,8 +172,8 @@ export function MobileNav({ appName = "WA-AKG" }: { appName?: string }) {
                             {session?.user?.name?.charAt(0)?.toUpperCase() || "U"}
                         </div>
                         <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-slate-700 truncate">{session?.user?.name || "User"}</p>
-                            <p className="text-[11px] text-slate-400 truncate">{session?.user?.email}</p>
+                            <p className="text-sm font-medium text-slate-700 truncate" translate="no">{session?.user?.name || "User"}</p>
+                            <p className="text-[11px] text-slate-400 truncate" translate="no">{session?.user?.email}</p>
                         </div>
                     </div>
                     <Button
@@ -197,7 +197,7 @@ export function MobileNav({ appName = "WA-AKG" }: { appName?: string }) {
                     >
                         <LogOut size={14} /> Sign Out
                     </Button>
-                    <p className="text-[10px] text-slate-300 text-center mt-2 font-mono">v{pkg.version}</p>
+                    <p className="text-[10px] text-slate-300 text-center mt-2 font-mono" translate="no">v{pkg.version}</p>
                 </div>
             </SheetContent>
         </Sheet>

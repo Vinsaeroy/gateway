@@ -205,3 +205,75 @@
     }
   }
 }
+
+/* ============================================================
+ * Translation safety + responsive baseline
+ * ============================================================ */
+
+/* Browser translators (Google Translate) inject `<font>` tags inside text
+ * nodes which breaks React reconciliation. The `.notranslate` class is the
+ * standard way to opt content out, and we also reset the inline `<font>`
+ * styles in case a translator still touches the page so the layout doesn't
+ * collapse. */
+.notranslate,
+[translate="no"] {
+    /* Belt-and-suspenders: signal to translators we manage this content */
+}
+
+font {
+    font: inherit;
+    color: inherit;
+}
+
+/* Prevent horizontal scroll on small screens caused by overflowing children
+ * (e.g. long unbroken strings, wide tables). `overflow-x: hidden` is too
+ * aggressive globally; use `overflow-wrap` to soft-break long words instead. */
+html,
+body {
+    overflow-x: hidden;
+    overflow-wrap: anywhere;
+    -webkit-text-size-adjust: 100%; /* iOS Safari zoom-on-rotate fix */
+}
+
+/* Avoid iOS auto-zoom on focus when input font-size < 16px */
+@media (max-width: 640px) {
+    input,
+    textarea,
+    select {
+        font-size: 16px;
+    }
+}
+
+/* Make tables scrollable inside their container instead of overflowing */
+.responsive-table-wrapper {
+    @apply w-full overflow-x-auto -mx-2 px-2 sm:mx-0 sm:px-0;
+}
+
+/* Better tap targets on mobile */
+@media (max-width: 640px) {
+    button,
+    a[role="button"],
+    [role="tab"] {
+        min-height: 36px;
+    }
+}
+
+/* Style the existing styled-scrollbar utility for consistency */
+.styled-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+}
+.styled-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+.styled-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+.styled-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 4px;
+}
+.styled-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: var(--muted-foreground);
+}

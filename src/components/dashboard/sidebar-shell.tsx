@@ -81,8 +81,8 @@ export function SidebarShell({ appName, userName, userEmail, version }: SidebarS
                                 {userName?.charAt(0)?.toUpperCase() || "U"}
                             </div>
                             <div className="flex-1 min-w-0">
-                                <p className="text-sm font-semibold text-foreground truncate">{userName || "User"}</p>
-                                <p className="text-[10px] text-muted-foreground truncate">{userEmail}</p>
+                                <p className="text-sm font-semibold text-foreground truncate" translate="no">{userName || "User"}</p>
+                                <p className="text-[10px] text-muted-foreground truncate" translate="no">{userEmail}</p>
                             </div>
                         </div>
                         <Button
@@ -105,7 +105,7 @@ export function SidebarShell({ appName, userName, userEmail, version }: SidebarS
                         >
                             <LogOut size={14} /> Sign Out
                         </Button>
-                        <p className="text-[9px] text-muted-foreground/50 text-center mt-2 font-mono">v{version}</p>
+                        <p className="text-[9px] text-muted-foreground/50 text-center mt-2 font-mono" translate="no">v{version}</p>
                     </>
                 )}
             </div>
