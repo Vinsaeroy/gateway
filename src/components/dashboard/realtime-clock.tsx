@@ -3,24 +3,30 @@
 import { useEffect, useState } from "react";
 import moment from "moment-timezone";
 import { Clock } from "lucide-react";
+import { useSession } from "next-auth/react";
 
 export function RealtimeClock() {
     const [time, setTime] = useState("");
     const [timezone, setTimezone] = useState("Asia/Jakarta");
     const [mounted, setMounted] = useState(false);
+    const { status } = useSession();
 
     useEffect(() => {
         setMounted(true);
+    }, []);
+
+    useEffect(() => {
+        // Wait for auth ready before fetching
+        if (status !== "authenticated") return;
         // Fetch global timezone
         fetch('/api/settings/system')
-            .then(r => r.json())
-            .then(data => {
-                if (data && data.timezone) {
-                    setTimezone(data.timezone);
-                }
+            .then(r => (r.ok ? r.json() : null))
+            .then(res => {
+                const tz = res?.data?.timezone || res?.timezone;
+                if (tz) setTimezone(tz);
             })
             .catch(() => { });
-    }, []);
+    }, [status]);
 
     useEffect(() => {
         if (!mounted) return;

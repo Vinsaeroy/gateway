@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { getCookie, setCookie } from "@/lib/client-cookie";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+import { useSession as useNextAuthSession } from "next-auth/react";
 
 interface Session {
     id: string;
@@ -27,6 +27,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     const [sessionId, setSessionIdState] = useState<string>("");
     const [loading, setLoading] = useState(true);
     const router = useRouter();
+    const { status: authStatus } = useNextAuthSession();
 
     const fetchSessions = async () => {
         try {
@@ -52,17 +53,20 @@ export function SessionProvider({ children }: { children: ReactNode }) {
                     setSessionIdState("");
                 }
             }
-        } catch (error) {
-            console.error(error);
-            toast.error("Failed to fetch sessions");
+            // Silently ignore 401/403 — auth still loading
+        } catch {
+            // Silent fail — only show toast on real network errors after auth ready
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
+        // Wait for NextAuth session to be authenticated before fetching
+        // This prevents 401 errors in Network log on initial dashboard load
+        if (authStatus !== "authenticated") return;
         fetchSessions();
-    }, []);
+    }, [authStatus]);
 
     const setSessionId = (id: string) => {
         setSessionIdState(id);
