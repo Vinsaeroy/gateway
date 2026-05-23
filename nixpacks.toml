@@ -2,7 +2,9 @@
 nixPkgs = ["nodejs_20", "openssl"]
 
 [phases.install]
-cmds = ["npm ci"]
+# Use --include=dev so build-time deps (tailwindcss, typescript, eslint-config-next)
+# are installed even when Railway sets NODE_ENV=production.
+cmds = ["npm ci --include=dev"]
 
 [phases.build]
 cmds = ["npx prisma generate", "npm run build"]
