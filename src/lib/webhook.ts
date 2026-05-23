@@ -172,7 +172,7 @@ export async function downloadAndSaveMedia(message: WAMessage, sessionId: string
             return null;
         }
 
-        logger.info("Media", `Attempting to download ${messageType}...`);
+        logger.debug("Media", `Attempting to download ${messageType}...`);
 
         let buffer: Buffer | null = null;
         const mediaObj = (messageContent as any)[messageType];
@@ -211,8 +211,25 @@ export async function downloadAndSaveMedia(message: WAMessage, sessionId: string
                     "buffer",
                     {}
                 ) as Buffer;
-            } catch (e) {
-                logger.error("Media", "Failed to download encrypted media:", e);
+            } catch (e: any) {
+                // Common WhatsApp limitations — log at warn level, don't spam errors:
+                //  • "bad decrypt" / "Provider routines" → media key expired or message too old
+                //  • "404" / "410" → media removed from WhatsApp servers
+                //  • "Stream closed" → connection dropped mid-download
+                const msg = e?.message || String(e);
+                const isExpected = (
+                    msg.includes("bad decrypt") ||
+                    msg.includes("Provider routines") ||
+                    msg.includes("404") ||
+                    msg.includes("410") ||
+                    msg.includes("Stream closed") ||
+                    msg.includes("AES_GCM_ERROR")
+                );
+                if (isExpected) {
+                    logger.debug("Media", `Unable to decrypt media (likely expired): ${message.key?.id}`);
+                } else {
+                    logger.error("Media", "Failed to download encrypted media:", e);
+                }
                 return null;
             }
         }
@@ -320,15 +337,12 @@ export async function onMessageReceived(sessionId: string, message: any, existin
         }
     }
 
-    // Download media if available (or use existing)
-    let fileUrl: string | null = existingFileUrl || null;
-    if (!fileUrl) {
-        try {
-            fileUrl = await downloadAndSaveMedia(message, sessionId);
-        } catch (e) {
-            logger.error("Media", "Error handling media download", e);
-        }
-    }
+    // Download media if available (or use existing).
+    // Note: store/index.ts already attempts this once and passes the result via existingFileUrl.
+    // We DO NOT retry here for messages that have a media payload but no fileUrl, because
+    // re-downloading encrypted media that already failed once will just fail again with the
+    // same "bad decrypt" error and pollute logs.
+    const fileUrl: string | null = existingFileUrl || null;
 
     const normalized = extractMessageContent(message);
     const quoted = await extractQuotedMessageAsync(message, sessionId);
@@ -371,13 +385,10 @@ export async function onMessageSent(sessionId: string, message: any, existingFil
     const isGroup = remoteJid.endsWith("@g.us");
     const remoteJidAlt = message.key?.remoteJidAlt || null;
 
-    // Download media for sent messages too
-    let fileUrl: string | null = existingFileUrl || null;
-    if (!fileUrl) {
-        try {
-            fileUrl = await downloadAndSaveMedia(message, sessionId);
-        } catch (e) { /* ignore */ }
-    }
+    // Download media for sent messages too.
+    // See onMessageReceived comment — we only honor existingFileUrl from the caller (store)
+    // to avoid duplicate decrypt attempts that always fail with the same error.
+    const fileUrl: string | null = existingFileUrl || null;
 
     // --- Consistent JID Normalization (same as onMessageReceived) ---
     const normalizedFrom = await resolveToPhoneJid(remoteJid, sessionId, remoteJidAlt);
