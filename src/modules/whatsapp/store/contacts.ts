@@ -79,10 +79,16 @@ export function bindContactSync(sock: WASocket, sessionId: string) {
         logger.info("Store", `Received messaging history: ${chats.length} chats, ${contacts?.length || 0} contacts, ${messages.length} messages`);
         
         // Sync chats as contacts (for personal chats and newsletters/channels)
+        let newsletterCount = 0;
         for (const chat of chats) {
             try {
                 if (!chat.id || chat.id.includes('@g.us') || chat.id === 'status@broadcast') continue;
                 
+                if (chat.id.endsWith('@newsletter')) {
+                    newsletterCount++;
+                    logger.debug("Store", `History sync newsletter: ${chat.id} name="${chat.name || '(none)'}"`);
+                }
+
                 await prisma.contact.upsert({
                     where: { sessionId_jid: { sessionId: dbSessionId, jid: chat.id } },
                     create: {
@@ -92,12 +98,17 @@ export function bindContactSync(sock: WASocket, sessionId: string) {
                         notify: (chat as any).notify || chat.name || undefined
                     },
                     update: {
-                        name: chat.name || (chat as any).subject || undefined
+                        // Only update name if we have one (don't overwrite existing name with null)
+                        ...(chat.name || (chat as any).subject ? { name: chat.name || (chat as any).subject } : {}),
+                        ...((chat as any).notify || chat.name ? { notify: (chat as any).notify || chat.name } : {})
                     }
                 });
             } catch (e) {
                 logger.error("Store", `Failed to sync chat contact ${chat.id}`, e);
             }
+        }
+        if (newsletterCount > 0) {
+            logger.info("Store", `History sync found ${newsletterCount} newsletter chats`);
         }
         
         // Sync explicit contacts

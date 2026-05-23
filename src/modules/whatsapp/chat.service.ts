@@ -44,6 +44,9 @@ export class ChatService {
             ...lastMessages.map(m => m.remoteJid)
         ]);
 
+        // Ensure all newsletter contacts appear in the list even without messages
+        contacts.filter(c => c.jid.endsWith("@newsletter")).forEach(c => allJids.add(c.jid));
+
         const jidMap = await batchResolveToPhoneJid(Array.from(allJids), dbSessionId);
 
         const contactMap = new Map();

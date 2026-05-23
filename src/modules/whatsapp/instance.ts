@@ -250,6 +250,9 @@ export class WhatsAppInstance {
     private async syncNewsletterNames() {
         if (!this.socket) return;
 
+        // Wait a bit for history sync to complete first
+        await new Promise(resolve => setTimeout(resolve, 5000));
+
         const session = await prisma.session.findUnique({
             where: { sessionId: this.sessionId },
             select: { id: true }
@@ -266,7 +269,7 @@ export class WhatsAppInstance {
             select: { remoteJid: true }
         });
 
-        // Also check contacts table for newsletters without names
+        // Also check contacts table for newsletters
         const newsletterContacts = await prisma.contact.findMany({
             where: {
                 sessionId: session.id,
@@ -277,24 +280,22 @@ export class WhatsAppInstance {
 
         const contactNameMap = new Map(newsletterContacts.map(c => [c.jid, c.name]));
 
-        // Collect all newsletter JIDs that need names
+        // Collect all newsletter JIDs
         const allNewsletterJids = new Set([
             ...newsletterMessages.map(m => m.remoteJid),
-            ...newsletterContacts.filter(c => !c.name).map(c => c.jid)
+            ...newsletterContacts.map(c => c.jid)
         ]);
 
         // Filter out ones that already have names
         const jidsNeedingNames = Array.from(allNewsletterJids).filter(jid => !contactNameMap.get(jid));
 
-        if (jidsNeedingNames.length === 0) {
-            logger.info("Instance", `All ${allNewsletterJids.size} newsletters already have names`);
-            return;
-        }
+        logger.info("Instance", `Newsletter sync: ${allNewsletterJids.size} total, ${jidsNeedingNames.length} need names (session: ${this.sessionId})`);
 
-        logger.info("Instance", `Fetching names for ${jidsNeedingNames.length} newsletters (session: ${this.sessionId})`);
+        if (jidsNeedingNames.length === 0) return;
 
         let synced = 0;
         for (const jid of jidsNeedingNames) {
+            if (!this.socket) break; // Socket might disconnect during sync
             try {
                 const metadata = await this.socket.newsletterMetadata("jid", jid);
                 // Handle different response formats from Baileys
@@ -326,14 +327,14 @@ export class WhatsAppInstance {
                         }
                     });
                     synced++;
-                    logger.debug("Instance", `Newsletter ${jid} → "${channelName}"`);
+                    logger.info("Instance", `Newsletter "${channelName}" (${jid})`);
                 } else {
-                    logger.warn("Instance", `Newsletter ${jid}: no name found in response: ${JSON.stringify(metadata).slice(0, 200)}`);
+                    logger.warn("Instance", `Newsletter ${jid}: no name in response: ${JSON.stringify(metadata).slice(0, 300)}`);
                 }
                 // Small delay to avoid rate limiting
-                await new Promise(resolve => setTimeout(resolve, 300));
+                await new Promise(resolve => setTimeout(resolve, 500));
             } catch (e: any) {
-                logger.warn("Instance", `Newsletter ${jid} metadata fetch failed: ${e.message || e}`);
+                logger.warn("Instance", `Newsletter ${jid} failed: ${e.message || e}`);
             }
         }
 
