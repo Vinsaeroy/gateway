@@ -128,10 +128,34 @@ export function Navbar({ appName }: NavbarProps) {
                     return notification && !notification.read ? Math.max(0, prev - 1) : prev;
                 });
                 toast.success("Notification deleted");
+            } else {
+                // Show server error so the user knows it didn't actually delete
+                const data = await res.json().catch(() => ({}));
+                toast.error(data.message || `Delete failed (HTTP ${res.status})`);
             }
         } catch (e) {
-            console.error("Failed to delete notification");
+            console.error("Failed to delete notification", e);
             toast.error("Failed to delete notification");
+        }
+    };
+
+    const deleteAllNotifications = async () => {
+        if (!confirm("Delete all notifications? This cannot be undone.")) return;
+        try {
+            const res = await fetch(`/api/notifications/delete?all=1`, {
+                method: "DELETE"
+            });
+            if (res.ok) {
+                setNotifications([]);
+                setUnreadCount(0);
+                toast.success("All notifications cleared");
+            } else {
+                const data = await res.json().catch(() => ({}));
+                toast.error(data.message || `Failed (HTTP ${res.status})`);
+            }
+        } catch (e) {
+            console.error("Failed to clear notifications", e);
+            toast.error("Failed to clear notifications");
         }
     };
 
@@ -169,11 +193,18 @@ export function Navbar({ appName }: NavbarProps) {
                                     {unreadCount > 0 ? `You have ${unreadCount} unread updates.` : "No new notifications."}
                                 </p>
                             </div>
-                            {unreadCount > 0 && (
-                                <Button variant="ghost" size="sm" onClick={() => markAsRead()} className="h-auto py-1 px-2 text-xs">
-                                    Mark all read
-                                </Button>
-                            )}
+                            <div className="flex items-center gap-1">
+                                {unreadCount > 0 && (
+                                    <Button variant="ghost" size="sm" onClick={() => markAsRead()} className="h-auto py-1 px-2 text-xs">
+                                        Mark all read
+                                    </Button>
+                                )}
+                                {notifications.length > 0 && (
+                                    <Button variant="ghost" size="sm" onClick={deleteAllNotifications} className="h-auto py-1 px-2 text-xs text-destructive hover:text-destructive">
+                                        Clear all
+                                    </Button>
+                                )}
+                            </div>
                         </div>
                         <div className="max-h-[300px] overflow-y-auto">
                             {notifications.length === 0 ? (
