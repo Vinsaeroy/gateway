@@ -115,7 +115,7 @@ export function MobileNav({ appName = "WA-AKG" }: { appName?: string }) {
             </SheetTrigger>
             <SheetContent side="left" className="w-[85vw] sm:w-[320px] p-0 flex flex-col">
                 <SheetHeader className="px-5 py-4 text-left border-b border-slate-100">
-                    <SheetTitle className="text-xl font-bold text-slate-800">{appName}</SheetTitle>
+                    <SheetTitle className="text-xl font-bold text-slate-800" translate="no">{appName}</SheetTitle>
                     <SheetDescription className="text-[11px] text-slate-400 -mt-1">WhatsApp Gateway</SheetDescription>
                 </SheetHeader>
 
