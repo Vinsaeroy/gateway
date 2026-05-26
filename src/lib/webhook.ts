@@ -14,6 +14,7 @@ export type WebhookEventType =
     | "message.status"
     | "connection.update"
     | "group.update"
+    | "group.upsert"
     | "contact.update"
     | "status.update"
     | "group.participant"

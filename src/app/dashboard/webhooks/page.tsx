@@ -46,6 +46,7 @@ const AVAILABLE_EVENTS = [
     { id: "message.status", label: "Message Status", description: "When message status changes (delivered, read)" },
     { id: "connection.update", label: "Connection Update", description: "When session connects/disconnects" },
     { id: "group.update", label: "Group Update", description: "When group info changes" },
+    { id: "group.upsert", label: "Group Joined", description: "When you join or are added to a new group" },
     { id: "group.participant", label: "Group Member", description: "When participants join, leave, or change roles" },
     { id: "contact.update", label: "Contact Update", description: "When contact info changes" },
     { id: "status.update", label: "Status/Story", description: "When a status is posted or viewed" },
