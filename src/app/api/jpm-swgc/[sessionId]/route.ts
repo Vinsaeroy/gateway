@@ -7,6 +7,10 @@ import { logger } from "@/lib/logger";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
+// Track in-flight JPM-SWGC dispatches per session so back-to-back clicks
+// or duplicate API calls don't cause the same status to land in a group twice.
+const activeDispatches = new Map<string, { startedAt: number; total: number }>();
+
 /**
  * JPM SWGC — Bulk Status Group Channel
  *
@@ -60,6 +64,19 @@ export async function POST(
             return NextResponse.json({ status: false, message: "Pick at least one target group" }, { status: 400 });
         }
 
+        // Block parallel dispatches for the same session — protects against
+        // double-click and accidental duplicate sends to the same group.
+        const inflight = activeDispatches.get(sessionId);
+        if (inflight) {
+            return NextResponse.json(
+                {
+                    status: false,
+                    message: `A JPM-SWGC dispatch is already running for this session (${inflight.total} groups). Wait for it to finish.`,
+                },
+                { status: 409 }
+            );
+        }
+
         // Build innerContent based on media type
         const sock = instance.socket;
         let innerContent: any;
@@ -105,45 +122,63 @@ export async function POST(
             return NextResponse.json({ status: false, message: "Failed to build content" }, { status: 500 });
         }
 
-        // Resolve group list
+        // Resolve group list (deduplicate just in case caller sent dupes)
         let groupIds: string[];
         if (scope === "SPECIFIC") {
-            groupIds = targets.filter((t) => t.endsWith("@g.us"));
+            groupIds = Array.from(new Set(targets.filter((t) => t.endsWith("@g.us"))));
         } else {
             const groups = await sock.groupFetchAllParticipating();
-            groupIds = Object.keys(groups || {});
+            groupIds = Array.from(new Set(Object.keys(groups || {})));
         }
 
+        if (groupIds.length === 0) {
+            return NextResponse.json({ status: false, message: "No valid target groups" }, { status: 400 });
+        }
+
+        // Mark this session as busy so duplicate POSTs are rejected with 409
+        activeDispatches.set(sessionId, {
+            startedAt: Date.now(),
+            total: groupIds.length,
+        });
+
         // Send asynchronously and return immediately with a job id-like response.
-        // We don't await the loop because some sessions have hundreds of groups
-        // and the request would time out.
         const startedAt = new Date().toISOString();
         let sent = 0;
         let skipped = 0;
         let failed = 0;
 
         // Fire-and-forget loop — caller polls /api/jpm-swgc/.../status if desired.
-        // For simplicity we just track via logs.
         (async () => {
-            for (const gid of groupIds) {
-                try {
-                    const envelope: any = {
-                        groupStatusMessageV2: {
-                            message: innerContent,
-                        },
-                    };
-                    await (sock as any).relayMessage(gid, envelope, {});
-                    sent++;
-                    if (delayMs) await sleep(delayMs);
-                } catch (e) {
-                    failed++;
-                    logger.debug("JPM-SWGC", `Failed to send to ${gid}`, e);
+            // Track JIDs already sent in this dispatch as a final guard
+            const sentToJids = new Set<string>();
+            try {
+                for (const gid of groupIds) {
+                    if (sentToJids.has(gid)) {
+                        skipped++;
+                        continue;
+                    }
+                    sentToJids.add(gid);
+                    try {
+                        const envelope: any = {
+                            groupStatusMessageV2: {
+                                message: innerContent,
+                            },
+                        };
+                        await (sock as any).relayMessage(gid, envelope, {});
+                        sent++;
+                        if (delayMs) await sleep(delayMs);
+                    } catch (e) {
+                        failed++;
+                        logger.debug("JPM-SWGC", `Failed to send to ${gid}`, e);
+                    }
                 }
+                logger.info(
+                    "JPM-SWGC",
+                    `Done for ${sessionId}: sent=${sent}, skipped=${skipped}, failed=${failed}, total=${groupIds.length}`
+                );
+            } finally {
+                activeDispatches.delete(sessionId);
             }
-            logger.info(
-                "JPM-SWGC",
-                `Done for ${sessionId}: sent=${sent}, skipped=${skipped}, failed=${failed}, total=${groupIds.length}`
-            );
         })();
 
         return NextResponse.json({

@@ -130,12 +130,14 @@ export default function JpmSwgcPage() {
                     mediaType,
                     delayMs,
                     scope,
-                    targets: scope === "SPECIFIC" ? targets : undefined,
+                    targets: scope === "SPECIFIC" ? Array.from(new Set(targets)) : undefined,
                 }),
             });
             const data = await res.json();
             if (data.status) {
                 toast.success(`Dispatch dimulai untuk ${data.data?.total || 0} grup. Cek log di Railway.`);
+            } else if (res.status === 409) {
+                toast.warning(data.message || "A dispatch is already running for this session");
             } else {
                 toast.error(data.message || "Failed to dispatch");
             }
