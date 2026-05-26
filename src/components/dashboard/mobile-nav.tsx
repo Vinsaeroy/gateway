@@ -71,6 +71,7 @@ const navGroups: NavGroup[] = [
             { href: "/dashboard/profile", label: "Bot Profile", icon: UserCircle },
             { href: "/dashboard/scheduler", label: "Scheduler", icon: CalendarClock },
             { href: "/dashboard/auto-broadcast", label: "Auto Broadcast", icon: Radio },
+            { href: "/dashboard/jpm-swgc", label: "JPM SWGC", icon: Megaphone },
             { href: "/dashboard/webhooks", label: "Webhooks & API", icon: Webhook },
         ],
     },
