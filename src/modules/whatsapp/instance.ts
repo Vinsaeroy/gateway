@@ -28,6 +28,7 @@ export class WhatsAppInstance {
     config: any = {};
     startTime: Date | null = null;
     pairingCode: string | null = null;
+    private groupSyncInterval: NodeJS.Timeout | null = null;
 
     isStopped: boolean = false;
 
@@ -109,6 +110,12 @@ export class WhatsAppInstance {
                 const code = (lastDisconnect?.error as any)?.output?.statusCode;
                 const isLoggedOut = code === DisconnectReason.loggedOut;
 
+                // Stop the periodic group sync interval
+                if (this.groupSyncInterval) {
+                    clearInterval(this.groupSyncInterval);
+                    this.groupSyncInterval = null;
+                }
+
                 // Only reconnect if NOT logged out AND NOT explicitly stopped
                 const shouldReconnect = !isLoggedOut && !this.isStopped;
 
@@ -174,6 +181,18 @@ export class WhatsAppInstance {
                 } catch (e) {
                     logger.error("Instance", "Group sync failed:", e);
                 }
+
+                // Periodic resync every 10 minutes — catches groups that missed
+                // the realtime upsert event (e.g. mobile app added user offline)
+                if (this.groupSyncInterval) clearInterval(this.groupSyncInterval);
+                this.groupSyncInterval = setInterval(async () => {
+                    if (!this.socket || this.isStopped) return;
+                    try {
+                        await syncGroups(this.socket as WASocket, this.sessionId);
+                    } catch (e) {
+                        logger.debug("Instance", "Periodic group sync failed (non-fatal)", e);
+                    }
+                }, 10 * 60 * 1000);
 
                 // Sync Newsletter/Channel names
                 this.syncNewsletterNames().catch(e => {

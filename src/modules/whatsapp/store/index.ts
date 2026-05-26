@@ -261,8 +261,66 @@ export const bindSessionStore = (sock: WASocket, sessionId: string, io: Server |
         }
     });
 
+    // Handle NEW Group Joins (fires when user joins/creates a group, or community/newsletter)
+    // Without this, newly-joined groups don't appear in chat list / auto-broadcast targets
+    // until the next session restart.
+    sock.ev.on('groups.upsert', async (newGroups) => {
+        if (sessionMissing) return;
+        if (!dbSessionId) {
+            const session = await prisma.session.findUnique({ where: { sessionId }, select: { id: true } });
+            if (!session) return;
+            dbSessionId = session.id;
+        }
+
+        for (const g of newGroups) {
+            try {
+                if (!g.id) continue;
+                await prisma.group.upsert({
+                    where: { sessionId_jid: { sessionId: dbSessionId, jid: g.id } },
+                    create: {
+                        sessionId: dbSessionId,
+                        jid: g.id,
+                        subject: g.subject || "",
+                        description: g.desc || null,
+                        ownerJid: g.owner || null,
+                        creation: g.creation ? new Date(g.creation * 1000) : undefined,
+                        restrict: g.restrict || false,
+                        announce: g.announce || false,
+                        participants: (g.participants || []) as any,
+                        metadata: g as any,
+                        isCommunity: g.isCommunity || false,
+                        linkedParentJid: g.linkedParent || null
+                    },
+                    update: {
+                        subject: g.subject || "",
+                        description: g.desc || null,
+                        ownerJid: g.owner || null,
+                        restrict: g.restrict || false,
+                        announce: g.announce || false,
+                        participants: (g.participants || []) as any,
+                        metadata: g as any,
+                        isCommunity: g.isCommunity || false,
+                        linkedParentJid: g.linkedParent || null
+                    }
+                });
+                logger.info("Store", `New group joined/added: ${g.subject || g.id}`);
+
+                // Notify webhook + frontend so UI can refresh immediately
+                dispatchWebhook(sessionId, "group.upsert", {
+                    jid: g.id,
+                    subject: g.subject,
+                    isCommunity: g.isCommunity || false,
+                });
+                io?.to(sessionId).emit('group.upsert', { jid: g.id, subject: g.subject });
+            } catch (e) {
+                logger.error("Store", `Failed to upsert new group ${g.id}`, e);
+            }
+        }
+    });
+
     // Handle Group Participants Update
     sock.ev.on('group-participants.update', async (update) => {
+        if (sessionMissing) return;
         if (!dbSessionId || !update.id) return;
 
         try {
@@ -274,14 +332,33 @@ export const bindSessionStore = (sock: WASocket, sessionId: string, io: Server |
                 action: update.action,
                 participants: update.participants
             });
-            
-            // To properly resync the group participants in DB, it's safer to re-fetch the entire group metadata
-            // But we don't await strictly to not block the socket
+
+            // Re-fetch metadata to keep participants list and (importantly) auto-create
+            // the group row if we were just added to a brand-new group.
             sock.groupMetadata(update.id).then(async (g) => {
-                await prisma.group.updateMany({
-                    where: { sessionId: dbSessionId as string, jid: update.id as string },
-                    data: { participants: g.participants as any }
+                await prisma.group.upsert({
+                    where: { sessionId_jid: { sessionId: dbSessionId as string, jid: update.id as string } },
+                    create: {
+                        sessionId: dbSessionId as string,
+                        jid: g.id,
+                        subject: g.subject || "",
+                        description: g.desc || null,
+                        ownerJid: g.owner || null,
+                        creation: g.creation ? new Date(g.creation * 1000) : undefined,
+                        restrict: g.restrict || false,
+                        announce: g.announce || false,
+                        participants: (g.participants || []) as any,
+                        metadata: g as any,
+                        isCommunity: g.isCommunity || false,
+                        linkedParentJid: g.linkedParent || null,
+                    },
+                    update: {
+                        subject: g.subject || undefined,
+                        participants: (g.participants || []) as any,
+                        metadata: g as any,
+                    },
                 });
+                io?.to(sessionId).emit('group.update', { jid: update.id, subject: g.subject });
             }).catch(e => {
                  logger.debug("Store", "Failed to refresh group participants metadata", e);
             });

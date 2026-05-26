@@ -9,7 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Trash2, Edit, Radio, Clock, Users } from "lucide-react";
+import { Plus, Trash2, Edit, Radio, Clock, Users, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { useSession } from "@/components/dashboard/session-provider";
 
@@ -67,12 +67,21 @@ export default function AutoBroadcastPage() {
         }
     };
 
-    const fetchGroups = async () => {
+    const [groupRefreshing, setGroupRefreshing] = useState(false);
+
+    const fetchGroups = async (forceRefresh = false) => {
         try {
-            const res = await fetch(`/api/groups/${sessionId}`);
+            if (forceRefresh) setGroupRefreshing(true);
+            const url = `/api/groups/${sessionId}${forceRefresh ? "?refresh=1" : ""}`;
+            const res = await fetch(url);
             const data = await res.json();
             if (data.status) setGroups(data.data || []);
-        } catch (_error) { }
+            if (forceRefresh) toast.success("Group list refreshed");
+        } catch (_error) {
+            if (forceRefresh) toast.error("Failed to refresh groups");
+        } finally {
+            if (forceRefresh) setGroupRefreshing(false);
+        }
     };
 
     const resetForm = () => {
@@ -335,12 +344,24 @@ export default function AutoBroadcastPage() {
 
                         <div>
                             <Label>Target Groups</Label>
-                            <Input
-                                placeholder="Search groups..."
-                                value={groupSearch}
-                                onChange={e => setGroupSearch(e.target.value)}
-                                className="mt-2 mb-2"
-                            />
+                            <div className="flex gap-2 mt-2 mb-2">
+                                <Input
+                                    placeholder="Search groups..."
+                                    value={groupSearch}
+                                    onChange={e => setGroupSearch(e.target.value)}
+                                    className="flex-1"
+                                />
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="icon"
+                                    onClick={() => fetchGroups(true)}
+                                    disabled={groupRefreshing}
+                                    title="Refresh group list from WhatsApp"
+                                >
+                                    <RefreshCw className={`h-4 w-4 ${groupRefreshing ? "animate-spin" : ""}`} />
+                                </Button>
+                            </div>
                             <div className="mt-2 space-y-1 max-h-56 overflow-y-auto border rounded p-2">
                                 <div
                                     className={`flex items-center gap-2 p-2 rounded cursor-pointer ${targets.includes("ALL") ? "bg-primary/10 border border-primary" : "hover:bg-muted"}`}
