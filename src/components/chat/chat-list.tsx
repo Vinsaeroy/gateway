@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { MessageSquarePlus, Search, MessageCircle, X, Users, User, Radio } from "lucide-react";
+import { MessageSquarePlus, Search, MessageCircle, X, Users, User, Radio, RefreshCw } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 import { cn } from "@/lib/utils";
@@ -189,6 +189,19 @@ export function ChatList({ sessionId, onSelectChat, selectedJid }: ChatListProps
         setNewChatNumber("");
     };
 
+    const [refreshing, setRefreshing] = useState(false);
+
+    const refreshChats = async () => {
+        setRefreshing(true);
+        try {
+            // Force re-sync groups + channels from WhatsApp before re-fetching the list
+            await fetch(`/api/sessions/${sessionId}/sync`, { method: "POST" }).catch(() => null);
+            await fetchChats();
+        } finally {
+            setRefreshing(false);
+        }
+    };
+
     if (loading) {
         return (
             <div className="p-3 space-y-3">
@@ -212,18 +225,30 @@ export function ChatList({ sessionId, onSelectChat, selectedJid }: ChatListProps
             <div className="px-3 pt-3 pb-2 space-y-2 flex-shrink-0">
                 <div className="flex justify-between items-center">
                     <h3 className="font-semibold text-base text-foreground">Chats</h3>
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 rounded-lg"
-                        onClick={() => setIsNewChatOpen(!isNewChatOpen)}
-                    >
-                        {isNewChatOpen ? (
-                            <X className="h-4 w-4" />
-                        ) : (
-                            <MessageSquarePlus className="h-4 w-4" />
-                        )}
-                    </Button>
+                    <div className="flex items-center gap-1">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 rounded-lg"
+                            onClick={refreshChats}
+                            disabled={refreshing}
+                            title="Refresh chats, groups, and channels"
+                        >
+                            <RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 rounded-lg"
+                            onClick={() => setIsNewChatOpen(!isNewChatOpen)}
+                        >
+                            {isNewChatOpen ? (
+                                <X className="h-4 w-4" />
+                            ) : (
+                                <MessageSquarePlus className="h-4 w-4" />
+                            )}
+                        </Button>
+                    </div>
                 </div>
 
                 {/* Search */}
