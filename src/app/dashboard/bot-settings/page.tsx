@@ -49,6 +49,11 @@ export default function BotSettingsPage() {
         botBlockedJids: [] as string[],
         autoReplyAllowedJids: [] as string[],
         autoReplyBlockedJids: [] as string[],
+
+        // Anti-Link
+        antiLinkMode: "OFF" as "OFF" | "INVITE" | "ALL",
+        antiLinkAction: "DELETE" as "DELETE" | "KICK",
+        antiLinkLimit: 3,
     });
     const [botLoading, setBotLoading] = useState(false);
 
@@ -533,6 +538,92 @@ export default function BotSettingsPage() {
                                 <Button onClick={handleSaveBot} disabled={botLoading || !sessionId}>
                                     {botLoading ? <RefreshCw className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                                     Save Protection Settings
+                                </Button>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Anti-Link (Group) */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Anti-Link (Group)</CardTitle>
+                            <CardDescription>
+                                Auto-delete messages containing links in groups. Bot must be group admin to enforce.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="grid sm:grid-cols-2 gap-4">
+                                <div className="grid gap-2">
+                                    <Label>Mode</Label>
+                                    <Select
+                                        value={botConfig.antiLinkMode}
+                                        onValueChange={(v) =>
+                                            setBotConfig((p) => ({ ...p, antiLinkMode: v as any }))
+                                        }
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="OFF">Off</SelectItem>
+                                            <SelectItem value="INVITE">Block WA invite links only</SelectItem>
+                                            <SelectItem value="ALL">Block ALL links</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <p className="text-xs text-muted-foreground">
+                                        <code>INVITE</code> blocks <code>chat.whatsapp.com/...</code>. <code>ALL</code> blocks any URL.
+                                    </p>
+                                </div>
+
+                                <div className="grid gap-2">
+                                    <Label>Action</Label>
+                                    <Select
+                                        value={botConfig.antiLinkAction}
+                                        onValueChange={(v) =>
+                                            setBotConfig((p) => ({ ...p, antiLinkAction: v as any }))
+                                        }
+                                        disabled={botConfig.antiLinkMode === "OFF"}
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="DELETE">Delete + Warn</SelectItem>
+                                            <SelectItem value="KICK">Warn then Kick after limit</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
+
+                            {botConfig.antiLinkAction === "KICK" && botConfig.antiLinkMode !== "OFF" && (
+                                <div className="grid gap-2 max-w-[200px]">
+                                    <Label>Warn Limit</Label>
+                                    <Input
+                                        type="number"
+                                        min={1}
+                                        max={10}
+                                        value={botConfig.antiLinkLimit}
+                                        onChange={(e) =>
+                                            setBotConfig((p) => ({
+                                                ...p,
+                                                antiLinkLimit: Math.max(1, Math.min(10, Number(e.target.value) || 3)),
+                                            }))
+                                        }
+                                    />
+                                    <p className="text-xs text-muted-foreground">
+                                        Kick after this many warnings.
+                                    </p>
+                                </div>
+                            )}
+
+                            <p className="text-xs text-muted-foreground border-l-2 border-amber-500/50 pl-3 py-1 bg-amber-500/5 rounded">
+                                ℹ️ Group admins and the session owner are exempt. Bot must be admin to delete or kick.
+                            </p>
+
+                            <div className="pt-2">
+                                <Button onClick={handleSaveBot} disabled={botLoading || !sessionId}>
+                                    {botLoading ? <RefreshCw className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                                    Save Anti-Link Settings
                                 </Button>
                             </div>
                         </CardContent>

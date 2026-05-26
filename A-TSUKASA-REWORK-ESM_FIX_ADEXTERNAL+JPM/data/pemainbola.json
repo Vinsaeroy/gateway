@@ -1,0 +1,487 @@
+[
+  {
+    "soal": "Pemain Argentina yang dijuluki 'La Pulga' dan telah memenangkan 8 Ballon d'Or.",
+    "jawaban": "Lionel Messi",
+    "deskripsi": "Dianggap oleh banyak orang sebagai pemain sepak bola terhebat sepanjang masa, terkenal karena dribbling, visi, passing, dan kemampuan mencetak golnya yang luar biasa."
+  },
+  {
+    "soal": "Pemain Portugal dengan rekor gol internasional terbanyak dan dikenal dengan selebrasi 'Siuuu'.",
+    "jawaban": "Cristiano Ronaldo",
+    "deskripsi": "Salah satu pencetak gol paling produktif dalam sejarah sepak bola, dikenal karena atletis, tendangan kuat, dan kemampuannya di udara."
+  },
+  {
+    "soal": "Pemain Brasil yang terkenal dengan skill Samba, trik, dan pernah menjadi pemain termahal di dunia.",
+    "jawaban": "Neymar Jr.",
+    "deskripsi": "Penyerang berbakat yang dikenal karena kreativitas, kemampuan menggiring bola, dan finishingnya. Telah bermain untuk Santos, Barcelona, dan Paris Saint-Germain."
+  },
+  {
+    "soal": "Penyerang cepat asal Prancis yang memenangkan Piala Dunia 2018 di usia muda.",
+    "jawaban": "Kylian Mbappé",
+    "deskripsi": "Dikenal karena kecepatan eksplosif, dribbling, dan penyelesaian akhir yang klinis. Dianggap sebagai salah satu pemain terbaik di generasinya."
+  },
+  {
+    "soal": "Penyerang Mesir yang menjadi andalan Liverpool dan dikenal dengan julukan 'The Egyptian King'.",
+    "jawaban": "Mohamed Salah",
+    "deskripsi": "Dikenal karena kecepatan, dribbling, dan kemampuan mencetak golnya. Telah memenangkan Liga Premier dan Liga Champions bersama Liverpool."
+  },
+  {
+    "soal": "Gelandang serang Belgia yang dikenal dengan umpan akurat dan visi bermainnya yang brilian untuk Manchester City.",
+    "jawaban": "Kevin De Bruyne",
+    "deskripsi": "Dianggap sebagai salah satu gelandang terbaik di dunia, terkenal karena kreativitas, jangkauan umpan, dan kemampuannya mencetak gol dari jarak jauh."
+  },
+  {
+    "soal": "Striker Polandia yang sangat produktif dan pernah memecahkan rekor gol Gerd Müller di Bundesliga.",
+    "jawaban": "Robert Lewandowski",
+    "deskripsi": "Salah satu penyerang tengah terbaik di generasinya, dikenal karena penyelesaian akhir, pergerakan, dan kemampuannya di udara."
+  },
+  {
+    "soal": "Striker muda Norwegia yang terkenal dengan kekuatan fisik dan kemampuan mencetak gol yang fenomenal.",
+    "jawaban": "Erling Haaland",
+    "deskripsi": "Dikenal karena kecepatan, kekuatan, dan penyelesaian akhir yang mematikan. Telah memecahkan berbagai rekor mencetak gol di usia muda."
+  },
+  {
+    "soal": "Gelandang Kroasia yang memenangkan Ballon d'Or pada tahun 2018 dan menjadi motor serangan Real Madrid.",
+    "jawaban": "Luka Modrić",
+    "deskripsi": "Dikenal karena visi, umpan, kontrol bola, dan kemampuannya mendikte tempo permainan. Telah memenangkan banyak gelar Liga Champions."
+  },
+  {
+    "soal": "Penyerang Senegal yang dikenal karena kecepatan dan kontribusinya saat bermain untuk Liverpool dan Bayern Munich.",
+    "jawaban": "Sadio Mané",
+    "deskripsi": "Pemain serbaguna yang bisa bermain di berbagai posisi menyerang, dikenal karena tingkat kerja, dribbling, dan kemampuan mencetak golnya."
+  },
+  {
+    "soal": "Bek tengah Belanda yang tangguh dan menjadi pilar pertahanan Liverpool.",
+    "jawaban": "Virgil van Dijk",
+    "deskripsi": "Dianggap sebagai salah satu bek tengah terbaik di dunia, dikenal karena kekuatan, kemampuan udara, kepemimpinan, dan ketenangannya."
+  },
+  {
+    "soal": "Penyerang Prancis yang memenangkan Ballon d'Or 2022 setelah musim yang luar biasa bersama Real Madrid.",
+    "jawaban": "Karim Benzema",
+    "deskripsi": "Seorang penyerang lengkap yang dikenal karena kemampuan mencetak gol, membuat assist, dan kecerdasan taktisnya."
+  },
+  {
+    "soal": "Kapten timnas Inggris dan striker produktif yang dikenal dengan kemampuan finishing dan passingnya.",
+    "jawaban": "Harry Kane",
+    "deskripsi": "Salah satu striker terbaik di dunia, dikenal karena kemampuannya mencetak berbagai jenis gol dan juga memberikan assist."
+  },
+  {
+    "soal": "Penyerang serbaguna Prancis yang pernah bermain untuk Atletico Madrid dan Barcelona, dikenal dengan selebrasi 'Hotline Bling'.",
+    "jawaban": "Antoine Griezmann",
+    "deskripsi": "Pemain yang fleksibel secara taktis, dikenal karena tingkat kerja, kreativitas, dan kemampuan mencetak golnya."
+  },
+  {
+    "soal": "Penyerang Korea Selatan yang menjadi bintang Tottenham Hotspur dan berbagi Sepatu Emas Liga Premier pada musim 2021-2022.",
+    "jawaban": "Son Heung-min",
+    "deskripsi": "Dikenal karena kecepatan, kemampuan menggiring bola dengan kedua kaki, dan tendangan jarak jauh yang kuat."
+  },
+  {
+    "soal": "Kiper Brasil yang menjadi andalan Liverpool dan timnas Brasil, dikenal dengan kemampuan satu lawan satu.",
+    "jawaban": "Alisson Becker",
+    "deskripsi": "Dianggap sebagai salah satu kiper terbaik di dunia, dikenal karena refleks, distribusi bola, dan kemampuannya dalam situasi krusial."
+  },
+  {
+    "soal": "Kiper Belgia jangkung yang menjadi pahlawan Real Madrid di final Liga Champions 2022.",
+    "jawaban": "Thibaut Courtois",
+    "deskripsi": "Dikenal karena postur tubuhnya yang tinggi, jangkauan, dan kemampuannya melakukan penyelamatan penting."
+  },
+  {
+    "soal": "Pemain serbaguna Jerman yang bisa bermain sebagai bek kanan atau gelandang bertahan untuk Bayern Munich.",
+    "jawaban": "Joshua Kimmich",
+    "deskripsi": "Dikenal karena kualitas umpan, tekel, energi, dan kepemimpinannya di lapangan."
+  },
+  {
+    "soal": "Gelandang kreatif Portugal yang menjadi pemain kunci untuk Manchester City dengan stamina dan skill dribblingnya.",
+    "jawaban": "Bernardo Silva",
+    "deskripsi": "Dikenal karena tingkat kerja yang tinggi, kemampuan menggiring bola di ruang sempit, dan visi bermainnya."
+  },
+  {
+    "soal": "Winger lincah Brasil yang menjadi bintang Real Madrid, terkenal dengan kecepatan dan skill individunya.",
+    "jawaban": "Vinícius Júnior",
+    "deskripsi": "Dikenal karena kemampuan dribblingnya yang eksplosif, kecepatan, dan kemampuannya melewati lawan."
+  },
+  {
+    "soal": "Striker Swedia yang karismatik dan telah bermain di banyak klub top Eropa, dikenal dengan gol-gol akrobatiknya.",
+    "jawaban": "Zlatan Ibrahimović",
+    "deskripsi": "Dikenal karena kepribadiannya yang kuat, kemampuan teknis yang luar biasa untuk pemain setinggi dia, dan gol-gol spektakuler."
+  },
+  {
+    "soal": "Gelandang Prancis yang dikenal dengan gaya rambutnya yang sering berganti dan kemampuannya mengontrol lini tengah.",
+    "jawaban": "Paul Pogba",
+    "deskripsi": "Pemain dengan fisik kuat dan teknik tinggi, dikenal karena jangkauan umpan, tendangan jarak jauh, dan kreativitasnya."
+  },
+  {
+    "soal": "Bek Spanyol legendaris yang terkenal dengan jiwa kepemimpinan dan gol-gol penting di menit akhir.",
+    "jawaban": "Sergio Ramos",
+    "deskripsi": "Salah satu bek terbaik di generasinya, dikenal karena kemampuan bertahan, sundulan mematikan, dan mentalitas juaranya."
+  },
+  {
+    "soal": "Kiper Jerman yang merevolusi peran 'sweeper-keeper' dengan kemampuannya bermain bola.",
+    "jawaban": "Manuel Neuer",
+    "deskripsi": "Dianggap sebagai salah satu kiper terhebat sepanjang masa, dikenal karena refleks, kemampuan menghentikan tembakan, dan distribusinya."
+  },
+  {
+    "soal": "Winger Belgia yang lincah dan menjadi bintang Chelsea sebelum pindah ke Real Madrid.",
+    "jawaban": "Eden Hazard",
+    "deskripsi": "Dikenal karena dribbling, kecepatan, kreativitas, dan kemampuannya mencetak gol."
+  },
+  {
+    "soal": "Striker Uruguay yang kontroversial namun sangat tajam di depan gawang, pernah bermain untuk Liverpool dan Barcelona.",
+    "jawaban": "Luis Suárez",
+    "deskripsi": "Seorang pencetak gol yang produktif dan gigih, dikenal karena pergerakan cerdas, penyelesaian akhir, dan semangat juangnya."
+  },
+  {
+    "soal": "Striker Belgia berbadan besar yang dikenal dengan kekuatan fisik dan kemampuan mencetak golnya.",
+    "jawaban": "Romelu Lukaku",
+    "deskripsi": "Penyerang tengah yang kuat, dikenal karena kemampuannya menahan bola, kecepatan, dan penyelesaian akhir di kotak penalti."
+  },
+  {
+    "soal": "Penyerang Argentina yang dijuluki 'La Joya' dan dikenal dengan kaki kirinya yang magis.",
+    "jawaban": "Paulo Dybala",
+    "deskripsi": "Pemain kreatif dengan teknik tinggi, dikenal karena dribbling, tendangan bebas, dan kemampuannya mencetak gol dari luar kotak penalti."
+  },
+  {
+    "soal": "Winger Argentina yang lincah dengan kaki kiri mematikan dan telah bermain untuk Real Madrid, Manchester United, dan PSG.",
+    "jawaban": "Ángel Di María",
+    "deskripsi": "Dikenal karena kecepatan, dribbling, kemampuan crossing, dan sering mencetak gol penting di final."
+  },
+  {
+    "soal": "Bek tengah Brasil yang menjadi kapten Paris Saint-Germain dan dikenal karena ketangguhan serta kemampuannya membaca permainan.",
+    "jawaban": "Marquinhos",
+    "deskripsi": "Bek yang serbaguna, bisa bermain sebagai bek tengah atau gelandang bertahan, dikenal karena kecepatan, tekel, dan kepemimpinannya."
+  },
+  {
+    "soal": "Gelandang Belanda yang dikenal dengan kemampuan dribblingnya dari lini tengah dan visi bermainnya untuk Barcelona.",
+    "jawaban": "Frenkie de Jong",
+    "deskripsi": "Pemain tengah modern yang unggul dalam membawa bola ke depan, mengontrol tempo, dan memberikan umpan kunci."
+  },
+  {
+    "soal": "Gelandang muda Spanyol dari Barcelona yang dikenal dengan kecerdasan, kontrol bola, dan ketenangannya, pemenang Kopa Trophy 2021.",
+    "jawaban": "Pedri",
+    "deskripsi": "Dianggap sebagai salah satu talenta muda terbaik di dunia, sering dibandingkan dengan gelandang legendaris Spanyol karena gaya bermainnya."
+  },
+  {
+    "soal": "Gelandang muda Spanyol lainnya dari Barcelona yang dikenal karena agresivitas, semangat juang, dan kemampuan teknisnya, pemenang Kopa Trophy 2022.",
+    "jawaban": "Gavi",
+    "deskripsi": "Pemain tengah yang energik dan kompetitif, tidak takut berduel dan memiliki kualitas teknis yang baik."
+  },
+  {
+    "soal": "Gelandang bertahan Spanyol yang menjadi jangkar Manchester City dan mencetak gol kemenangan di final Liga Champions 2023.",
+    "jawaban": "Rodri",
+    "deskripsi": "Dikenal karena kemampuan membaca permainan, distribusi bola yang akurat, dan kemampuannya melindungi lini pertahanan."
+  },
+  {
+    "soal": "Gelandang bertahan Inggris yang dikenal dengan kemampuan merebut bola dan energinya di lini tengah, kini bermain untuk Arsenal.",
+    "jawaban": "Declan Rice",
+    "deskripsi": "Pemain yang kuat dalam tekel dan intersep, serta memiliki kemampuan untuk memulai serangan dari posisi gelandang bertahan."
+  },
+  {
+    "soal": "Gelandang muda Inggris yang bersinar di Borussia Dortmund sebelum pindah ke Real Madrid, dikenal karena kedewasaan bermainnya.",
+    "jawaban": "Jude Bellingham",
+    "deskripsi": "Pemain serba bisa di lini tengah, memiliki kemampuan fisik, teknik, dan kecerdasan taktis yang luar biasa untuk usianya."
+  },
+  {
+    "soal": "Gelandang serang muda Jerman yang lincah dan menjadi andalan Bayern Munich, dikenal dengan kemampuan dribbling di ruang sempit.",
+    "jawaban": "Jamal Musiala",
+    "deskripsi": "Pemain dengan skill individu tinggi, mampu melewati lawan dengan mudah dan memiliki visi untuk menciptakan peluang."
+  },
+  {
+    "soal": "Winger muda Inggris yang menjadi pemain kunci Arsenal, dikenal karena kecepatan, dribbling, dan kontribusi golnya.",
+    "jawaban": "Bukayo Saka",
+    "deskripsi": "Pemain serbaguna yang bisa bermain di berbagai posisi, memiliki etos kerja yang tinggi dan terus berkembang menjadi pemain top."
+  },
+  {
+    "soal": "Gelandang serang Inggris bertalenta dari Manchester City yang dikenal dengan skill kaki kiri dan kreativitasnya.",
+    "jawaban": "Phil Foden",
+    "deskripsi": "Pemain dengan kontrol bola yang sangat baik, visi bermain, dan kemampuan untuk mencetak gol maupun memberikan assist."
+  },
+  {
+    "soal": "Striker Argentina yang menjadi andalan Inter Milan dan dikenal dengan julukan 'El Toro'.",
+    "jawaban": "Lautaro Martínez",
+    "deskripsi": "Penyerang yang agresif dan pekerja keras, memiliki penyelesaian akhir yang baik dan kuat dalam duel fisik."
+  },
+  {
+    "soal": "Gelandang Uruguay serba bisa yang bermain untuk Real Madrid, dikenal karena energi, kecepatan, dan tendangan kerasnya.",
+    "jawaban": "Federico Valverde",
+    "deskripsi": "Pemain dinamis yang dapat berkontribusi dalam bertahan maupun menyerang, sering melakukan lari menusuk dari lini tengah."
+  },
+  {
+    "soal": "Bek sayap kanan Maroko yang sangat cepat dan ofensif, bermain untuk Paris Saint-Germain.",
+    "jawaban": "Achraf Hakimi",
+    "deskripsi": "Salah satu bek sayap menyerang terbaik di dunia, dikenal karena kecepatan lari, kemampuan crossing, dan kontribusi golnya."
+  },
+  {
+    "soal": "Bek sayap kiri Kanada yang sangat cepat dan bermain untuk Bayern Munich, dikenal dengan julukan 'Roadrunner'.",
+    "jawaban": "Alphonso Davies",
+    "deskripsi": "Memiliki kecepatan yang luar biasa, kemampuan dribbling, dan kontribusi signifikan dalam serangan maupun pertahanan."
+  },
+  {
+    "soal": "Bek kanan Inggris dari Liverpool yang dikenal dengan kemampuan crossing dan umpan panjangnya yang luar biasa.",
+    "jawaban": "Trent Alexander-Arnold",
+    "deskripsi": "Seorang playmaker dari posisi bek kanan, memiliki visi dan teknik umpan yang setara dengan gelandang top."
+  },
+  {
+    "soal": "Bek kiri Skotlandia dari Liverpool yang dikenal dengan stamina, kecepatan, dan umpan silangnya yang berbahaya.",
+    "jawaban": "Andrew Robertson",
+    "deskripsi": "Pemain yang sangat energik di sisi kiri, memberikan kontribusi besar dalam serangan dan pertahanan."
+  },
+  {
+    "soal": "Gelandang bertahan Brasil yang menjadi pilar Real Madrid selama bertahun-tahun sebelum pindah ke Manchester United.",
+    "jawaban": "Casemiro",
+    "deskripsi": "Dikenal karena kemampuan tekel, intersep, dan melindungi lini belakang, serta sesekali mencetak gol penting."
+  },
+  {
+    "soal": "Gelandang Prancis yang dikenal karena stamina luar biasa, kemampuan merebut bola, dan kerendahan hatinya.",
+    "jawaban": "N'Golo Kanté",
+    "deskripsi": "Pemain yang seolah memiliki energi tak terbatas, sangat efektif dalam memutus serangan lawan dan memulai serangan balik."
+  },
+  {
+    "soal": "Gelandang Italia kelahiran Brasil yang dikenal dengan gaya penalti uniknya dan kemampuannya mengatur tempo permainan.",
+    "jawaban": "Jorginho",
+    "deskripsi": "Seorang deep-lying playmaker yang unggul dalam umpan pendek, menjaga penguasaan bola, dan mengeksekusi penalti dengan tenang."
+  },
+  {
+    "soal": "Gelandang Italia mungil yang menjadi motor lini tengah Paris Saint-Germain, dikenal dengan kontrol bola dan kemampuan passingnya.",
+    "jawaban": "Marco Verratti",
+    "deskripsi": "Pemain dengan teknik tinggi, sangat baik dalam menjaga bola di ruang sempit dan mendistribusikannya secara akurat."
+  },
+  {
+    "soal": "Kiper Brasil Manchester City yang dikenal dengan kemampuan distribusi bola jarak jauhnya yang akurat.",
+    "jawaban": "Ederson Moraes",
+    "deskripsi": "Kiper modern yang berperan penting dalam membangun serangan dari belakang, selain kemampuan menghentikan tembakannya."
+  },
+  {
+    "soal": "Legenda Brasil yang memenangkan tiga Piala Dunia dan mencetak lebih dari 1000 gol dalam karirnya.",
+    "jawaban": "Pelé",
+    "deskripsi": "Dianggap oleh banyak orang sebagai 'Raja Sepak Bola', dikenal karena skill, kecepatan, dan kemampuan mencetak golnya yang luar biasa."
+  },
+  {
+    "soal": "Legenda Argentina yang terkenal dengan 'Gol Tangan Tuhan' dan gol solo spektakuler melawan Inggris di Piala Dunia 1986.",
+    "jawaban": "Diego Maradona",
+    "deskripsi": "Dikenal karena dribbling magis, visi, dan kepemimpinannya, membawa Argentina menjuarai Piala Dunia 1986."
+  },
+  {
+    "soal": "Maestro Belanda yang terkenal dengan 'Cruyff Turn' dan menjadi ikon 'Total Football'.",
+    "jawaban": "Johan Cruyff",
+    "deskripsi": "Pemain dan pelatih revolusioner, memenangkan tiga Ballon d'Or dan meninggalkan warisan besar di Ajax dan Barcelona."
+  },
+  {
+    "soal": "Legenda Jerman yang dijuluki 'Der Kaiser', memenangkan Piala Dunia sebagai pemain dan pelatih.",
+    "jawaban": "Franz Beckenbauer",
+    "deskripsi": "Bek elegan yang merevolusi peran libero, dikenal karena ketenangan, visi, dan kepemimpinannya."
+  },
+  {
+    "soal": "Gelandang serang Prancis keturunan Aljazair yang terkenal dengan skill, visi, dan gol voli ikonik di final Liga Champions 2002.",
+    "jawaban": "Zinedine Zidane",
+    "deskripsi": "Pemenang Piala Dunia 1998 dan Euro 2000, dikenal karena keanggunan, kontrol bola, dan kemampuannya mengubah jalannya pertandingan."
+  },
+  {
+    "soal": "Penyihir lapangan hijau asal Brasil yang selalu tersenyum, terkenal dengan skill, trik, dan memenangkan Ballon d'Or 2005.",
+    "jawaban": "Ronaldinho",
+    "deskripsi": "Pemain yang sangat menghibur, dikenal karena kreativitas, dribbling, dan kemampuannya mencetak gol-gol indah."
+  },
+  {
+    "soal": "Gelandang serang Brasil yang elegan, memenangkan Ballon d'Or 2007 setelah membawa AC Milan menjuarai Liga Champions.",
+    "jawaban": "Kaká",
+    "deskripsi": "Dikenal karena kecepatan lari dengan bola, visi, dan penyelesaian akhir yang klinis."
+  },
+  {
+    "soal": "Bek legendaris Italia yang menghabiskan seluruh karirnya di AC Milan dan memenangkan lima gelar Liga Champions.",
+    "jawaban": "Paolo Maldini",
+    "deskripsi": "Dianggap sebagai salah satu bek terbaik sepanjang masa, dikenal karena ketangguhan, kecerdasan taktis, dan loyalitasnya."
+  },
+  {
+    "soal": "Kiper legendaris Italia yang memiliki karir sangat panjang dan memenangkan Piala Dunia 2006.",
+    "jawaban": "Gianluigi Buffon",
+    "deskripsi": "Dikenal karena konsistensi, kepemimpinan, dan penyelamatan gemilangnya selama lebih dari dua dekade."
+  },
+  {
+    "soal": "Gelandang maestro Spanyol yang menjadi otak permainan Barcelona dan timnas Spanyol di era keemasan mereka.",
+    "jawaban": "Xavi Hernández",
+    "deskripsi": "Dikenal karena umpan presisi, visi, dan kemampuannya mengontrol tempo permainan (tiki-taka)."
+  },
+  {
+    "soal": "Gelandang Spanyol yang mencetak gol kemenangan di final Piala Dunia 2010, terkenal dengan dribbling dan kreativitasnya.",
+    "jawaban": "Andrés Iniesta",
+    "deskripsi": "Pemain dengan teknik luar biasa, kontrol bola yang rapat, dan kemampuan menciptakan momen magis."
+  },
+  {
+    "soal": "Penyerang Prancis legendaris Arsenal, dikenal karena kecepatan, keanggunan, dan penyelesaian akhirnya yang khas.",
+    "jawaban": "Thierry Henry",
+    "deskripsi": "Pencetak gol terbanyak sepanjang masa Arsenal, memenangkan Piala Dunia dan Euro bersama Prancis."
+  },
+  {
+    "soal": "Kapten legendaris Liverpool yang dikenal dengan tendangan jarak jauh, semangat juang, dan kepemimpinannya.",
+    "jawaban": "Steven Gerrard",
+    "deskripsi": "Gelandang serba bisa yang mampu mencetak gol penting dan menginspirasi timnya, terkenal dengan comeback Istanbul 2005."
+  },
+  {
+    "soal": "Gelandang produktif Chelsea yang menjadi pencetak gol terbanyak sepanjang masa klub tersebut dari posisi tengah.",
+    "jawaban": "Frank Lampard",
+    "deskripsi": "Dikenal karena kecerdasan, lari dari lini kedua, dan kemampuan mencetak gol yang konsisten."
+  },
+  {
+    "soal": "Gelandang Italia yang dijuluki 'Il Maestro', terkenal dengan visi, umpan panjang akurat, dan tendangan bebasnya.",
+    "jawaban": "Andrea Pirlo",
+    "deskripsi": "Seorang deep-lying playmaker yang elegan, mendikte permainan dengan ketenangan dan kecerdasan."
+  },
+  {
+    "soal": "Winger Belanda yang dikenal dengan gerakan memotong ke dalam dari kanan dan melepaskan tembakan kaki kiri melengkung.",
+    "jawaban": "Arjen Robben",
+    "deskripsi": "Pemain sayap yang cepat dan lincah, sering mencetak gol-gol penting untuk Bayern Munich dan Belanda."
+  },
+  {
+    "soal": "Gelandang Jerman yang dikenal dengan akurasi umpan luar biasa dan telah memenangkan banyak gelar Liga Champions bersama Real Madrid.",
+    "jawaban": "Toni Kroos",
+    "deskripsi": "Seorang pengatur tempo permainan yang tenang dan presisi, memiliki visi dan kemampuan eksekusi bola mati yang baik."
+  },
+  {
+    "soal": "Penyerang Jerman yang unik dengan julukan 'Raumdeuter' karena kemampuannya menemukan ruang.",
+    "jawaban": "Thomas Müller",
+    "deskripsi": "Pemain yang sangat cerdas secara taktis, efektif dalam mencetak gol dan memberikan assist, serta memiliki tingkat kerja tinggi."
+  },
+  {
+    "soal": "Striker Argentina legendaris Manchester City, pencetak gol kemenangan ikonik di menit akhir yang mengamankan gelar Liga Premier 2012.",
+    "jawaban": "Sergio Agüero",
+    "deskripsi": "Salah satu striker terbaik di generasinya, dikenal karena penyelesaian akhir yang klinis dan pergerakan cerdas di kotak penalti."
+  },
+  {
+    "soal": "Pencetak gol terbanyak sepanjang masa Manchester United dan timnas Inggris.",
+    "jawaban": "Wayne Rooney",
+    "deskripsi": "Penyerang serba bisa yang kuat, dikenal karena etos kerja, tendangan keras, dan kemampuan mencetak gol spektakuler."
+  },
+  {
+    "soal": "Kiper legendaris Spanyol dan Real Madrid, kapten tim yang memenangkan Piala Dunia 2010 dan dua Euro.",
+    "jawaban": "Iker Casillas",
+    "deskripsi": "Dikenal dengan julukan 'San Iker' karena penyelamatan-penyelamatan penting dan refleksnya yang luar biasa."
+  },
+  {
+    "soal": "Bek tengah dan kapten legendaris Barcelona berambut ikal, dikenal karena semangat juang dan kepemimpinannya.",
+    "jawaban": "Carles Puyol",
+    "deskripsi": "Bek yang tangguh dan tanpa kompromi, menjadi pilar pertahanan Barcelona dan Spanyol selama bertahun-tahun."
+  },
+  {
+    "soal": "Gelandang Inggris yang terkenal dengan tendangan bebas melengkung, umpan silang akurat, dan status selebritinya.",
+    "jawaban": "David Beckham",
+    "deskripsi": "Pemain sayap kanan dengan teknik luar biasa, menjadi ikon global baik di dalam maupun di luar lapangan."
+  },
+  {
+    "soal": "Striker Pantai Gading legendaris Chelsea, dikenal karena kekuatan fisik dan gol-gol penting di laga besar.",
+    "jawaban": "Didier Drogba",
+    "deskripsi": "Penyerang yang sangat berpengaruh, pahlawan Chelsea di final Liga Champions 2012."
+  },
+  {
+    "soal": "Striker Kamerun yang produktif, memenangkan Liga Champions dengan dua klub berbeda (Barcelona dan Inter Milan).",
+    "jawaban": "Samuel Eto'o",
+    "deskripsi": "Dikenal karena kecepatan, penyelesaian akhir yang tajam, dan kontribusinya dalam meraih treble winners."
+  },
+  {
+    "soal": "Pangeran Roma, pemain legendaris Italia yang menghabiskan seluruh karirnya di AS Roma.",
+    "jawaban": "Francesco Totti",
+    "deskripsi": "Penyerang serba bisa yang kreatif, dikenal karena loyalitas, visi, dan gol-gol indahnya, termasuk tendangan chip 'cucchiaio'."
+  },
+  {
+    "soal": "Pemain Wales yang dikenal dengan kecepatan lari luar biasa dan gol-gol spektakuler, termasuk salto di final Liga Champions.",
+    "jawaban": "Gareth Bale",
+    "deskripsi": "Winger atau penyerang yang memiliki kemampuan atletik tinggi dan sering menjadi penentu di pertandingan besar."
+  },
+  {
+    "soal": "Bek kiri Brasil yang sangat ofensif dan memenangkan banyak gelar bersama Real Madrid, dikenal dengan skill individunya.",
+    "jawaban": "Marcelo",
+    "deskripsi": "Salah satu bek kiri terbaik di generasinya, memiliki kemampuan menyerang yang luar biasa dan teknik tinggi."
+  },
+  {
+    "soal": "Bek kanan Brasil dengan koleksi trofi terbanyak dalam sejarah sepak bola.",
+    "jawaban": "Dani Alves",
+    "deskripsi": "Dikenal karena energi, kemampuan menyerang dari sisi kanan, dan kontribusi besar dalam kesuksesan Barcelona dan tim lainnya."
+  },
+  {
+    "soal": "Bek tengah Brasil yang dikenal dengan kepemimpinan, ketenangan, dan kemampuan membaca permainan, bermain untuk Chelsea dan PSG.",
+    "jawaban": "Thiago Silva",
+    "deskripsi": "Dianggap sebagai salah satu bek tengah terbaik di generasinya, memiliki konsistensi dan kualitas bertahan yang tinggi."
+  },
+  {
+    "soal": "Bek tengah Italia yang tangguh dan merupakan bagian dari trio BBC di Juventus dan timnas Italia.",
+    "jawaban": "Giorgio Chiellini",
+    "deskripsi": "Dikenal karena kemampuan bertahan yang tanpa kompromi, semangat juang, dan kepemimpinannya di lini belakang."
+  },
+  {
+    "soal": "Bek tengah Italia yang dikenal dengan kemampuan membangun serangan dari belakang dan menjadi bagian dari trio BBC.",
+    "jawaban": "Leonardo Bonucci",
+    "deskripsi": "Selain bertahan, ia juga memiliki visi dan umpan panjang yang baik untuk memulai serangan."
+  },
+  {
+    "soal": "Gelandang serang Portugal yang menjadi motor serangan Manchester United, dikenal dengan kreativitas dan gol-golnya.",
+    "jawaban": "Bruno Fernandes",
+    "deskripsi": "Pemain yang memiliki pengaruh besar dalam permainan tim, sering menciptakan peluang dan mencetak gol dari lini tengah."
+  },
+  {
+    "soal": "Bek tengah Portugal yang menjadi pilar pertahanan Manchester City dan memenangkan penghargaan Pemain Terbaik Liga Premier.",
+    "jawaban": "Rúben Dias",
+    "deskripsi": "Dikenal karena ketangguhan, kemampuan duel udara, dan kepemimpinannya di lini belakang."
+  },
+  {
+    "soal": "Kiper Slovenia yang menjadi andalan Atletico Madrid dan dikenal dengan refleks serta penyelamatan gemilangnya.",
+    "jawaban": "Jan Oblak",
+    "deskripsi": "Dianggap sebagai salah satu kiper terbaik di dunia, sering melakukan penyelamatan krusial dan memiliki konsistensi tinggi."
+  },
+  {
+    "soal": "Kiper Jerman Barcelona yang dikenal dengan kemampuan bermain bola menggunakan kaki dan penyelamatan penting.",
+    "jawaban": "Marc-André ter Stegen",
+    "deskripsi": "Kiper modern yang nyaman dengan bola di kakinya dan mampu melakukan penyelamatan spektakuler."
+  },
+  {
+    "soal": "Gelandang Jerman berdarah Turki yang menjadi kapten Manchester City saat meraih treble dan dikenal dengan kemampuan mencetak gol dari lini tengah.",
+    "jawaban": "İlkay Gündoğan",
+    "deskripsi": "Pemain cerdas dengan penempatan posisi yang baik, sering muncul di kotak penalti untuk mencetak gol penting."
+  },
+  {
+    "soal": "Penyerang Prancis yang menjadi pencetak gol terbanyak sepanjang masa timnas Prancis, dikenal dengan sundulan dan gol akrobatiknya.",
+    "jawaban": "Olivier Giroud",
+    "deskripsi": "Striker target man yang kuat di udara dan memiliki kemampuan untuk mencetak gol-gol indah."
+  },
+  {
+    "soal": "Gelandang serang Norwegia yang menjadi kapten Arsenal, dikenal dengan visi, kreativitas, dan kaki kirinya.",
+    "jawaban": "Martin Ødegaard",
+    "deskripsi": "Seorang playmaker yang elegan, mampu mengatur serangan timnya dan memberikan umpan-umpan kunci."
+  },
+  {
+    "soal": "Winger Georgia yang dijuluki 'Kvaradona' setelah penampilan impresifnya membawa Napoli meraih Scudetto.",
+    "jawaban": "Khvicha Kvaratskhelia",
+    "deskripsi": "Dikenal karena kemampuan dribbling yang luar biasa, kreativitas, dan kemampuannya mencetak gol serta assist."
+  },
+  {
+    "soal": "Striker Nigeria yang menjadi top skor Serie A dan membawa Napoli meraih Scudetto, dikenal dengan topeng pelindungnya.",
+    "jawaban": "Victor Osimhen",
+    "deskripsi": "Penyerang yang cepat, kuat, dan memiliki penyelesaian akhir yang tajam, sangat berbahaya di depan gawang."
+  },
+  {
+    "soal": "Winger Portugal yang lincah dan menjadi pemain kunci AC Milan, dikenal dengan kecepatan dan kemampuan dribblingnya.",
+    "jawaban": "Rafael Leão",
+    "deskripsi": "Pemain sayap yang eksplosif, mampu melewati lawan dengan mudah dan memberikan kontribusi gol signifikan."
+  },
+  {
+    "soal": "Penyerang muda Argentina yang memenangkan Piala Dunia 2022 dan Liga Champions bersama Manchester City di musim yang sama.",
+    "jawaban": "Julián Álvarez",
+    "deskripsi": "Striker serba bisa yang pekerja keras, memiliki insting gol yang baik dan mampu bermain di berbagai posisi menyerang."
+  },
+  {
+    "soal": "Gelandang bertahan muda Prancis yang bermain untuk Real Madrid, dikenal dengan kemampuan fisik dan tekelnya.",
+    "jawaban": "Aurélien Tchouaméni",
+    "deskripsi": "Pemain tengah yang kuat dalam memutus serangan lawan dan memiliki kemampuan distribusi bola yang baik."
+  },
+  {
+    "soal": "Gelandang muda Prancis serba bisa yang bermain untuk Real Madrid, dikenal karena energi dan kemampuannya mengubah permainan.",
+    "jawaban": "Eduardo Camavinga",
+    "deskripsi": "Pemain dinamis yang bisa bermain di berbagai posisi lini tengah maupun bek kiri, memiliki teknik dan fisik yang baik."
+  },
+  {
+    "soal": "Winger muda Brasil yang bermain untuk Real Madrid, dikenal karena gol-gol pentingnya di Liga Champions.",
+    "jawaban": "Rodrygo",
+    "deskripsi": "Penyerang sayap yang lincah, memiliki kemampuan mencetak gol di momen krusial dan terus berkembang."
+  },
+  {
+    "soal": "Bek tengah Prancis yang menjadi pilar pertahanan Arsenal, dikenal karena ketenangan dan kemampuan bertahannya.",
+    "jawaban": "William Saliba",
+    "deskripsi": "Bek muda yang elegan, kuat dalam duel, dan memiliki kemampuan membaca permainan yang baik."
+  }
+]

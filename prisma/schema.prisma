@@ -259,6 +259,11 @@ model BotConfig {
   autoRead        Boolean @default(false)
   alwaysOnline    Boolean @default(false)
 
+  // Anti-Link (group only)
+  antiLinkMode    String  @default("OFF") // OFF | INVITE | ALL
+  antiLinkAction  String  @default("DELETE") // DELETE (warn+remove msg) | KICK (warn+kick after limit)
+  antiLinkLimit   Int     @default(3)    // Warn count before kick (when action=KICK)
+
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 

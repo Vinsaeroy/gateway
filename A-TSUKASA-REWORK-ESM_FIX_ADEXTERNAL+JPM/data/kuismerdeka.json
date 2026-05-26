@@ -1,0 +1,502 @@
+[
+  {
+    "index": 0,
+    "soal": "Proklamasi, 17 Agustus, Kemerdekaan, Bung Karno, Bung Hatta",
+    "jawaban": "PROKLAMASI"
+  },
+  {
+    "index": 1,
+    "soal": "BPUPKI, Persiapan, Jepang, Dokuritsu Junbi Cosakai",
+    "jawaban": "BPUPKI"
+  },
+  {
+    "index": 2,
+    "soal": "Panitia, Kemerdekaan, 7 Agustus, Dokuritsu Junbi Inkai",
+    "jawaban": "PPKI"
+  },
+  {
+    "index": 3,
+    "soal": "Soekarno, Hatta, Kemerdekaan, Proklamasi, Indonesia",
+    "jawaban": "PROKLAMATOR"
+  },
+  {
+    "index": 4,
+    "soal": "Soekarno, 6 Juni, Pemimpin, Presiden",
+    "jawaban": "SOEKARNO"
+  },
+  {
+    "index": 5,
+    "soal": "Hatta, Wakil Presiden, Proklamator, Bung",
+    "jawaban": "HATTA"
+  },
+  {
+    "index": 6,
+    "soal": "Bendera, Merah Putih, Pusaka, Sang Saka",
+    "jawaban": "SANG SAKA MERAH PUTIH"
+  },
+  {
+    "index": 7,
+    "soal": "Indonesia, Nasional, Lagu, WR Supratman",
+    "jawaban": "INDONESIA RAYA"
+  },
+  {
+    "index": 8,
+    "soal": "Maklumat, Pemerintah, Indonesia, 1945",
+    "jawaban": "MAKLUMAT"
+  },
+  {
+    "index": 9,
+    "soal": "Agresi, Belanda, 1947, 1948, Penjajahan",
+    "jawaban": "AGRESI"
+  },
+  {
+    "index": 10,
+    "soal": "Serangan, Umum, 1 Maret, Jogja",
+    "jawaban": "SERANGAN UMUM"
+  },
+  {
+    "index": 11,
+    "soal": "Perundingan, Linggarjati, Indonesia, Belanda",
+    "jawaban": "LINGGARJATI"
+  },
+  {
+    "index": 12,
+    "soal": "Perundingan, Renville, Indonesia, Belanda",
+    "jawaban": "RENVILLE"
+  },
+  {
+    "index": 13,
+    "soal": "Konferensi, Meja Bundar, Indonesia, Belanda",
+    "jawaban": "KMB"
+  },
+  {
+    "index": 14,
+    "soal": "Pahlawan, Revolusi, G30S, PKI",
+    "jawaban": "PAHLAWAN REVOLUSI"
+  },
+  {
+    "index": 15,
+    "soal": "Peristiwa, 30 September, PKI, Kudeta",
+    "jawaban": "G30S"
+  },
+  {
+    "index": 16,
+    "soal": "Diponegoro, Pahlawan, Jawa, Perang",
+    "jawaban": "DIPONEGORO"
+  },
+  {
+    "index": 17,
+    "soal": "Pattimura, Pahlawan, Maluku, Perang",
+    "jawaban": "PATTIMURA"
+  },
+  {
+    "index": 18,
+    "soal": "Cut Nyak Dien, Pahlawan, Aceh, Perang",
+    "jawaban": "CUT NYAK DIEN"
+  },
+  {
+    "index": 19,
+    "soal": "Imam Bonjol, Pahlawan, Minangkabau, Perang",
+    "jawaban": "IMAM BONJOL"
+  },
+  {
+    "index": 20,
+    "soal": "Kartini, Emansipasi, Perempuan, Pahlawan",
+    "jawaban": "KARTINI"
+  },
+  {
+    "index": 21,
+    "soal": "Sudirman, Jenderal, Gerilya, TNI",
+    "jawaban": "SUDIRMAN"
+  },
+  {
+    "index": 22,
+    "soal": "Dewantara, Pendidikan, Taman Siswa, Ki Hajar",
+    "jawaban": "DEWANTARA"
+  },
+  {
+    "index": 23,
+    "soal": "Soedirman, Panglima, Tentara, Gerilya",
+    "jawaban": "SOEDIRMAN"
+  },
+  {
+    "index": 24,
+    "soal": "Mohammad Natsir, Piagam, Jakarta, Perdana Menteri",
+    "jawaban": "NATSIR"
+  },
+  {
+    "index": 25,
+    "soal": "Ampera, Jembatan, Palembang, Sumatera Selatan",
+    "jawaban": "AMPERA"
+  },
+  {
+    "index": 26,
+    "soal": "Ejaan, Bahasa, Pembaharuan, Soewandi",
+    "jawaban": "EYD"
+  },
+  {
+    "index": 27,
+    "soal": "Arsitek, Monumen, Nasional, Silaban",
+    "jawaban": "MONAS"
+  },
+  {
+    "index": 28,
+    "soal": "Rengasdengklok, Penculikan, Soekarno, Hatta",
+    "jawaban": "RENGASDENGKLOK"
+  },
+  {
+    "index": 29,
+    "soal": "Teks, Proklamasi, Kemerdekaan, Indonesia",
+    "jawaban": "PROKLAMASI"
+  },
+  {
+    "index": 30,
+    "soal": "Republik, Indonesia, Serikat, RIS",
+    "jawaban": "RIS"
+  },
+  {
+    "index": 31,
+    "soal": "Peristiwa, Tiga Daerah, Revolusi, Indonesia",
+    "jawaban": "TIGA DAERAH"
+  },
+  {
+    "index": 32,
+    "soal": "Undang-Undang, Dasar, 1945, Konstitusi",
+    "jawaban": "UUD 1945"
+  },
+  {
+    "index": 33,
+    "soal": "Pancasila, Ideologi, Dasar, Negara",
+    "jawaban": "PANCASILA"
+  },
+  {
+    "index": 34,
+    "soal": "Sumpah, Pemuda, 28 Oktober, Persatuan",
+    "jawaban": "SUMPAH PEMUDA"
+  },
+  {
+    "index": 35,
+    "soal": "Lagu, Kebangsaan, Indonesia Raya, W.R. Supratman",
+    "jawaban": "INDONESIA RAYA"
+  },
+  {
+    "index": 36,
+    "soal": "Indonesia, Merdeka, 1945, Proklamasi",
+    "jawaban": "MERDEKA"
+  },
+  {
+    "index": 37,
+    "soal": "Laskar, Pemuda, Pertempuran, 10 November",
+    "jawaban": "10 NOVEMBER"
+  },
+  {
+    "index": 38,
+    "soal": "Soepomo, Tokoh, Hukum, Indonesia",
+    "jawaban": "SOEPOMO"
+  },
+  {
+    "index": 39,
+    "soal": "Hatta, Bung, Wakil Presiden, Indonesia",
+    "jawaban": "HATTA"
+  },
+  {
+    "index": 40,
+    "soal": "Dewantara, Pendidikan, Ki Hajar, Taman Siswa",
+    "jawaban": "DEWANTARA"
+  },
+  {
+    "index": 41,
+    "soal": "Wahid, Gus Dur, Presiden, Abdurrahman",
+    "jawaban": "GUS DUR"
+  },
+  {
+    "index": 42,
+    "soal": "Proklamasi, Kemerdekaan, Indonesia, Soekarno",
+    "jawaban": "PROKLAMASI"
+  },
+  {
+    "index": 43,
+    "soal": "Hatta, Bung, Wakil, Presiden",
+    "jawaban": "HATTA"
+  },
+  {
+    "index": 44,
+    "soal": "Kartini, Emansipasi, Wanita, Pahlawan",
+    "jawaban": "KARTINI"
+  },
+  {
+    "index": 45,
+    "soal": "Dewi Sartika, Pendidikan, Wanita, Pahlawan",
+    "jawaban": "DEWI SARTIKA"
+  },
+  {
+    "index": 46,
+    "soal": "Sutomo, Dokter, Pendidikan, Pahlawan",
+    "jawaban": "SUTOMO"
+  },
+  {
+    "index": 47,
+    "soal": "Kekuasaan, Indonesia, Jepang, Penjajahan",
+    "jawaban": "JEPANG"
+  },
+  {
+    "index": 48,
+    "soal": "Bung Karno, Bung Hatta, Pidato, Proklamasi",
+    "jawaban": "PIDATO PROKLAMASI"
+  },
+  {
+    "index": 49,
+    "soal": "Bung Karno, Kongres, 1935, Indonesia",
+    "jawaban": "KONGRES"
+  },
+  {
+    "index": 50,
+    "soal": "Pahlawan, Aceh, Perang, Kemerdekaan",
+    "jawaban": "SULTAN ISKANDAR MUDHA"
+  },
+  {
+    "index": 51,
+    "soal": "Soekarno, Hatta, Jakarta, 1945",
+    "jawaban": "JAKARTA"
+  },
+  {
+    "index": 52,
+    "soal": "Pahlawan, Indonesia, Kebangkitan, 1908",
+    "jawaban": "BOGOR"
+  },
+  {
+    "index": 53,
+    "soal": "Soekarno, Pidato, Kemerdekaan, 1945",
+    "jawaban": "PIDATO KEMERDEKAAN"
+  },
+  {
+    "index": 54,
+    "soal": "Jenderal, Pemerintah, Proklamasi, 1945",
+    "jawaban": "JENDERAL"
+  },
+  {
+    "index": 55,
+    "soal": "Agresi, Belanda, 1947, 1948, Penjajahan",
+    "jawaban": "AGRESI MILITER"
+  },
+  {
+    "index": 56,
+    "soal": "Bung Karno, Kemerdekaan, Sejarah, Indonesia",
+    "jawaban": "SEJARAH KEMERDEKAAN"
+  },
+  {
+    "index": 57,
+    "soal": "Tari, Pahlawan, Indonesia, Kebangkitan",
+    "jawaban": "TARI KEBANGKITAN"
+  },
+  {
+    "index": 58,
+    "soal": "Perundingan, Indonesia, Belanda, 1945",
+    "jawaban": "PERUNDINGAN"
+  },
+  {
+    "index": 59,
+    "soal": "Pahlawan, Maluku, Perang, Penjajahan",
+    "jawaban": "PATTIMURA"
+  },
+  {
+    "index": 60,
+    "soal": "Sukarno, Hatta, Proklamasi, 1945",
+    "jawaban": "PROKLAMASI 1945"
+  },
+  {
+    "index": 61,
+    "soal": "Lagu, Indonesia, Kebangsaan, Supratman",
+    "jawaban": "KEBANGSAAN"
+  },
+  {
+    "index": 62,
+    "soal": "Bendera, Nasional, Indonesia, Merah Putih",
+    "jawaban": "MERAH PUTIH"
+  },
+  {
+    "index": 63,
+    "soal": "Kongres, 1935, Soekarno, Kemerdekaan",
+    "jawaban": "KONGRES 1935"
+  },
+  {
+    "index": 64,
+    "soal": "Revolusi, Kemerdekaan, Indonesia, 1945",
+    "jawaban": "REVOLUSI KEMERDEKAAN"
+  },
+  {
+    "index": 65,
+    "soal": "Sumpah Pemuda, 28 Oktober, Persatuan, Indonesia",
+    "jawaban": "SUMPAH PEMUDA"
+  },
+  {
+    "index": 66,
+    "soal": "Kebangkitan, Nasional, Indonesia, 1908",
+    "jawaban": "Kebangkitan NASIONAL"
+  },
+  {
+    "index": 67,
+    "soal": "Presiden, Pertama, Indonesia, Proklamasi",
+    "jawaban": "SOEKARNO"
+  },
+  {
+    "index": 68,
+    "soal": "Pahlawan, Perang, Jawa, Diponegoro",
+    "jawaban": "DIPONEGORO"
+  },
+  {
+    "index": 69,
+    "soal": "Kemerdekaan, Indonesia, Proklamasi, 17 Agustus",
+    "jawaban": "KEMERDEKAAN"
+  },
+  {
+    "index": 70,
+    "soal": "Pendidikan, Indonesia, Ki Hajar, Dewantara",
+    "jawaban": "KI HAJAR DEWANTARA"
+  },
+  {
+    "index": 71,
+    "soal": "Pahlawan, Aceh, Perang, Indonesia",
+    "jawaban": "CUT NYAK DIEN"
+  },
+  {
+    "index": 72,
+    "soal": "Sumpah, Pemuda, 28 Oktober, Persatuan, Negara",
+    "jawaban": "SUMPah PEMUDA"
+  },
+  {
+    "index": 73,
+    "soal": "Perang, Kemerdekaan, Indonesia, 1945",
+    "jawaban": "PERANG KEMERDEKAAN"
+  },
+  {
+    "index": 74,
+    "soal": "Pahlawan, Indonesia, Perang, 1945",
+    "jawaban": "HATTA"
+  },
+  {
+    "index": 75,
+    "soal": "Pahlawan, Nasional, Indonesia, 1945",
+    "jawaban": "SUDIRMAN"
+  },
+  {
+    "index": 76,
+    "soal": "Kongres, 1935, Pahlawan, Indonesia",
+    "jawaban": "KONGRES 1935"
+  },
+  {
+    "index": 77,
+    "soal": "Peristiwa, 1945, Kemerdekaan, Indonesia",
+    "jawaban": "PERISTIWA KEMERDEKAAN"
+  },
+  {
+    "index": 78,
+    "soal": "Perjanjian, Linggarjati, Indonesia, Belanda",
+    "jawaban": "PERJANJIAN LINGGARJATI"
+  },
+  {
+    "index": 79,
+    "soal": "Pahlawan, Perang, Maluku, Pattimura",
+    "jawaban": "PATTIMURA"
+  },
+  {
+    "index": 80,
+    "soal": "Sukarno, Proklamasi, Indonesia, 1945",
+    "jawaban": "PROKLAMASI"
+  },
+  {
+    "index": 81,
+    "soal": "Teks, Proklamasi, Kemerdekaan, Indonesia",
+    "jawaban": "TEKS PROKLAMASI"
+  },
+  {
+    "index": 82,
+    "soal": "Bendera, Indonesia, Merah, Putih",
+    "jawaban": "BENDERA MERAH PUTIH"
+  },
+  {
+    "index": 83,
+    "soal": "Pahlawan, Indonesia, 1945, Kemerdekaan",
+    "jawaban": "PAHLAWAN KEMERDEKAAN"
+  },
+  {
+    "index": 84,
+    "soal": "Proklamasi, Kemerdekaan, 17 Agustus, 1945",
+    "jawaban": "PROKLAMASI"
+  },
+  {
+    "index": 85,
+    "soal": "Pahlawan, Perang, Nasional, Indonesia",
+    "jawaban": "PAHLAWAN NASIONAL"
+  },
+  {
+    "index": 86,
+    "soal": "Jenderal, Soekarno, Proklamasi, Indonesia",
+    "jawaban": "JENDERAL SOEKARNO"
+  },
+  {
+    "index": 87,
+    "soal": "Pahlawan, Perang, Aceh, 1945",
+    "jawaban": "CUT NYAK DIEN"
+  },
+  {
+    "index": 88,
+    "soal": "Presiden, Indonesia, Pertama, Soekarno",
+    "jawaban": "PRESIDEN SOEKARNO"
+  },
+  {
+    "index": 89,
+    "soal": "Pahlawan, Indonesia, Ki Hajar, Dewantara",
+    "jawaban": "KI HAJAR DEWANTARA"
+  },
+  {
+    "index": 90,
+    "soal": "Peristiwa, Indonesia, 30 September, G30S",
+    "jawaban": "G30S"
+  },
+  {
+    "index": 91,
+    "soal": "Soekarno, Kemerdekaan, 17 Agustus, 1945",
+    "jawaban": "SOEKARNO"
+  },
+  {
+    "index": 92,
+    "soal": "Bendera, Nasional, Merah, Putih",
+    "jawaban": "BENDERA NASIONAL"
+  },
+  {
+    "index": 93,
+    "soal": "Kartini, Emansipasi, Perempuan, Pahlawan",
+    "jawaban": "KARTINI"
+  },
+  {
+    "index": 94,
+    "soal": "Pahlawan, Maluku, Perang, Pattimura",
+    "jawaban": "PATTIMURA"
+  },
+  {
+    "index": 95,
+    "soal": "Jenderal, Gerilya, Soedirman, TNI",
+    "jawaban": "JENDERAL SOEDIRMAN"
+  },
+  {
+    "index": 96,
+    "soal": "Ki Hajar, Pendidikan, Dewantara, Indonesia",
+    "jawaban": "KI HAJAR DEWANTARA"
+  },
+  {
+    "index": 97,
+    "soal": "Pahlawan, Aceh, Cut Nyak, Dien",
+    "jawaban": "CUT NYAK DIEN"
+  },
+  {
+    "index": 98,
+    "soal": "Peristiwa, 10 November, Surabaya, Pahlawan",
+    "jawaban": "PERISTIWA 10 NOVEMBER"
+  },
+  {
+    "index": 99,
+    "soal": "Pahlawan, Diponegoro, Perang, Jawa",
+    "jawaban": "DIPONEGORO"
+  }
+]

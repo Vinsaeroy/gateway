@@ -53,7 +53,10 @@ export async function GET(
             spamDelayMax: 3000,
             welcomeMessage: null,
             autoRead: false,
-            alwaysOnline: false
+            alwaysOnline: false,
+            antiLinkMode: "OFF",
+            antiLinkAction: "DELETE",
+            antiLinkLimit: 3,
         };
 
         return NextResponse.json({ status: true, message: "Bot config fetched successfully", data: session.botConfig });
@@ -112,6 +115,9 @@ export async function POST(
             "welcomeMessage",
             "autoRead",
             "alwaysOnline",
+            "antiLinkMode",
+            "antiLinkAction",
+            "antiLinkLimit",
         ];
         for (const key of passthrough) {
             if (body[key] !== undefined) updateFields[key] = body[key];
@@ -150,6 +156,9 @@ export async function POST(
                 welcomeMessage: body.welcomeMessage || null,
                 autoRead: body.autoRead ?? false,
                 alwaysOnline: body.alwaysOnline ?? false,
+                antiLinkMode: body.antiLinkMode || "OFF",
+                antiLinkAction: body.antiLinkAction || "DELETE",
+                antiLinkLimit: body.antiLinkLimit ?? 3,
             },
             update: updateFields,
         });

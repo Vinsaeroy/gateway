@@ -13,6 +13,7 @@ import { bindSessionStore } from "./store";
 import { syncGroups } from "./store/groups";
 import { bindContactSync } from "./store/contacts";
 import { bindAutoReply } from "./store/autoreply";
+import { bindAntiLink } from "./store/antilink";
 import { bindPpGuard } from "./store/ppguard";
 import { antispam } from "./antispam";
 import { logger } from "@/lib/logger";
@@ -202,6 +203,11 @@ export class WhatsAppInstance {
                 // Bind Auto Reply (only if socket still exists)
                 if (this.socket) {
                     bindAutoReply(this.socket as WASocket, this.sessionId);
+                }
+
+                // Bind Anti-Link (group link blocker)
+                if (this.socket) {
+                    bindAntiLink(this.socket as WASocket, this.sessionId);
                 }
 
                 // Bind PP Guard (only if socket still exists)
