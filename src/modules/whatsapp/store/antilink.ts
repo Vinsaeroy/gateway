@@ -105,12 +105,19 @@ export function bindAntiLink(sock: WASocket, sessionId: string) {
 
         const action = String(config.antiLinkAction || "DELETE").toUpperCase();
         const limit = Math.max(1, Number(config.antiLinkLimit) || 3);
+        const scope = String(config.antiLinkScope || "ALL").toUpperCase();
+        const allowedGroups: string[] = Array.isArray(config.antiLinkGroups)
+            ? config.antiLinkGroups.filter((g: any) => typeof g === "string")
+            : [];
 
         for (const msg of messages) {
             try {
                 const remoteJid = msg.key.remoteJid;
                 if (!remoteJid || !remoteJid.endsWith("@g.us")) continue;
                 if (msg.key.fromMe) continue;
+
+                // Scope check — only enforce in selected groups when scope=SPECIFIC
+                if (scope === "SPECIFIC" && !allowedGroups.includes(remoteJid)) continue;
 
                 const senderJid = msg.key.participant || (msg as any).participant;
                 if (!senderJid) continue;

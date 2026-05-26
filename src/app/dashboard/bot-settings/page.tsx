@@ -54,6 +54,8 @@ export default function BotSettingsPage() {
         antiLinkMode: "OFF" as "OFF" | "INVITE" | "ALL",
         antiLinkAction: "DELETE" as "DELETE" | "KICK",
         antiLinkLimit: 3,
+        antiLinkScope: "ALL" as "ALL" | "SPECIFIC",
+        antiLinkGroups: [] as string[],
     });
     const [botLoading, setBotLoading] = useState(false);
 
@@ -65,9 +67,33 @@ export default function BotSettingsPage() {
         readReceipts: true,
     });
     const [privacyLoading, setPrivacyLoading] = useState(false);
+    const [groupsList, setGroupsList] = useState<Array<{ jid: string; subject: string | null }>>([]);
+    const [groupSearch, setGroupSearch] = useState("");
+    const [groupsRefreshing, setGroupsRefreshing] = useState(false);
+
+    const fetchGroupsList = async (forceRefresh = false) => {
+        if (!sessionId) return;
+        try {
+            if (forceRefresh) setGroupsRefreshing(true);
+            const url = `/api/groups/${sessionId}${forceRefresh ? "?refresh=1" : ""}`;
+            const res = await fetch(url);
+            const data = await res.json();
+            if (data.status) {
+                setGroupsList(
+                    (data.data || []).map((g: any) => ({ jid: g.jid, subject: g.subject || null }))
+                );
+            }
+            if (forceRefresh) toast.success("Group list refreshed");
+        } catch {
+            if (forceRefresh) toast.error("Failed to refresh groups");
+        } finally {
+            if (forceRefresh) setGroupsRefreshing(false);
+        }
+    };
 
     useEffect(() => {
         if (!sessionId) return;
+        fetchGroupsList();
 
         fetch(`/api/sessions/${sessionId}/bot-config`)
             .then(res => { if (!res.ok) throw new Error(); return res.json(); })
@@ -84,6 +110,7 @@ export default function BotSettingsPage() {
                         botBlockedJids: data.botBlockedJids || [],
                         autoReplyAllowedJids: data.autoReplyAllowedJids || [],
                         autoReplyBlockedJids: data.autoReplyBlockedJids || [],
+                        antiLinkGroups: data.antiLinkGroups || [],
                     }));
                 }
             })
@@ -616,8 +643,90 @@ export default function BotSettingsPage() {
                                 </div>
                             )}
 
+                            {/* Scope: ALL groups vs SPECIFIC */}
+                            {botConfig.antiLinkMode !== "OFF" && (
+                                <div className="grid gap-2">
+                                    <Label>Apply To</Label>
+                                    <Select
+                                        value={botConfig.antiLinkScope}
+                                        onValueChange={(v) =>
+                                            setBotConfig((p) => ({ ...p, antiLinkScope: v as any }))
+                                        }
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="ALL">All groups</SelectItem>
+                                            <SelectItem value="SPECIFIC">Selected groups only</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            )}
+
+                            {/* Group picker — only when scope=SPECIFIC */}
+                            {botConfig.antiLinkMode !== "OFF" && botConfig.antiLinkScope === "SPECIFIC" && (
+                                <div className="grid gap-2">
+                                    <div className="flex items-center justify-between gap-2 flex-wrap">
+                                        <Label>Active Groups ({botConfig.antiLinkGroups.length} selected)</Label>
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => fetchGroupsList(true)}
+                                            disabled={groupsRefreshing}
+                                        >
+                                            <RefreshCw className={`h-3.5 w-3.5 mr-1 ${groupsRefreshing ? "animate-spin" : ""}`} />
+                                            Refresh
+                                        </Button>
+                                    </div>
+                                    <Input
+                                        placeholder="Search groups..."
+                                        value={groupSearch}
+                                        onChange={(e) => setGroupSearch(e.target.value)}
+                                    />
+                                    <div className="max-h-56 overflow-y-auto border rounded-lg p-2 space-y-1 bg-muted/20">
+                                        {groupsList.length === 0 ? (
+                                            <p className="text-xs text-muted-foreground text-center py-3">
+                                                No groups found. Click Refresh to sync from WhatsApp.
+                                            </p>
+                                        ) : (
+                                            groupsList
+                                                .filter((g) =>
+                                                    !groupSearch ||
+                                                    (g.subject || g.jid).toLowerCase().includes(groupSearch.toLowerCase())
+                                                )
+                                                .map((g) => {
+                                                    const checked = botConfig.antiLinkGroups.includes(g.jid);
+                                                    return (
+                                                        <label
+                                                            key={g.jid}
+                                                            className={`flex items-center gap-2 p-2 rounded cursor-pointer text-sm hover:bg-muted ${checked ? "bg-primary/10 border border-primary/30" : ""}`}
+                                                        >
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={checked}
+                                                                onChange={(e) => {
+                                                                    setBotConfig((p) => ({
+                                                                        ...p,
+                                                                        antiLinkGroups: e.target.checked
+                                                                            ? [...p.antiLinkGroups, g.jid]
+                                                                            : p.antiLinkGroups.filter((x) => x !== g.jid),
+                                                                    }));
+                                                                }}
+                                                                className="shrink-0"
+                                                            />
+                                                            <span className="truncate">{g.subject || g.jid}</span>
+                                                        </label>
+                                                    );
+                                                })
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+
                             <p className="text-xs text-muted-foreground border-l-2 border-amber-500/50 pl-3 py-1 bg-amber-500/5 rounded">
-                                ℹ️ Group admins and the session owner are exempt. Bot must be admin to delete or kick.
+                                ℹ️ Group admins are exempt. Bot must be admin to delete or kick.
                             </p>
 
                             <div className="pt-2">

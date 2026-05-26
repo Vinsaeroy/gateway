@@ -263,6 +263,8 @@ model BotConfig {
   antiLinkMode    String  @default("OFF") // OFF | INVITE | ALL
   antiLinkAction  String  @default("DELETE") // DELETE (warn+remove msg) | KICK (warn+kick after limit)
   antiLinkLimit   Int     @default(3)    // Warn count before kick (when action=KICK)
+  antiLinkScope   String  @default("ALL") // ALL = active in every group, SPECIFIC = only listed groups
+  antiLinkGroups  Json?   // Array of group JIDs when scope=SPECIFIC, e.g. ["123@g.us"]
 
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
