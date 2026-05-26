@@ -166,8 +166,8 @@ export default function SettingsPage() {
                         </div>
                     </div>
 
-                    <div className="flex items-center justify-between space-x-2 pt-2 border-t border-border/50">
-                        <Label htmlFor="enable-registration" className="flex flex-col space-y-1">
+                    <div className="flex items-center justify-between gap-3 pt-2 border-t border-border/50">
+                        <Label htmlFor="enable-registration" className="flex flex-col space-y-1 min-w-0 flex-1">
                             <span>Enable User Registration</span>
                             <span className="font-normal text-xs text-muted-foreground">Allow new users to sign up for accounts. Turn off to keep the platform private.</span>
                         </Label>

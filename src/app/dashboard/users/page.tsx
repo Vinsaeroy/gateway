@@ -219,26 +219,26 @@ export default function UsersPage() {
                 {users.map(user => (
                     <Card key={user.id} className="overflow-hidden">
                         <CardContent className="p-0">
-                            <div className="p-6">
-                                <div className="flex justify-between items-start mb-4">
-                                    <div className="flex items-center gap-3">
-                                        <div className="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-500">
+                            <div className="p-4 sm:p-6">
+                                <div className="flex justify-between items-start gap-2 mb-4">
+                                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                                        <div className="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-500 shrink-0">
                                             {user.name?.charAt(0) || user.email.charAt(0)}
                                         </div>
-                                        <div>
-                                            <h3 className="font-semibold">{user.name || "User"}</h3>
-                                            <p className="text-xs text-muted-foreground">{user.email}</p>
+                                        <div className="min-w-0 flex-1">
+                                            <h3 className="font-semibold truncate">{user.name || "User"}</h3>
+                                            <p className="text-xs text-muted-foreground truncate">{user.email}</p>
                                         </div>
                                     </div>
-                                    <Badge variant="outline" className="flex items-center gap-1">
+                                    <Badge variant="outline" className="flex items-center gap-1 shrink-0">
                                         {getRoleIcon(user.role)}
                                         {user.role}
                                     </Badge>
                                 </div>
 
-                                <div className="flex justify-between items-center text-sm text-muted-foreground">
-                                    <span>{user._count?.sessions || 0} Sessions</span>
-                                    <span>Joined {new Date(user.createdAt).toLocaleDateString()}</span>
+                                <div className="flex justify-between items-center text-xs sm:text-sm text-muted-foreground gap-2">
+                                    <span className="truncate">{user._count?.sessions || 0} Sessions</span>
+                                    <span className="truncate">Joined {new Date(user.createdAt).toLocaleDateString()}</span>
                                 </div>
                             </div>
                             <div className="bg-slate-50 p-3 flex justify-end gap-2 border-t">

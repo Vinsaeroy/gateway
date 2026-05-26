@@ -476,10 +476,10 @@ export default function WebhooksPage() {
                             webhooks.map((webhook) => (
                                 <Card key={webhook.id} className={webhook.isActive ? "" : "opacity-60"}>
                                     <CardContent className="pt-4 space-y-3">
-                                        <div className="flex justify-between items-start">
-                                            <div>
-                                                <h3 className="font-semibold flex items-center gap-2">
-                                                    {webhook.name}
+                                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
+                                            <div className="min-w-0 flex-1">
+                                                <h3 className="font-semibold flex items-center gap-2 flex-wrap">
+                                                    <span className="truncate max-w-full">{webhook.name}</span>
                                                     <Badge variant={webhook.isActive ? "default" : "secondary"}>
                                                         {webhook.isActive ? "Active" : "Inactive"}
                                                     </Badge>
@@ -489,17 +489,17 @@ export default function WebhooksPage() {
                                                         </Badge>
                                                     )}
                                                 </h3>
-                                                <p className="text-sm text-muted-foreground font-mono">{webhook.url}</p>
+                                                <p className="text-sm text-muted-foreground font-mono break-all">{webhook.url}</p>
                                             </div>
-                                            <div className="flex items-center gap-2">
+                                            <div className="flex items-center gap-1 sm:gap-2 self-end sm:self-start shrink-0">
                                                 <Switch
                                                     checked={webhook.isActive}
                                                     onCheckedChange={(checked) => toggleWebhookActive(webhook.id, checked)}
                                                 />
-                                                <Button variant="ghost" size="sm" onClick={() => handleEdit(webhook)}>
+                                                <Button variant="ghost" size="sm" onClick={() => handleEdit(webhook)} className="h-8 px-2">
                                                     Edit
                                                 </Button>
-                                                <Button variant="ghost" size="icon" onClick={() => deleteWebhook(webhook.id)}>
+                                                <Button variant="ghost" size="icon" onClick={() => deleteWebhook(webhook.id)} className="h-8 w-8">
                                                     <Trash2 className="h-4 w-4 text-destructive" />
                                                 </Button>
                                             </div>
