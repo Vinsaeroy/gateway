@@ -137,7 +137,17 @@ export default function JpmSwgcPage() {
             if (data.status) {
                 toast.success(`Dispatch dimulai untuk ${data.data?.total || 0} grup. Cek log di Railway.`);
             } else if (res.status === 409) {
-                toast.warning(data.message || "A dispatch is already running for this session");
+                // Locked — let user clear it manually
+                toast.warning(data.message || "A dispatch is already running", {
+                    action: {
+                        label: "Force reset",
+                        onClick: async () => {
+                            await fetch(`/api/jpm-swgc/${sessionId}`, { method: "DELETE" });
+                            toast.success("Lock cleared. Try Send again.");
+                        },
+                    },
+                    duration: 10000,
+                });
             } else {
                 toast.error(data.message || "Failed to dispatch");
             }
@@ -145,6 +155,19 @@ export default function JpmSwgcPage() {
             toast.error(e?.message || "Failed to dispatch");
         } finally {
             setSending(false);
+        }
+    };
+
+    const handleForceReset = async () => {
+        if (!sessionId) return;
+        if (!confirm("Force-clear any stuck dispatch lock for this session?")) return;
+        try {
+            const res = await fetch(`/api/jpm-swgc/${sessionId}`, { method: "DELETE" });
+            const data = await res.json();
+            if (data.status) toast.success(data.message);
+            else toast.error(data.message || "Reset failed");
+        } catch (e: any) {
+            toast.error(e?.message || "Reset failed");
         }
     };
 
@@ -345,7 +368,7 @@ export default function JpmSwgcPage() {
                             </p>
                         </div>
 
-                        <div className="pt-2">
+                        <div className="pt-2 flex flex-col sm:flex-row gap-2">
                             <Button
                                 onClick={handleSend}
                                 disabled={sending || !sessionId || (scope === "SPECIFIC" && targets.length === 0)}
@@ -360,6 +383,16 @@ export default function JpmSwgcPage() {
                                 {sending
                                     ? "Mengirim..."
                                     : `Send to ${scope === "ALL" ? `${groups.length} groups` : `${targets.length} groups`}`}
+                            </Button>
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="lg"
+                                onClick={handleForceReset}
+                                disabled={!sessionId}
+                                title="Clear stuck lock if Send keeps showing 409"
+                            >
+                                Force reset
                             </Button>
                         </div>
                     </CardContent>

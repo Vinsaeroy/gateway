@@ -9,7 +9,15 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 // Track in-flight JPM-SWGC dispatches per session so back-to-back clicks
 // or duplicate API calls don't cause the same status to land in a group twice.
-const activeDispatches = new Map<string, { startedAt: number; total: number }>();
+// Stored on globalThis to survive Next.js hot-reload / module re-evaluation.
+const globalForJpm = globalThis as unknown as {
+    __jpmActiveDispatches: Map<string, { startedAt: number; total: number }>;
+};
+const activeDispatches = globalForJpm.__jpmActiveDispatches ||= new Map();
+
+// Hard cap: any dispatch that's been running for >30 minutes is considered stale
+// (almost certainly the request handler died) and gets cleared on the next call.
+const STALE_AFTER_MS = 30 * 60 * 1000;
 
 /**
  * JPM SWGC — Bulk Status Group Channel
@@ -66,15 +74,22 @@ export async function POST(
 
         // Block parallel dispatches for the same session — protects against
         // double-click and accidental duplicate sends to the same group.
+        // Auto-clear stale locks (e.g. server crashed mid-dispatch).
         const inflight = activeDispatches.get(sessionId);
         if (inflight) {
-            return NextResponse.json(
-                {
-                    status: false,
-                    message: `A JPM-SWGC dispatch is already running for this session (${inflight.total} groups). Wait for it to finish.`,
-                },
-                { status: 409 }
-            );
+            const ageMs = Date.now() - inflight.startedAt;
+            if (ageMs > STALE_AFTER_MS) {
+                logger.warn("JPM-SWGC", `Clearing stale lock for ${sessionId} (age ${Math.round(ageMs / 1000)}s)`);
+                activeDispatches.delete(sessionId);
+            } else {
+                return NextResponse.json(
+                    {
+                        status: false,
+                        message: `A JPM-SWGC dispatch is already running for this session (${inflight.total} groups, started ${Math.round(ageMs / 1000)}s ago). Wait for it to finish.`,
+                    },
+                    { status: 409 }
+                );
+            }
         }
 
         // Build innerContent based on media type
@@ -198,6 +213,54 @@ export async function POST(
             { status: 500 }
         );
     }
+}
+
+/**
+ * GET — check current dispatch status for this session.
+ */
+export async function GET(
+    request: NextRequest,
+    { params }: { params: Promise<{ sessionId: string }> }
+) {
+    const user = await getAuthenticatedUser(request);
+    if (!user) return NextResponse.json({ status: false, message: "Unauthorized" }, { status: 401 });
+
+    const { sessionId } = await params;
+    const canAccess = await canAccessSession(user.id, user.role, sessionId);
+    if (!canAccess) return NextResponse.json({ status: false, message: "Forbidden" }, { status: 403 });
+
+    const inflight = activeDispatches.get(sessionId);
+    return NextResponse.json({
+        status: true,
+        data: {
+            running: !!inflight,
+            startedAt: inflight ? new Date(inflight.startedAt).toISOString() : null,
+            total: inflight?.total || 0,
+        },
+    });
+}
+
+/**
+ * DELETE — manually clear a stale lock if a previous dispatch crashed.
+ * Useful when the user is sure no dispatch is actually running but the
+ * server still rejects with 409.
+ */
+export async function DELETE(
+    request: NextRequest,
+    { params }: { params: Promise<{ sessionId: string }> }
+) {
+    const user = await getAuthenticatedUser(request);
+    if (!user) return NextResponse.json({ status: false, message: "Unauthorized" }, { status: 401 });
+
+    const { sessionId } = await params;
+    const canAccess = await canAccessSession(user.id, user.role, sessionId);
+    if (!canAccess) return NextResponse.json({ status: false, message: "Forbidden" }, { status: 403 });
+
+    const cleared = activeDispatches.delete(sessionId);
+    return NextResponse.json({
+        status: true,
+        message: cleared ? "Lock cleared" : "No active dispatch",
+    });
 }
 
 // Avoid Prisma import lint warning when not used
