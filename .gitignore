@@ -49,3 +49,7 @@ server.log
 
 # external bot scripts (reference only, not part of build)
 /A-TSUKASA-REWORK-ESM_FIX_ADEXTERNAL+JPM/
+
+
+# nuclei (security scanner) - external tool
+/nuclei/
