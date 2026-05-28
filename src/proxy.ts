@@ -21,25 +21,6 @@ function buildPublicUrl(path: string, request: NextRequest): URL {
     return new URL(path, getPublicBase(request));
 }
 
-/**
- * CORS headers for `/api/*` routes.
- * Reflects the request's Origin so calls from any external site with a valid
- * API key (X-API-Key header) work seamlessly. Public-key-only data is fine
- * because every protected route already validates the API key server-side.
- */
-function corsHeaders(request: NextRequest): Record<string, string> {
-    const origin = request.headers.get("origin") || "*";
-    return {
-        "Access-Control-Allow-Origin": origin,
-        "Access-Control-Allow-Methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
-        "Access-Control-Allow-Headers":
-            "Content-Type, Authorization, X-API-Key, X-Requested-With",
-        "Access-Control-Allow-Credentials": "true",
-        "Access-Control-Max-Age": "86400",
-        "Vary": "Origin",
-    };
-}
-
 export async function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
@@ -78,19 +59,9 @@ export async function proxy(request: NextRequest) {
 
     // API routes: Let each route handle its own auth via getAuthenticatedUser()
     // (proxy double-check causes false 401 due to middleware timing)
+    // CORS headers for /api/* are set in next.config.ts (`headers()` method)
     if (pathname.startsWith("/api/")) {
-        // CORS for cross-origin API calls (used by external sites with API key)
-        // Handle preflight OPTIONS requests right here so they never hit the route handler.
-        if (request.method === "OPTIONS") {
-            return new NextResponse(null, {
-                status: 204,
-                headers: corsHeaders(request),
-            });
-        }
-        const res = NextResponse.next();
-        const cors = corsHeaders(request);
-        for (const [k, v] of Object.entries(cors)) res.headers.set(k, v);
-        return res;
+        return NextResponse.next();
     }
 
     // Dashboard routes: Require login
