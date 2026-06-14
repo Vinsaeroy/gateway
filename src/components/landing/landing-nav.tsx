@@ -1,12 +1,33 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Bot, Github, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function LandingNav() {
     const [open, setOpen] = useState(false);
+    // null = belum tahu, true/false = status login. Pakai endpoint next-auth
+    // (/api/auth/session) supaya tidak perlu SessionProvider di halaman publik.
+    const [authed, setAuthed] = useState<boolean | null>(null);
+
+    useEffect(() => {
+        let active = true;
+        fetch("/api/auth/session", { cache: "no-store" })
+            .then((r) => (r.ok ? r.json() : null))
+            .then((d) => {
+                if (active) setAuthed(!!d?.user);
+            })
+            .catch(() => {
+                if (active) setAuthed(false);
+            });
+        return () => {
+            active = false;
+        };
+    }, []);
+
+    const ctaHref = authed ? "/dashboard" : "/auth/login";
+    const ctaLabel = authed ? "Dashboard" : "Sign In";
 
     const close = () => setOpen(false);
 
@@ -34,9 +55,9 @@ export function LandingNav() {
 
                     {/* Right side: hamburger (mobile) + sign in */}
                     <div className="flex items-center gap-2 shrink-0">
-                        <Link href="/auth/login" className="hidden sm:block">
+                        <Link href={ctaHref} className="hidden sm:block">
                             <Button size="sm" className="rounded-full px-5 md:px-6 bg-foreground text-background hover:bg-foreground/90 shadow-xl shadow-foreground/10">
-                                Sign In
+                                {ctaLabel}
                             </Button>
                         </Link>
                         <button
@@ -86,12 +107,12 @@ export function LandingNav() {
                                 <Github className="h-4 w-4" /> GitHub
                             </Link>
                             <Link
-                                href="/auth/login"
+                                href={ctaHref}
                                 onClick={close}
                                 className="mt-1 sm:hidden"
                             >
                                 <Button size="sm" className="w-full rounded-xl bg-foreground text-background hover:bg-foreground/90">
-                                    Sign In
+                                    {ctaLabel}
                                 </Button>
                             </Link>
                         </nav>
