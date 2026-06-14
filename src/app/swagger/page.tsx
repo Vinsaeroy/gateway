@@ -10,6 +10,10 @@ export default function ApiDocsPage() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [spec, setSpec] = useState<any>(null);
+    const [specError, setSpecError] = useState("");
+    const [specLoading, setSpecLoading] = useState(false);
 
     useEffect(() => {
         // Suppress Swagger UI legacy lifecycle warnings (ModelCollapse)
@@ -34,6 +38,38 @@ export default function ApiDocsPage() {
             console.warn = originalWarn;
         };
     }, []);
+
+    // Ambil spesifikasi sendiri supaya bisa menangani error (anti halaman blank).
+    useEffect(() => {
+        if (!authorized) return;
+        let active = true;
+        setSpecLoading(true);
+        setSpecError("");
+        fetch("/api/docs", { headers: { Accept: "application/json" } })
+            .then(async (res) => {
+                const ct = res.headers.get("content-type") || "";
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                if (!ct.includes("application/json"))
+                    throw new Error("Respons bukan JSON (mungkin ke-redirect / error server)");
+                return res.json();
+            })
+            .then((json) => {
+                if (!active) return;
+                if (!json || typeof json !== "object" || !json.openapi)
+                    throw new Error("Spesifikasi OpenAPI tidak valid");
+                setSpec(json);
+            })
+            .catch((e) => {
+                if (!active) return;
+                setSpecError(e?.message || "Gagal memuat dokumentasi");
+            })
+            .finally(() => {
+                if (active) setSpecLoading(false);
+            });
+        return () => {
+            active = false;
+        };
+    }, [authorized]);
 
     const handleLogin = (e: React.FormEvent) => {
         e.preventDefault();
@@ -154,7 +190,24 @@ export default function ApiDocsPage() {
             </div>
 
             <div className="container mx-auto">
-                <SwaggerUI url="/api/docs" />
+                {specLoading && (
+                    <div className="p-10 text-center text-gray-600">Memuat dokumentasi…</div>
+                )}
+                {specError && (
+                    <div className="m-6 p-5 rounded-lg border border-red-200 bg-red-50 text-red-700">
+                        <p className="font-semibold mb-1">Gagal memuat dokumentasi API</p>
+                        <p className="text-sm mb-3">{specError}</p>
+                        <a
+                            href="/api/docs"
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-sm font-medium underline hover:text-red-900"
+                        >
+                            Buka spesifikasi mentah (/api/docs)
+                        </a>
+                    </div>
+                )}
+                {spec && !specError && <SwaggerUI spec={spec} />}
             </div>
         </div>
     );

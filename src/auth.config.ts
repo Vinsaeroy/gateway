@@ -15,8 +15,9 @@ export const authConfig = {
         authorized({ auth, request: { nextUrl } }) {
             const isLoggedIn = !!auth?.user;
             
-            // Only handle redirect from /auth/login when already logged in
-            // Dashboard auth is handled by proxy.ts to avoid duplicate callbackUrl
+            // Only handle redirect from /auth/login when already logged in.
+            // Dashboard auth is enforced server-side in src/app/dashboard/layout.tsx
+            // (auth() + redirect), so we don't gate it here to avoid duplicate callbackUrl.
             if (isLoggedIn && nextUrl.pathname === '/auth/login') {
                 return Response.redirect(new URL('/dashboard', nextUrl));
             }
