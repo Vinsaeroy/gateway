@@ -31,8 +31,8 @@ export async function PUT(
             }
         }
 
-        const session = await prisma.session.findUnique({
-            where: { sessionId: sessionId },
+        const session = await prisma.session.findFirst({
+            where: { OR: [{ sessionId }, { id: sessionId }] },
             select: { id: true }
         });
 
@@ -91,8 +91,8 @@ export async function DELETE(
     }
 
     try {
-        const session = await prisma.session.findUnique({
-            where: { sessionId: sessionId },
+        const session = await prisma.session.findFirst({
+            where: { OR: [{ sessionId }, { id: sessionId }] },
             select: { id: true }
         });
 

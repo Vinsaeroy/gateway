@@ -23,8 +23,8 @@ export async function GET(
     try {
         // Resolve session string ID to internal ID if needed, or just look up webhooks
         // We need the internal ID to query the Webhook table
-        const session = await prisma.session.findUnique({
-            where: { sessionId: sessionId },
+        const session = await prisma.session.findFirst({
+            where: { OR: [{ sessionId }, { id: sessionId }] },
             select: { id: true }
         });
 
@@ -83,8 +83,8 @@ export async function POST(
             return NextResponse.json({ status: false, message: urlCheck.reason || "Invalid URL", error: urlCheck.reason || "Invalid URL" }, { status: 400 });
         }
 
-        const session = await prisma.session.findUnique({
-            where: { sessionId: sessionId },
+        const session = await prisma.session.findFirst({
+            where: { OR: [{ sessionId }, { id: sessionId }] },
             select: { id: true }
         });
 

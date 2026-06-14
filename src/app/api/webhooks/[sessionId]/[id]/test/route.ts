@@ -24,8 +24,8 @@ export async function POST(
         return NextResponse.json({ status: false, message: "Forbidden - Cannot access this session" }, { status: 403 });
     }
 
-    const session = await prisma.session.findUnique({
-        where: { sessionId },
+    const session = await prisma.session.findFirst({
+        where: { OR: [{ sessionId }, { id: sessionId }] },
         select: { id: true },
     });
     if (!session) {
