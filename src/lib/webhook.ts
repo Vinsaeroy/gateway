@@ -28,6 +28,51 @@ interface WebhookPayload {
     data: any;
 }
 
+// Pelacak kegagalan beruntun per-webhook (in-memory, reset saat restart).
+// Webhook yang terus gagal (mis. URL 404) akan dinonaktifkan otomatis supaya
+// tidak menspam log pada tiap event WhatsApp.
+const webhookFailures = new Map<string, number>();
+const MAX_WEBHOOK_FAILURES = 15;
+
+async function handleWebhookFailure(
+    webhook: { id: string; url: string },
+    err: unknown
+) {
+    const count = (webhookFailures.get(webhook.id) || 0) + 1;
+    webhookFailures.set(webhook.id, count);
+    const msg = err instanceof Error ? err.message : String(err);
+
+    if (count >= MAX_WEBHOOK_FAILURES) {
+        webhookFailures.delete(webhook.id);
+        try {
+            await prisma.webhook.update({
+                where: { id: webhook.id },
+                data: { isActive: false },
+            });
+            logger.warn(
+                "Webhook",
+                `Webhook ${webhook.id} (${webhook.url}) dinonaktifkan otomatis setelah ${MAX_WEBHOOK_FAILURES}x gagal. Terakhir: ${msg}. Perbaiki URL di Dashboard → Webhooks lalu aktifkan lagi.`
+            );
+        } catch (e) {
+            logger.error("Webhook", `Gagal menonaktifkan webhook ${webhook.id}:`, e);
+        }
+        return;
+    }
+
+    // Kurangi spam: kegagalan pertama -> warn (sekali), berikutnya -> debug.
+    if (count === 1) {
+        logger.warn(
+            "Webhook",
+            `Webhook ${webhook.id} gagal: ${msg}. Cek URL tujuan di Dashboard → Webhooks.`
+        );
+    } else {
+        logger.debug(
+            "Webhook",
+            `Webhook ${webhook.id} gagal lagi (${count}/${MAX_WEBHOOK_FAILURES}): ${msg}`
+        );
+    }
+}
+
 /**
  * Dispatch webhook to all matching endpoints
  */
@@ -85,9 +130,14 @@ export async function dispatchWebhook(
             }
 
             // Send webhook in background
-            sendWebhookRequest(webhook.url, payload, webhook.secret).catch(err => {
-                logger.error("Webhook", `Webhook ${webhook.id} failed:`, err);
-            });
+            sendWebhookRequest(webhook.url, payload, webhook.secret)
+                .then(() => {
+                    // Sukses → reset penghitung kegagalan.
+                    if (webhookFailures.has(webhook.id)) webhookFailures.delete(webhook.id);
+                })
+                .catch((err) => {
+                    handleWebhookFailure(webhook, err);
+                });
         }
     } catch (error) {
         logger.error("Webhook", "Dispatch error:", error);
