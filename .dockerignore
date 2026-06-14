@@ -9,7 +9,6 @@ npm-debug.log*
 !.env.example
 README.md
 CHANGELOG.md
-docs
 data/media/*
 AuthSesi
 A-TSUKASA-REWORK-ESM_FIX_ADEXTERNAL+JPM

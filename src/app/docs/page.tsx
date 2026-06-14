@@ -33,7 +33,12 @@ export default async function PublicDocsPage() {
         const packageJson = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
         version = `v${packageJson.version}`;
     } catch (err) {
-        content = '# Error\n\nCould not load documentation file.';
+        content =
+            '# Dokumentasi sedang tidak tersedia\n\n' +
+            'File dokumentasi tidak dapat dimuat di server ini.\n\n' +
+            'Sementara itu, kamu bisa pakai:\n\n' +
+            '- **[Swagger UI](/swagger)** — referensi API interaktif & uji coba endpoint\n' +
+            '- **[Dashboard API Docs](/dashboard/api-docs)**\n';
         console.error("Error loading docs:", err);
     }
 
