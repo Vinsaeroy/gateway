@@ -63,6 +63,7 @@ export default function WebhooksPage() {
     const [showApiKey, setShowApiKey] = useState(false);
     const [loading, setLoading] = useState(true);
     const [showRegenConfirm, setShowRegenConfirm] = useState(false);
+    const [testingId, setTestingId] = useState<string | null>(null);
 
     // New webhook form
     const [showNewForm, setShowNewForm] = useState(false);
@@ -249,6 +250,23 @@ export default function WebhooksPage() {
             setWebhooks(webhooks.map(w => w.id === id ? { ...w, isActive } : w));
         } catch (error) {
             toast.error("Failed to update webhook");
+        }
+    };
+
+    const handleTestWebhook = async (webhook: WebhookConfig) => {
+        setTestingId(webhook.id);
+        try {
+            const res = await fetch(`/api/webhooks/${sessionId}/${webhook.id}/test`, { method: "POST" });
+            const data = await res.json();
+            if (data?.ok) {
+                toast.success(data.message || "Webhook berhasil!");
+            } else {
+                toast.error(data?.message || "Test webhook gagal", { duration: 6000 });
+            }
+        } catch {
+            toast.error("Gagal menjalankan test webhook");
+        } finally {
+            setTestingId(null);
         }
     };
 
@@ -497,6 +515,9 @@ export default function WebhooksPage() {
                                                     checked={webhook.isActive}
                                                     onCheckedChange={(checked) => toggleWebhookActive(webhook.id, checked)}
                                                 />
+                                                <Button variant="ghost" size="sm" onClick={() => handleTestWebhook(webhook)} disabled={testingId === webhook.id} className="h-8 px-2">
+                                                    {testingId === webhook.id ? "Testing..." : "Test"}
+                                                </Button>
                                                 <Button variant="ghost" size="sm" onClick={() => handleEdit(webhook)} className="h-8 px-2">
                                                     Edit
                                                 </Button>
