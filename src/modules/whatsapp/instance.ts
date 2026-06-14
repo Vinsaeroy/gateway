@@ -17,6 +17,7 @@ import { bindAntiLink } from "./store/antilink";
 import { bindPpGuard } from "./store/ppguard";
 import { antispam } from "./antispam";
 import { antiban } from "./antiban";
+import { onConnectionUpdate } from "@/lib/webhook";
 import { logger } from "@/lib/logger";
 
 export class WhatsAppInstance {
@@ -152,6 +153,9 @@ export class WhatsAppInstance {
 
                 this.io?.to(this.sessionId).emit("connection.update", { status: this.status, qr: null });
 
+                // Webhook: beri tahu integrasi eksternal status terkini (tanpa QR).
+                onConnectionUpdate(this.sessionId, this.status);
+
                 // Use try-catch specifically for update as session might be deleted
                 try {
                     await prisma.session.update({
@@ -212,6 +216,9 @@ export class WhatsAppInstance {
                 }
 
                 this.io?.to(this.sessionId).emit("connection.update", { status: this.status, qr: null });
+
+                // Webhook: status CONNECTED ke integrasi eksternal.
+                onConnectionUpdate(this.sessionId, this.status);
 
                 // Sync Groups from WhatsApp (with error handling)
                 try {

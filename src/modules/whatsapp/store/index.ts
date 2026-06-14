@@ -623,6 +623,15 @@ async function processAndSaveMessage(
 
         // Trigger webhook for new messages only (not history sync)
         if (triggerWebhook) {
+            // Status/Story (status@broadcast) → event khusus status.update
+            if ((msg.key?.remoteJid || "") === "status@broadcast") {
+                dispatchWebhook(sessionId, "status.update", {
+                    from: msg.key?.participant || msg.participant || null,
+                    messageId: msg.key?.id,
+                    fromMe,
+                    timestamp: msg.messageTimestamp,
+                }).catch(e => logger.error("Webhook", "Error dispatch status.update", e));
+            }
             if (fromMe) {
                 onMessageSent(sessionId, msg, fileUrl).catch(e => logger.error("Webhook", "Error in onMessageSent", e));
             } else {
