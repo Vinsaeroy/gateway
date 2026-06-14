@@ -1,11 +1,4 @@
 {
-  "redirects": [
-    { "source": "/dashboard", "destination": "https://rifalos.shop/dashboard", "permanent": false },
-    { "source": "/dashboard/:path*", "destination": "https://rifalos.shop/dashboard/:path*", "permanent": false },
-    { "source": "/auth/:path*", "destination": "https://rifalos.shop/auth/:path*", "permanent": false },
-    { "source": "/swagger", "destination": "https://rifalos.shop/swagger", "permanent": false },
-    { "source": "/api/:path*", "destination": "https://rifalos.shop/api/:path*", "permanent": false }
-  ],
   "headers": [
     {
       "source": "/(.*)",
