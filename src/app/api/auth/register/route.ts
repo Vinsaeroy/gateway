@@ -9,8 +9,43 @@ const registerSchema = z.object({
     password: z.string().min(6),
 });
 
+// Rate limit registrasi berbasis IP (anti-spam pembuatan akun massal).
+// In-memory: reset saat restart, cukup untuk mencegah abuse otomatis.
+const regAttempts = new Map<string, number[]>();
+const REG_WINDOW_MS = 60 * 60 * 1000; // 1 jam
+const REG_MAX = 5; // maks 5 percobaan daftar per IP per jam
+
+function getClientIp(req: Request): string {
+    const xff = req.headers.get("x-forwarded-for");
+    if (xff) return xff.split(",")[0].trim();
+    return req.headers.get("x-real-ip") || "unknown";
+}
+
+function isRateLimited(ip: string): boolean {
+    const now = Date.now();
+    const recent = (regAttempts.get(ip) || []).filter((t) => now - t < REG_WINDOW_MS);
+    // Cegah map membengkak tak terbatas.
+    if (regAttempts.size > 5000) regAttempts.clear();
+    if (recent.length >= REG_MAX) {
+        regAttempts.set(ip, recent);
+        return true;
+    }
+    recent.push(now);
+    regAttempts.set(ip, recent);
+    return false;
+}
+
 export async function POST(req: Request) {
     try {
+        // Anti-spam: batasi jumlah registrasi per IP.
+        const ip = getClientIp(req);
+        if (isRateLimited(ip)) {
+            return NextResponse.json(
+                { error: "Terlalu banyak percobaan registrasi. Coba lagi dalam 1 jam." },
+                { status: 429 }
+            );
+        }
+
         const body = await req.json();
         const { email, password, name } = registerSchema.parse(body);
 
