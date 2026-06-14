@@ -3,73 +3,88 @@
 Satu aplikasi saja. Engine WhatsApp + dashboard + landing/pricing semuanya jadi
 satu di repo ini. Tidak ada app marketing terpisah.
 
-## Ringkas: pakai host yang mana?
+## Realita hosting (jujur, per 2026)
 
-| Platform | Biaya | Bisa jalan? | Catatan |
+App ini butuh proses **always-on** (WhatsApp/Baileys WebSocket 24 jam + socket.io
++ node-cron). Platform serverless (Vercel/Netlify/Cloudflare) **tidak bisa**.
+Dan PaaS "gratis + always-on + tanpa kartu" sudah hampir punah:
+
+| Platform | Biaya | 24/7? | Catatan |
 |---|---|---|---|
-| **Koyeb** | 🆓 Gratis | ✅ Penuh | **Pilihan gratis terbaik.** 1 free instance 512MB always-on, deploy dari Dockerfile, tanpa VPS |
-| **Render** | 💲 Starter | ✅ Penuh | Mantap & stabil. Free tier-nya auto-sleep → JANGAN dipakai untuk WA |
-| **Vercel** | 🆓 | ⚠️ UI saja | Halaman muncul, tapi **engine WhatsApp TIDAK jalan** (lihat di bawah) |
+| **Oracle Cloud Always Free** | 🆓 Gratis selamanya | ✅ | VM ARM (≤24GB RAM). **Ini VPS** (perlu setup), daftar butuh kartu verifikasi |
+| **Perangkat sendiri** (PC/RasPi/Termux) | 🆓 | ✅ | Tanpa cloud, tanpa kartu. Cocok pemakaian pribadi |
+| **Render Starter** | 💲 ~$7/bln | ✅ | Paling anti-ribet, stabil |
+| **VPS murah** (Contabo/Hetzner/dll) | 💲 ~$3–5/bln | ✅ | Kontrol penuh |
+| **Render Free** | 🆓 | ❌ | Auto-sleep 15 menit → WA putus. Cuma buat tes |
+| **Koyeb / Fly.io / Railway** | trial→💲 | — | Tidak gratis lagi (butuh kartu / habis trial) |
+| **Vercel / Netlify** | 🆓 | ❌ | Serverless → engine WA mati. UI saja |
 
-> Kombinasi 100% gratis tanpa VPS: **Koyeb (app) + Neon (database)**.
+> Kesimpulan: **gratis + tanpa VPS + WA 24 jam = tidak ada lagi.** Pilihan gratis
+> sungguhan = Oracle Always Free (VPS) atau hosting di perangkat sendiri.
 
 ---
 
-## ⚠️ Kenapa engine TIDAK jalan di Vercel
+## ⚠️ Kenapa engine TIDAK jalan di Vercel/Netlify/Cloudflare
 
-Inti aplikasi butuh proses **always-on**:
-
-- Custom HTTP server + **Socket.io** (`src/server/index.ts`, dijalankan via `bootstrap.ts`)
+- Custom HTTP server + **Socket.io** (`src/server/index.ts` via `bootstrap.ts`)
 - Koneksi **WhatsApp (Baileys) persisten di memori** (`waManager`)
-- **node-cron** (scheduler + auto-broadcast)
-- State di memori (antrian anti-spam, lock JPM)
+- **node-cron** (scheduler + auto-broadcast), plus state di memori (anti-spam, lock JPM)
 
-Vercel menjalankan Next.js sebagai **serverless function** — mati setelah tiap
-request, tidak ada WebSocket server yang nyala terus, tidak ada cron always-on.
-Kalau dipaksa: halaman kebuka, tapi **scan QR / kirim pesan / realtime / scheduler
-MATI**. Ini batasan arsitektur Vercel, bukan bug yang bisa ditambal.
-
-➡️ **Untuk dipakai beneran, deploy ke Koyeb (gratis) atau Render.**
+Serverless mematikan fungsi setelah tiap request → koneksi WA putus terus. Bukan bug.
 
 ---
 
-## Opsi A — Koyeb (GRATIS, full app, REKOMENDASI tanpa VPS)
+## Opsi A — Oracle Cloud Always Free (gratis selamanya, butuh setup VPS)
 
-1. Daftar di [koyeb.com](https://www.koyeb.com), login pakai **GitHub**.
-2. **Create Service → GitHub** → pilih repo `Vinsaeroy/WA-AKG`.
-3. **Builder:** Dockerfile (otomatis terdeteksi dari `Dockerfile` di root).
-4. **Instance:** pilih **Free** (512MB RAM, US/EU).
-5. **Port:** isi `3030` (server membaca `process.env.PORT`).
-6. **Health check path:** `/`.
-7. **Environment variables:** isi (lihat tabel "Environment Variables" di bawah).
-   `BASE_URL` = URL Koyeb-mu, mis. `https://wa-akg-xxxx.koyeb.app`.
-8. **Deploy.** Build pertama agak lama (Docker build + `next build`).
+1. Daftar di [oracle.com/cloud/free](https://www.oracle.com/cloud/free/) (butuh kartu
+   untuk verifikasi; Always Free tidak ditagih).
+2. Buat **VM Instance** → pilih shape **Ampere A1 (ARM)**, OS Ubuntu. Always Free
+   memberi hingga 4 vCPU / 24GB RAM gratis.
+3. Buka port firewall (Security List + `iptables`/`ufw`) untuk port HTTP-mu.
+4. SSH ke VM, install Docker:
+   ```bash
+   curl -fsSL https://get.docker.com | sh
+   ```
+5. Clone repo + build & run (lihat "Opsi D — Docker" di bawah).
+6. Pasang Nginx/Caddy untuk HTTPS + domain (opsional).
 
-### Batasan free tier Koyeb (penting, jujur)
-- **RAM 512MB pas-pasan** untuk Next.js + Baileys + sharp. Cukup untuk 1 session
-  beban ringan. Banyak session / broadcast besar bisa OOM. Lihat "Tips hemat memori".
-- **Filesystem ephemeral** → media upload (`/app/data/media`) bisa hilang saat
-  restart/redeploy. **Sesi WhatsApp AMAN** karena tersimpan di DB (tabel `AuthState`),
-  jadi tidak perlu scan ulang.
+> ARM kadang kehabisan stok; coba region lain atau ulangi beberapa saat kemudian.
 
-## Opsi B — Render (Starter, full app, paling stabil)
+## Opsi B — Perangkat sendiri (100% gratis)
+
+PC/laptop nganggur, Raspberry Pi, atau Android (Termux). Asal koneksi internet stabil
+dan perangkat nyala terus. Jalankan via Docker atau Node langsung (lihat Opsi D / E).
+
+## Opsi C — Render Starter (berbayar, paling gampang)
 
 1. Render → **New → Blueprint**, pilih repo (otomatis pakai `render.yaml`).
-2. Isi env var rahasia (yang `sync: false`) di dashboard Render.
-3. Disk `/app/data` sudah didefinisikan di `render.yaml` untuk media (persisten).
+2. Isi env var rahasia (`sync: false`) di dashboard.
+3. Disk `/app/data` sudah didefinisikan untuk media (persisten).
+4. Pakai plan **Starter** — JANGAN Free (auto-sleep → WA putus).
 
-> Jangan pakai plan **Free** Render — auto-sleep setelah 15 menit nganggur, dan
-> saat tidur sesi WhatsApp putus. Pakai minimal **Starter**.
+## Opsi D — Docker (untuk Oracle / VPS / perangkat sendiri)
 
-## Opsi C — Vercel (hanya UI, tanpa engine WhatsApp)
+```bash
+git clone https://github.com/Vinsaeroy/WA-AKG.git
+cd WA-AKG
+# siapkan .env dari .env.example
+docker build -t wa-akg .
+docker run -d --name wa-akg \
+  --env-file .env \
+  -p 3030:3030 \
+  -v $PWD/data:/app/data \
+  --restart unless-stopped \
+  wa-akg
+```
 
-Hanya kalau kamu sadar engine WA tidak akan jalan di sini.
+## Opsi E — Node langsung (tanpa Docker)
 
-1. Vercel → **New Project** → import repo. Framework: Next.js (auto). Deploy.
-2. Set env `NEXT_PUBLIC_*` sesuai domain Vercel.
-
-Landing/pricing/UI muncul, tapi scan QR & kirim pesan tidak berfungsi. Untuk fitur
-WhatsApp arahkan ke deployment Koyeb/Render.
+```bash
+npm ci
+npm run db:push          # sekali, kalau DB masih kosong
+npm run build
+npm run start            # custom server di PORT (default 3030)
+```
 
 ---
 
@@ -77,63 +92,40 @@ WhatsApp arahkan ke deployment Koyeb/Render.
 
 | Variable | Wajib | Keterangan |
 |---|---|---|
-| `DATABASE_URL` | ✅ | PostgreSQL connection string (mis. dari Neon) |
-| `AUTH_SECRET` | ✅ | String acak panjang — generate: `node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"` |
+| `DATABASE_URL` | ✅ | PostgreSQL connection string (mis. dari Neon — gratis) |
+| `AUTH_SECRET` | ✅ | String acak — generate: `node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"` |
 | `AUTH_TRUST_HOST` | ✅ | `true` |
-| `BASE_URL` | ✅ | URL publik, mis. `https://wa-akg-xxxx.koyeb.app` |
+| `BASE_URL` | ✅ | URL publik, mis. `https://wa.domainmu.com` atau `http://IP:3030` |
 | `NEXTAUTH_URL` | ✅ | Sama dengan BASE_URL |
 | `NEXT_PUBLIC_APP_URL` | ✅ | Sama dengan BASE_URL |
 | `NEXT_PUBLIC_API_URL` | ✅ | `BASE_URL` + `/api` |
-| `PORT` | ⬜ | Default 3030 (host biasanya inject sendiri) |
+| `PORT` | ⬜ | Default 3030 |
 | `TZ` | ⬜ | `Asia/Jakarta` |
-| `NODE_OPTIONS` | ⬜ | Untuk 512MB: `--max-old-space-size=400` (lihat "Tips hemat memori") |
+| `NODE_OPTIONS` | ⬜ | RAM kecil: `--max-old-space-size=400` |
 | `NEXT_PUBLIC_SWAGGER_USERNAME/PASSWORD` | ⬜ | Login halaman `/swagger` |
 | `KLIKQRIS_*` | ⬜ | Fallback; lebih baik atur via dashboard (SUPERADMIN) |
 
-> ⚠️ URL host (Koyeb/Render) baru muncul setelah deploy pertama. Alur: deploy
-> sekali → lihat URL → isi `BASE_URL`/`NEXTAUTH_URL`/`NEXT_PUBLIC_*` dengan URL itu
-> → redeploy. Salah isi = redirect login kacau.
-
----
-
-## Tips hemat memori (untuk Koyeb free 512MB)
-
-1. **Batasi heap Node** — set env `NODE_OPTIONS=--max-old-space-size=400`.
-   Bikin GC jalan lebih awal sebelum container OOM-kill.
-2. **Jaga jumlah session WhatsApp tetap sedikit** (idealnya 1) di free tier.
-3. **Hindari broadcast/JPM ke ratusan grup sekaligus** — proses gambar (sharp/jimp)
-   makan memori. Pecah jadi batch kecil.
-4. Kalau sering OOM, naik ke instance berbayar (Koyeb/Render) atau Render Starter.
+> ⚠️ Isi `BASE_URL`/`NEXTAUTH_URL`/`NEXT_PUBLIC_*` dengan URL/IP host yang benar.
+> Salah isi = redirect login kacau (seperti masalah lokal kemarin).
 
 ---
 
 ## Setelah Deploy (WAJIB)
 
-1. **Siapkan database** (kalau DB masih kosong) — dari mesin yang punya akses `DATABASE_URL`:
-   ```bash
-   npm run db:push
-   ```
-   > Kalau pakai DB Neon yang sama dengan lokal, tabel sudah ada → lewati langkah ini.
-
-2. **Buat admin / SUPERADMIN**:
-   - User pertama yang registrasi di `/auth/register` otomatis jadi SUPERADMIN, **atau**
-   - jalankan `npm run make-admin` (lihat `scripts/setup-admin.js`).
-
-3. **Atur Payment Gateway** (login SUPERADMIN → Settings → Payment Gateway),
-   lalu daftarkan webhook di KlikQRIS:
-   `https://<domain-kamu>/api/billing/callback`
-
-4. **Persistensi**:
-   - Sesi WhatsApp tersimpan di **database** (tabel `AuthState`) → aman saat redeploy.
-   - Media upload di `/app/data/media` → pakai **disk/volume** kalau host mendukung
-     (Render Starter punya; Koyeb free ephemeral → media bisa hilang saat restart).
+1. **Siapkan database** (kalau DB masih kosong): `npm run db:push`.
+   Kalau pakai DB Neon yang sama dengan lokal, tabel sudah ada → lewati.
+2. **Buat admin:** user pertama yang registrasi di `/auth/register` otomatis SUPERADMIN,
+   atau jalankan `npm run make-admin`.
+3. **Payment gateway:** login SUPERADMIN → Settings → Payment Gateway. Webhook KlikQRIS:
+   `https://<domain-kamu>/api/billing/callback`.
+4. **Persistensi:** sesi WhatsApp di DB (`AuthState`) aman saat redeploy; media di
+   `/app/data/media` → mount volume biar tidak hilang.
 
 ---
 
-## Checklist sebelum go-live
-- [ ] Deploy di **Koyeb** atau **Render** (bukan Vercel) untuk fitur WhatsApp
+## Checklist
+- [ ] Host always-on (Oracle/VPS/perangkat sendiri/Render Starter) — bukan Vercel/Render Free
 - [ ] `DATABASE_URL` valid & `npm run db:push` sukses (kalau DB baru)
-- [ ] `AUTH_SECRET` di-set (jangan pakai default)
-- [ ] `BASE_URL`/`NEXTAUTH_URL`/`NEXT_PUBLIC_*` = URL host yang benar
-- [ ] (Koyeb 512MB) `NODE_OPTIONS=--max-old-space-size=400` di-set
-- [ ] Plan host TIDAK auto-sleep (Render free dilarang untuk WA)
+- [ ] `AUTH_SECRET` di-set
+- [ ] `BASE_URL`/`NEXTAUTH_URL`/`NEXT_PUBLIC_*` = URL/IP host yang benar
+- [ ] Volume `/app/data` ter-mount
