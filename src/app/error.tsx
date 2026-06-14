@@ -20,6 +20,14 @@ export default function GlobalError({
     reset: () => void;
 }) {
     useEffect(() => {
+        // Log error lengkap ke console supaya akar masalah kelihatan di DevTools
+        // (pesan generik di bawah menyembunyikan penyebab asli).
+        console.error("[GlobalError]", {
+            message: error?.message,
+            digest: error?.digest,
+            stack: error?.stack,
+        });
+
         // Detect translator-induced errors and auto-recover
         const message = error?.message || "";
         const isTranslateError =

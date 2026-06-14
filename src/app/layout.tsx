@@ -59,7 +59,7 @@ export default function RootLayout({
             DOM mutations fail-soft so React keeps rendering. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){if(typeof Node==='undefined')return;var p=Node.prototype;if(p.__translateFixApplied)return;p.__translateFixApplied=true;var origRemove=p.removeChild;p.removeChild=function(child){if(child.parentNode!==this)return child;return origRemove.apply(this,arguments);};var origInsert=p.insertBefore;p.insertBefore=function(newNode,refNode){if(refNode&&refNode.parentNode!==this)return origInsert.call(this,newNode,null);return origInsert.apply(this,arguments);};})();`,
+            __html: `(function(){if(typeof Node==='undefined')return;var p=Node.prototype;if(p.__translateFixApplied)return;p.__translateFixApplied=true;var origRemove=p.removeChild;p.removeChild=function(child){if(child.parentNode!==this)return child;return origRemove.apply(this,arguments);};var origInsert=p.insertBefore;p.insertBefore=function(newNode,refNode){if(refNode&&refNode.parentNode!==this)return origInsert.call(this,newNode,null);return origInsert.apply(this,arguments);};var origReplace=p.replaceChild;p.replaceChild=function(newNode,oldNode){if(oldNode&&oldNode.parentNode!==this)return oldNode;return origReplace.apply(this,arguments);};})();`,
           }}
         />
         {/* Global ambient background glow for premium feel */}
