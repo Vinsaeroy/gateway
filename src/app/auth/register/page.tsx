@@ -15,7 +15,7 @@ import {
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Bot, ArrowRight, Loader2 } from "lucide-react";
+import { Bot, ArrowRight, Loader2, Eye, EyeOff } from "lucide-react";
 import Link from 'next/link';
 
 const formSchema = z.object({
@@ -33,6 +33,8 @@ export default function RegisterPage() {
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirm, setShowConfirm] = useState(false);
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -159,12 +161,23 @@ export default function RegisterPage() {
                                     <FormItem>
                                         <FormLabel className="text-foreground/80">Password</FormLabel>
                                         <FormControl>
-                                            <Input
-                                                type="password"
-                                                placeholder="••••••••"
-                                                className="h-12 px-4 rounded-xl bg-background/50 border-white/20 dark:border-white/10 focus-visible:ring-primary/50 transition-all font-medium"
-                                                {...field}
-                                            />
+                                            <div className="relative">
+                                                <Input
+                                                    type={showPassword ? "text" : "password"}
+                                                    placeholder="••••••••"
+                                                    className="h-12 px-4 pr-12 rounded-xl bg-background/50 border-white/20 dark:border-white/10 focus-visible:ring-primary/50 transition-all font-medium"
+                                                    {...field}
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setShowPassword((v) => !v)}
+                                                    tabIndex={-1}
+                                                    aria-label={showPassword ? "Sembunyikan password" : "Tampilkan password"}
+                                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                                                >
+                                                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                                                </button>
+                                            </div>
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -177,12 +190,23 @@ export default function RegisterPage() {
                                     <FormItem>
                                         <FormLabel className="text-foreground/80">Confirm Password</FormLabel>
                                         <FormControl>
-                                            <Input
-                                                type="password"
-                                                placeholder="••••••••"
-                                                className="h-12 px-4 rounded-xl bg-background/50 border-white/20 dark:border-white/10 focus-visible:ring-primary/50 transition-all font-medium"
-                                                {...field}
-                                            />
+                                            <div className="relative">
+                                                <Input
+                                                    type={showConfirm ? "text" : "password"}
+                                                    placeholder="••••••••"
+                                                    className="h-12 px-4 pr-12 rounded-xl bg-background/50 border-white/20 dark:border-white/10 focus-visible:ring-primary/50 transition-all font-medium"
+                                                    {...field}
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setShowConfirm((v) => !v)}
+                                                    tabIndex={-1}
+                                                    aria-label={showConfirm ? "Sembunyikan password" : "Tampilkan password"}
+                                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                                                >
+                                                    {showConfirm ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                                                </button>
+                                            </div>
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>

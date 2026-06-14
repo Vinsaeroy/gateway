@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import { waManager } from "@/modules/whatsapp/manager";
-import { getAuthenticatedUser, canAccessSession } from "@/lib/api-auth";
+import { canAccessSession } from "@/lib/api-auth";
+import { enforceApiQuota } from "@/lib/rate-limit";
 import Sticker from "wa-sticker-formatter";
 
 // POST: Send sticker from image
@@ -9,10 +10,9 @@ export async function POST(
     { params }: { params: Promise<{ sessionId: string; jid: string }> }
 ) {
     try {
-        const user = await getAuthenticatedUser(request);
-        if (!user) {
-            return NextResponse.json({ status: false, message: "Unauthorized", error: "Unauthorized" }, { status: 401 });
-        }
+        const gate = await enforceApiQuota(request);
+        if (gate.error) return gate.error;
+        const { user } = gate;
 
         const { sessionId, jid } = await params;
         const formData = await request.formData();
@@ -38,8 +38,8 @@ export async function POST(
         // Convert File to Buffer
         const buffer = Buffer.from(await file.arrayBuffer());
 
-        const pack = formData.get("pack") as string || "WA-AKG";
-        const author = formData.get("author") as string || user.name || "User";
+        const pack = formData.get("pack") as string || process.env.APP_NAME || "Sticker";
+        const author = formData.get("author") as string || user.name || process.env.APP_NAME || "Sticker";
         const type = (formData.get("type") as string) || "full";
         const quality = parseInt(formData.get("quality") as string) || 50;
 

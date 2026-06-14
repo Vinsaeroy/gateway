@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import { waManager } from "@/modules/whatsapp/manager";
-import { getAuthenticatedUser, canAccessSession } from "@/lib/api-auth";
+import { canAccessSession } from "@/lib/api-auth";
+import { enforceApiQuota } from "@/lib/rate-limit";
 
 // POST: Send contact card
 export async function POST(
@@ -8,10 +9,9 @@ export async function POST(
     { params }: { params: Promise<{ sessionId: string; jid: string }> }
 ) {
     try {
-        const user = await getAuthenticatedUser(request);
-        if (!user) {
-            return NextResponse.json({ status: false, message: "Unauthorized", error: "Unauthorized" }, { status: 401 });
-        }
+        const gate = await enforceApiQuota(request);
+        if (gate.error) return gate.error;
+        const { user } = gate;
 
         const { sessionId, jid } = await params;
         const body = await request.json();

@@ -1,38 +1,15 @@
 "use client";
 
-import { useEffect } from "react";
-import { useSession } from "next-auth/react";
+// ============================================================
+// AUTO UPDATE CHECK DIMATIKAN (manual update only)
+// ------------------------------------------------------------
+// Komponen ini dulu otomatis polling /api/system/check-updates
+// yang mengambil rilis dari repo lain (vinsaeroy/WA-AKG).
+// Supaya perubahan di repo lain tidak ikut masuk ke sini,
+// pengecekan otomatis dimatikan. Update dilakukan manual.
+// ============================================================
 
 export function UpdateChecker() {
-    const { status } = useSession();
-
-    useEffect(() => {
-        // Wait until auth ready — /api/system/check-updates requires SUPERADMIN
-        if (status !== "authenticated") return;
-
-        const checkUpdates = async () => {
-            try {
-                // Only check once per day to avoid spamming GitHub API
-                const lastCheck = localStorage.getItem("lastUpdateCheck");
-                const now = Date.now();
-                const ONE_DAY = 24 * 60 * 60 * 1000;
-
-                if (lastCheck && (now - parseInt(lastCheck)) < ONE_DAY) {
-                    return; // Already checked today
-                }
-
-                const res = await fetch('/api/system/check-updates', { method: 'POST' });
-                if (res.ok) {
-                    localStorage.setItem("lastUpdateCheck", String(now));
-                }
-                // Silently ignore 401/403 — only SUPERADMIN can check
-            } catch (_error) {
-                // Silently fail — not critical
-            }
-        };
-
-        checkUpdates();
-    }, [status]);
-
+    // Sengaja tidak melakukan apa-apa: tidak ada polling ke upstream.
     return null;
 }

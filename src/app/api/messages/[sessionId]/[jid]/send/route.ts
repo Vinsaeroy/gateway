@@ -1,5 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
-import { getAuthenticatedUser, canAccessSession } from "@/lib/api-auth";
+import { canAccessSession } from "@/lib/api-auth";
+import { enforceApiQuota } from "@/lib/rate-limit";
 import { ChatService } from "@/modules/whatsapp/chat.service";
 
 export async function POST(
@@ -7,10 +8,10 @@ export async function POST(
     { params }: { params: Promise<{ sessionId: string, jid: string }> }
 ) {
     try {
-        const user = await getAuthenticatedUser(request);
-        if (!user) {
-            return NextResponse.json({ status: false, message: "Unauthorized", error: "Unauthorized" }, { status: 401 });
-        }
+        // Auth + rate limit (kuota per plan)
+        const gate = await enforceApiQuota(request);
+        if (gate.error) return gate.error;
+        const { user } = gate;
 
         const { sessionId, jid: rawJid } = await params;
         const jid = decodeURIComponent(rawJid);

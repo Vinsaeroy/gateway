@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import { waManager } from "@/modules/whatsapp/manager";
-import { getAuthenticatedUser, canAccessSession } from "@/lib/api-auth";
+import { canAccessSession } from "@/lib/api-auth";
+import { enforceApiQuota } from "@/lib/rate-limit";
 
 // POST: Send location message
 export async function POST(
@@ -11,10 +12,9 @@ export async function POST(
         const { sessionId, jid: rawJid } = await params;
         const jid = decodeURIComponent(rawJid);
 
-        const user = await getAuthenticatedUser(request);
-        if (!user) {
-            return NextResponse.json({ status: false, message: "Unauthorized", error: "Unauthorized" }, { status: 401 });
-        }
+        const gate = await enforceApiQuota(request);
+        if (gate.error) return gate.error;
+        const { user } = gate;
 
         const body = await request.json();
         const { latitude, longitude, name, address } = body;

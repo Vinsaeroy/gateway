@@ -69,8 +69,13 @@ export function startAutoBroadcast() {
                     activeBroadcasts.delete(broadcast.id);
                 });
             }
-        } catch (error) {
-            logger.error("AutoBroadcast", "Error in auto broadcast loop:", error);
+        } catch (error: any) {
+            const code = error?.code;
+            if (["P1001", "P1002", "P1008", "P1017"].includes(code)) {
+                logger.warn("AutoBroadcast", `Database belum siap (${code}) — skip siklus ini.`);
+            } else {
+                logger.error("AutoBroadcast", "Error in auto broadcast loop:", error);
+            }
         } finally {
             isRunning = false;
         }

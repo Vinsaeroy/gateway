@@ -28,7 +28,8 @@ import {
     MessageCircleReply,
     Contact,
     UserPlus,
-    Radio
+    Radio,
+    CreditCard
 } from "lucide-react";
 import { useSidebar } from "./sidebar-context";
 import {
@@ -93,6 +94,12 @@ const navGroups: NavGroup[] = [
         items: [
             { href: "/docs", label: "API Docs", icon: FileText },
             { href: "/swagger", label: "Swagger UI", icon: Code, external: true },
+        ],
+    },
+    {
+        label: "Account",
+        items: [
+            { href: "/dashboard/billing", label: "Billing & Plan", icon: CreditCard },
         ],
     },
     {

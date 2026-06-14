@@ -1,0 +1,33 @@
+services:
+  - type: web
+    name: wa-akg
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: starter            # minimal "starter" — engine WA butuh always-on (jangan free yg auto-sleep)
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: TZ
+        value: Asia/Jakarta
+      - key: PORT
+        value: "3030"
+      - key: DATABASE_URL
+        sync: false          # isi manual di dashboard (rahasia)
+      - key: AUTH_SECRET
+        sync: false
+      - key: AUTH_TRUST_HOST
+        value: "true"
+      - key: BASE_URL
+        sync: false          # mis. https://wa-akg.onrender.com
+      - key: NEXTAUTH_URL
+        sync: false
+      - key: NEXT_PUBLIC_APP_URL
+        sync: false
+      - key: NEXT_PUBLIC_API_URL
+        sync: false          # mis. https://wa-akg.onrender.com/api
+    disk:
+      name: wa-akg-data
+      mountPath: /app/data   # simpan media upload biar tidak hilang saat redeploy
+      sizeGB: 1

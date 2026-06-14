@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import type { WASocket, WAMessage } from "@whiskeysockets/baileys";
-import { downloadMediaMessage } from "@whiskeysockets/baileys";
+import { downloadMediaMessage, jidNormalizedUser, areJidsSameUser } from "@whiskeysockets/baileys";
 import Sticker from "wa-sticker-formatter";
 import sharp from "sharp";
 import fs from "fs/promises";
@@ -37,6 +37,58 @@ export function setSessionStartTime(sessionId: string) {
     if (!startTimes.has(sessionId)) {
         startTimes.set(sessionId, Date.now());
     }
+}
+
+// ===== Helper untuk command grup =====
+function isGroupJid(jid: string) {
+    return jid.endsWith("@g.us");
+}
+
+/**
+ * Pastikan: di grup, pengirim admin (atau owner/fromMe), dan bot adalah admin.
+ * Mengembalikan metadata kalau lolos, atau pesan error.
+ */
+async function requireGroupAdmin(
+    sock: WASocket,
+    remoteJid: string,
+    msg: WAMessage,
+    fromMe: boolean
+): Promise<{ ok: boolean; metadata?: any; error?: string }> {
+    if (!isGroupJid(remoteJid)) return { ok: false, error: "❌ Perintah ini hanya bisa dipakai di dalam grup." };
+
+    let metadata: any;
+    try {
+        metadata = await sock.groupMetadata(remoteJid);
+    } catch {
+        return { ok: false, error: "❌ Gagal ambil data grup." };
+    }
+
+    const participants = metadata.participants || [];
+    const isAdmin = (jid: string) =>
+        participants.some(
+            (p: any) => p.id && areJidsSameUser(p.id, jid) && (p.admin === "admin" || p.admin === "superadmin")
+        );
+
+    const botJid = jidNormalizedUser(sock.user?.id || "");
+    const botIsAdmin = isAdmin(botJid);
+
+    const senderJid = msg.key.participant || (msg as any).participant || "";
+    const senderIsAdmin = fromMe || isAdmin(senderJid);
+
+    if (!senderIsAdmin) return { ok: false, error: "❌ Khusus admin grup." };
+    if (!botIsAdmin) return { ok: false, error: "❌ Jadikan bot sebagai admin grup dulu." };
+
+    return { ok: true, metadata };
+}
+
+/** Ambil target JID dari: mention > reply > nomor di argumen. */
+function resolveTargetJids(msg: WAMessage, args: string[]): string[] {
+    const ctx = msg.message?.extendedTextMessage?.contextInfo;
+    const mentioned = ctx?.mentionedJid || [];
+    if (mentioned.length) return mentioned;
+    if (ctx?.participant) return [ctx.participant];
+    const nums = args.map((a) => a.replace(/[^0-9]/g, "")).filter((n) => n.length >= 6);
+    return nums.map((n) => `${n}@s.whatsapp.net`);
 }
 
 export async function handleBotCommand(
@@ -339,9 +391,142 @@ export async function handleBotCommand(
 • *${prefix}uptime*: Check Session Uptime
 • *${prefix}id*: Get Chat ID
 
+👥 *Group (admin):*
+• *${prefix}tagall* [pesan]: Tag semua anggota
+• *${prefix}hidetag* [pesan]: Tag tersembunyi
+• *${prefix}kick* (tag/reply/nomor): Keluarkan anggota
+• *${prefix}add* <nomor>: Tambah anggota
+• *${prefix}promote* / *${prefix}demote* (tag/reply): Jadikan/copot admin
+• *${prefix}open* / *${prefix}close*: Buka/tutup grup
+
 _Made with ❤️_
 `;
                 await sock.sendMessage(remoteJid, { text: menu }, { quoted: msg });
+                break;
+            }
+
+            // ===== GROUP: TAG ALL =====
+            case "tagall":
+            case "everyone": {
+                if (!isGroupJid(remoteJid)) {
+                    await sock.sendMessage(remoteJid, { text: "❌ Hanya untuk grup." }, { quoted: msg });
+                    return;
+                }
+                const metadata = await sock.groupMetadata(remoteJid);
+                const parts = metadata.participants || [];
+                const mentions = parts.map((p: any) => p.id);
+                const note = args.join(" ").trim();
+                let teks = note ? `${note}\n\n` : `📢 *Tag All* (${parts.length} anggota)\n\n`;
+                for (const p of parts) teks += `• @${(p.id as string).split("@")[0]}\n`;
+                await sock.sendMessage(remoteJid, { text: teks, mentions });
+                break;
+            }
+
+            // ===== GROUP: HIDETAG (tag tersembunyi) =====
+            case "hidetag":
+            case "ht": {
+                if (!isGroupJid(remoteJid)) {
+                    await sock.sendMessage(remoteJid, { text: "❌ Hanya untuk grup." }, { quoted: msg });
+                    return;
+                }
+                const metadata = await sock.groupMetadata(remoteJid);
+                const mentions = (metadata.participants || []).map((p: any) => p.id);
+                const teks = args.join(" ").trim() || "📢";
+                await sock.sendMessage(remoteJid, { text: teks, mentions });
+                break;
+            }
+
+            // ===== GROUP: KICK =====
+            case "kick": {
+                const gate = await requireGroupAdmin(sock, remoteJid, msg, fromMe);
+                if (!gate.ok) {
+                    await sock.sendMessage(remoteJid, { text: gate.error! }, { quoted: msg });
+                    return;
+                }
+                const targets = resolveTargetJids(msg, args);
+                if (!targets.length) {
+                    await sock.sendMessage(remoteJid, { text: `❌ Tag/reply orangnya, atau ketik ${prefix}kick <nomor>.` }, { quoted: msg });
+                    return;
+                }
+                try {
+                    await sock.groupParticipantsUpdate(remoteJid, targets, "remove");
+                    await sock.sendMessage(remoteJid, { text: `✅ Berhasil kick ${targets.length} anggota.`, mentions: targets }, { quoted: msg });
+                } catch (e) {
+                    await sock.sendMessage(remoteJid, { text: `❌ Gagal kick: ${(e as any)?.message || e}` }, { quoted: msg });
+                }
+                break;
+            }
+
+            // ===== GROUP: ADD =====
+            case "add": {
+                const gate = await requireGroupAdmin(sock, remoteJid, msg, fromMe);
+                if (!gate.ok) {
+                    await sock.sendMessage(remoteJid, { text: gate.error! }, { quoted: msg });
+                    return;
+                }
+                const targets = resolveTargetJids(msg, args);
+                if (!targets.length) {
+                    await sock.sendMessage(remoteJid, { text: `❌ Ketik ${prefix}add <nomor> (pakai kode negara, mis. 628xxxx).` }, { quoted: msg });
+                    return;
+                }
+                try {
+                    const res: any = await sock.groupParticipantsUpdate(remoteJid, targets, "add");
+                    const failed = Array.isArray(res) ? res.filter((r: any) => r.status !== "200") : [];
+                    if (failed.length) {
+                        await sock.sendMessage(remoteJid, { text: `⚠️ Sebagian gagal ditambah (mungkin privasi/sudah keluar). Berhasil: ${targets.length - failed.length}/${targets.length}.` }, { quoted: msg });
+                    } else {
+                        await sock.sendMessage(remoteJid, { text: `✅ Berhasil menambah ${targets.length} anggota.` }, { quoted: msg });
+                    }
+                } catch (e) {
+                    await sock.sendMessage(remoteJid, { text: `❌ Gagal add: ${(e as any)?.message || e}` }, { quoted: msg });
+                }
+                break;
+            }
+
+            // ===== GROUP: PROMOTE / DEMOTE =====
+            case "promote":
+            case "demote": {
+                const gate = await requireGroupAdmin(sock, remoteJid, msg, fromMe);
+                if (!gate.ok) {
+                    await sock.sendMessage(remoteJid, { text: gate.error! }, { quoted: msg });
+                    return;
+                }
+                const targets = resolveTargetJids(msg, args);
+                if (!targets.length) {
+                    await sock.sendMessage(remoteJid, { text: `❌ Tag/reply orangnya untuk ${prefix}${cmd}.` }, { quoted: msg });
+                    return;
+                }
+                try {
+                    await sock.groupParticipantsUpdate(remoteJid, targets, cmd === "promote" ? "promote" : "demote");
+                    await sock.sendMessage(remoteJid, {
+                        text: cmd === "promote" ? `✅ Dijadikan admin.` : `✅ Dicopot dari admin.`,
+                        mentions: targets
+                    }, { quoted: msg });
+                } catch (e) {
+                    await sock.sendMessage(remoteJid, { text: `❌ Gagal: ${(e as any)?.message || e}` }, { quoted: msg });
+                }
+                break;
+            }
+
+            // ===== GROUP: OPEN / CLOSE (siapa yang bisa kirim pesan) =====
+            case "open":
+            case "close":
+            case "mute":
+            case "unmute": {
+                const gate = await requireGroupAdmin(sock, remoteJid, msg, fromMe);
+                if (!gate.ok) {
+                    await sock.sendMessage(remoteJid, { text: gate.error! }, { quoted: msg });
+                    return;
+                }
+                const lock = cmd === "close" || cmd === "mute";
+                try {
+                    await sock.groupSettingUpdate(remoteJid, lock ? "announcement" : "not_announcement");
+                    await sock.sendMessage(remoteJid, {
+                        text: lock ? "🔒 Grup ditutup — hanya admin yang bisa kirim pesan." : "🔓 Grup dibuka — semua anggota bisa kirim pesan."
+                    }, { quoted: msg });
+                } catch (e) {
+                    await sock.sendMessage(remoteJid, { text: `❌ Gagal ubah pengaturan grup: ${(e as any)?.message || e}` }, { quoted: msg });
+                }
                 break;
             }
 

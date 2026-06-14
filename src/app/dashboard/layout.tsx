@@ -27,8 +27,16 @@ export default async function DashboardLayout({
         redirect("/auth/login");
     }
     
-    // @ts-ignore
-    const systemConfig = await prisma.systemConfig.findUnique({ where: { id: "default" } });
+    // Select hanya kolom yang dipakai → aman walau ada kolom baru yang belum di-`db push`
+    let systemConfig: { appName: string | null; enableRegistration: boolean } | null = null;
+    try {
+        systemConfig = await prisma.systemConfig.findUnique({
+            where: { id: "default" },
+            select: { appName: true, enableRegistration: true }
+        });
+    } catch (e) {
+        console.error("DashboardLayout: gagal baca systemConfig", e);
+    }
     const appName = systemConfig?.appName || "WA-AKG";
     const registrationEnabled = systemConfig?.enableRegistration ?? true;
 

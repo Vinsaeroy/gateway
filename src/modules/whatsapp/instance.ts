@@ -16,6 +16,7 @@ import { bindAutoReply } from "./store/autoreply";
 import { bindAntiLink } from "./store/antilink";
 import { bindPpGuard } from "./store/ppguard";
 import { antispam } from "./antispam";
+import { antiban } from "./antiban";
 import { logger } from "@/lib/logger";
 
 export class WhatsAppInstance {
@@ -30,6 +31,8 @@ export class WhatsAppInstance {
     startTime: Date | null = null;
     pairingCode: string | null = null;
     private groupSyncInterval: NodeJS.Timeout | null = null;
+    private reconnectTimer: NodeJS.Timeout | null = null;
+    private reconnectAttempts: number = 0;
 
     isStopped: boolean = false;
 
@@ -47,8 +50,22 @@ export class WhatsAppInstance {
         this.config = sessionData?.config || {};
         const botConfig = (sessionData as any)?.botConfig;
 
+        // usePrismaAuthState bukan React Hook — ini factory auth state Baileys.
+        // eslint-disable-next-line react-hooks/rules-of-hooks
         const { state, saveCreds } = await usePrismaAuthState(this.sessionId);
         const { version } = await fetchLatestBaileysVersion();
+
+        // Bersihin socket lama dulu sebelum bikin yang baru.
+        // Tanpa ini, tiap reconnect ninggalin "ghost socket" yang masih
+        // ngeluarin event (QR storm) → gejala "scan tapi gak konek / putus terus".
+        if (this.socket) {
+            try {
+                this.socket.ev.removeAllListeners("connection.update");
+                this.socket.ev.removeAllListeners("creds.update");
+                this.socket.end(undefined);
+            } catch { /* ignore */ }
+            this.socket = null;
+        }
 
         // Force silent logger to prevent Baileys debug spam (Railway log rate limit)
         const silentLogger = pino({ level: "silent" }) as any;
@@ -69,9 +86,13 @@ export class WhatsAppInstance {
         // Apply Anti-Spam Wrapper to sendMessage
         // This wraps the socket's sendMessage so ALL outgoing messages go through the queue
         const originalSendMessage = this.socket.sendMessage.bind(this.socket);
+        const sock = this.socket;
         const sessionId = this.sessionId;
         this.socket.sendMessage = async function (jid: string, content: any, options?: any) {
+            // Anti-spam throttle (antri sesuai rate limit)
             await antispam.enqueue(sessionId, jid, content);
+            // Anti-ban humanizer (presence "mengetik" + jeda manusiawi)
+            await antiban.humanize(sock, sessionId, jid, content);
             return originalSendMessage(jid, content, options);
         } as any;
 
@@ -142,8 +163,17 @@ export class WhatsAppInstance {
                 }
 
                 if (shouldReconnect) {
-                    // Connection lost unexpectedly, reconnect
-                    this.init();
+                    // Reconnect dengan jeda + backoff biar gak loop kenceng
+                    // (immediate reconnect = rate-limit dari server = putus terus).
+                    if (this.reconnectTimer) clearTimeout(this.reconnectTimer);
+                    const delay = Math.min(30000, 3000 * (this.reconnectAttempts + 1));
+                    this.reconnectAttempts++;
+                    logger.info("Instance", `Session ${this.sessionId} reconnect dalam ${delay}ms (percobaan ke-${this.reconnectAttempts})`);
+                    this.reconnectTimer = setTimeout(() => {
+                        this.reconnectTimer = null;
+                        if (this.isStopped) return;
+                        this.init().catch(e => logger.error("Instance", "Reconnect gagal:", e));
+                    }, delay);
                 } else if (isLoggedOut) {
                     // Explicit logout: delete credentials
                     logger.info("Instance", `Session ${this.sessionId} logged out. Deleting credentials...`);
@@ -173,6 +203,13 @@ export class WhatsAppInstance {
                 this.status = "CONNECTED";
                 this.qr = null;
                 this.startTime = new Date();
+
+                // Sukses konek: reset counter & batalin timer reconnect yang masih antri
+                this.reconnectAttempts = 0;
+                if (this.reconnectTimer) {
+                    clearTimeout(this.reconnectTimer);
+                    this.reconnectTimer = null;
+                }
 
                 this.io?.to(this.sessionId).emit("connection.update", { status: this.status, qr: null });
 

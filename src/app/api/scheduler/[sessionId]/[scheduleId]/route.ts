@@ -28,7 +28,7 @@ export async function PUT(
 
         // Fetch system timezone
         // @ts-ignore
-        const systemConfig = await prisma.systemConfig.findUnique({ where: { id: "default" } });
+        const systemConfig = await prisma.systemConfig.findUnique({ where: { id: "default" }, select: { timezone: true } });
         const timezone = systemConfig?.timezone || "Asia/Jakarta";
 
         console.log(`[Scheduler:PUT] Received sendAt: ${sendAt}, using timezone: ${timezone}`);

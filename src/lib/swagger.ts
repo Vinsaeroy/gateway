@@ -33,8 +33,14 @@ All endpoints require authentication via:
             },
             servers: [
                 {
-                    url: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api",
-                    description: "API Server",
+                    // Relatif: "Try it out" otomatis pakai host+port halaman swagger
+                    // (localhost:3030 saat dev, domain saat prod). Anti salah port.
+                    url: "/api",
+                    description: "Current host (otomatis)",
+                },
+                {
+                    url: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3030/api",
+                    description: "Configured API URL (env)",
                 },
             ],
             components: {
@@ -1086,7 +1092,7 @@ All endpoints require authentication via:
                                                     sticker: {
                                                         url: "https://example.com/sticker.webp",
                                                         pack: "My Stickers",
-                                                        author: "WA-AKG"
+                                                        author: "My Brand"
                                                     }
                                                 }
                                             }
@@ -5754,6 +5760,178 @@ All endpoints require authentication via:
             }
         }
     });
+
+    // ============================================================
+    // POST-PROCESS — perbaiki endpoint yang "tidak aktif"
+    // ------------------------------------------------------------
+    // 1) Hapus path legacy yang TIDAK punya route nyata (single-param
+    //    /groups/{jid}/... dsb). Ini yang bikin 404 saat dicoba.
+    // 2) Tambahkan dokumentasi endpoint baru (billing, usage, jpm-swgc,
+    //    settings/payment) yang belum terdaftar.
+    // ============================================================
+    if (spec && spec.paths) {
+        const deadPaths = [
+            "/messages/{id}/media",
+            "/autoreplies/{id}",
+            "/scheduler/{id}",
+            "/webhooks/{id}",
+            "/labels/{id}",
+            "/groups/{jid}",
+            "/groups/{jid}/subject",
+            "/groups/{jid}/members",
+            "/groups/{jid}/invite",
+            "/groups/{jid}/leave",
+            "/groups/{jid}/picture",
+            "/groups/{jid}/settings",
+            "/groups/{jid}/description",
+            "/groups/{jid}/ephemeral"
+        ];
+        for (const p of deadPaths) {
+            if (spec.paths[p]) delete spec.paths[p];
+        }
+
+        // Endpoint baru
+        const okJson = (desc) => ({
+            200: {
+                description: desc,
+                content: { "application/json": { schema: { $ref: "#/components/schemas/Success" } } }
+            }
+        });
+
+        Object.assign(spec.paths, {
+            "/usage": {
+                get: {
+                    tags: ["Billing"],
+                    summary: "Get current API usage & plan limits",
+                    description: "Pemakaian API user (harian & bulanan) beserta limit plannya.",
+                    responses: {
+                        ...okJson("Usage data"),
+                        401: { $ref: "#/components/responses/Unauthorized" }
+                    }
+                }
+            },
+            "/billing/plans": {
+                get: {
+                    tags: ["Billing"],
+                    summary: "List available plans",
+                    description: "Daftar plan + harga + limit (publik).",
+                    security: [],
+                    responses: okJson("List of plans")
+                }
+            },
+            "/billing/checkout": {
+                post: {
+                    tags: ["Billing"],
+                    summary: "Create QRIS payment for a plan",
+                    description: "Membuat transaksi QRIS (KlikQRIS) untuk upgrade plan.",
+                    requestBody: {
+                        required: true,
+                        content: {
+                            "application/json": {
+                                schema: {
+                                    type: "object",
+                                    required: ["plan"],
+                                    properties: {
+                                        plan: { type: "string", enum: ["STANDARD", "PRO", "ENTERPRISE"], example: "STANDARD" }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    responses: {
+                        ...okJson("QRIS created"),
+                        400: { $ref: "#/components/responses/BadRequest" },
+                        401: { $ref: "#/components/responses/Unauthorized" },
+                        503: { description: "Payment gateway not configured" }
+                    }
+                }
+            },
+            "/billing/status/{id}": {
+                get: {
+                    tags: ["Billing"],
+                    summary: "Check payment status",
+                    parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" }, description: "Payment ID" }],
+                    responses: {
+                        ...okJson("Payment status"),
+                        401: { $ref: "#/components/responses/Unauthorized" },
+                        404: { $ref: "#/components/responses/NotFound" }
+                    }
+                }
+            },
+            "/billing/callback": {
+                post: {
+                    tags: ["Billing"],
+                    summary: "KlikQRIS webhook (server-to-server)",
+                    description: "Endpoint callback untuk KlikQRIS. Dipanggil oleh gateway, bukan user.",
+                    security: [],
+                    responses: okJson("Acknowledged")
+                }
+            },
+            "/settings/payment": {
+                get: {
+                    tags: ["Settings"],
+                    summary: "Get payment gateway settings (SUPERADMIN)",
+                    responses: {
+                        ...okJson("Payment settings (API key masked)"),
+                        403: { $ref: "#/components/responses/Forbidden" }
+                    }
+                },
+                post: {
+                    tags: ["Settings"],
+                    summary: "Update payment gateway settings (SUPERADMIN)",
+                    requestBody: {
+                        content: {
+                            "application/json": {
+                                schema: {
+                                    type: "object",
+                                    properties: {
+                                        klikqrisBaseUrl: { type: "string", example: "https://klikqris.com/api" },
+                                        klikqrisMerchantId: { type: "string" },
+                                        klikqrisApiKey: { type: "string", description: "Kosongkan kalau tidak ingin mengubah" },
+                                        klikqrisEnabled: { type: "boolean" }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    responses: {
+                        ...okJson("Saved"),
+                        403: { $ref: "#/components/responses/Forbidden" }
+                    }
+                }
+            },
+            "/jpm-swgc/{sessionId}": {
+                post: {
+                    tags: ["Messages"],
+                    summary: "JPM SWGC — bulk group status",
+                    parameters: [{ name: "sessionId", in: "path", required: true, schema: { type: "string" } }],
+                    requestBody: {
+                        content: {
+                            "application/json": {
+                                schema: {
+                                    type: "object",
+                                    properties: {
+                                        text: { type: "string" },
+                                        mediaUrl: { type: "string" },
+                                        mediaType: { type: "string", enum: ["image", "video", "text"] },
+                                        delayMs: { type: "integer", example: 1000 },
+                                        scope: { type: "string", enum: ["ALL", "SPECIFIC"] },
+                                        targets: { type: "array", items: { type: "string" } }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    responses: {
+                        ...okJson("Dispatch started"),
+                        401: { $ref: "#/components/responses/Unauthorized" },
+                        409: { description: "A dispatch is already running" }
+                    }
+                }
+            }
+        });
+    }
+
     return spec;
 };
 

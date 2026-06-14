@@ -67,8 +67,13 @@ export function initScheduler() {
                 }
             }
 
-        } catch (error) {
-            logger.error("Cron", "Scheduler error:", error);
+        } catch (error: any) {
+            const code = error?.code;
+            if (["P1001", "P1002", "P1008", "P1017"].includes(code)) {
+                logger.warn("Cron", `Database belum siap (${code}) — skip siklus ini.`);
+            } else {
+                logger.error("Cron", "Scheduler error:", error);
+            }
         }
     });
     

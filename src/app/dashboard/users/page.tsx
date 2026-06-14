@@ -26,6 +26,8 @@ interface UserProfile {
     name: string | null;
     email: string;
     role: "SUPERADMIN" | "OWNER" | "STAFF";
+    plan?: "FREE" | "STANDARD" | "PRO" | "ENTERPRISE";
+    planExpiresAt?: string | null;
     createdAt: string;
     _count?: {
         sessions: number;
@@ -44,7 +46,8 @@ export default function UsersPage() {
         name: "",
         email: "",
         password: "",
-        role: "OWNER"
+        role: "STAFF",
+        plan: "FREE"
     });
 
     useEffect(() => {
@@ -84,7 +87,7 @@ export default function UsersPage() {
                 toast.success(editingUser ? "User updated" : "User created");
                 setShowForm(false);
                 setEditingUser(null);
-                setFormData({ name: "", email: "", password: "", role: "OWNER" });
+                setFormData({ name: "", email: "", password: "", role: "STAFF", plan: "FREE" });
                 fetchUsers();
             } else {
                 const error = await res.json();
@@ -144,7 +147,7 @@ export default function UsersPage() {
                 </div>
                 <Button size="sm" onClick={() => {
                     setEditingUser(null);
-                    setFormData({ name: "", email: "", password: "", role: "OWNER" });
+                    setFormData({ name: "", email: "", password: "", role: "STAFF", plan: "FREE" });
                     setShowForm(true);
                 }}>
                     <Plus className="h-4 w-4 mr-1 sm:mr-2" /> Add User
@@ -205,6 +208,28 @@ export default function UsersPage() {
                                     </Select>
                                 </div>
                             </div>
+                            {editingUser && (
+                                <div className="space-y-2">
+                                    <Label>Plan</Label>
+                                    <Select
+                                        value={formData.plan}
+                                        onValueChange={(v: string) => setFormData({ ...formData, plan: v })}
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="FREE">Free</SelectItem>
+                                            <SelectItem value="STANDARD">Standard</SelectItem>
+                                            <SelectItem value="PRO">Pro</SelectItem>
+                                            <SelectItem value="ENTERPRISE">Enterprise</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <p className="text-xs text-muted-foreground">
+                                        Ubah plan user ini. Masa aktif memakai durasi default plan (FREE = tanpa batas).
+                                    </p>
+                                </div>
+                            )}
                             <div className="flex justify-end gap-2">
                                 <Button type="button" variant="ghost" onClick={() => setShowForm(false)}>Cancel</Button>
                                 <Button type="submit">{editingUser ? "Update" : "Create"}</Button>
@@ -236,6 +261,13 @@ export default function UsersPage() {
                                     </Badge>
                                 </div>
 
+                                <div className="mb-3">
+                                    <Badge variant="secondary" className="text-xs">
+                                        Plan: {user.plan || "FREE"}
+                                        {user.planExpiresAt ? ` · s/d ${new Date(user.planExpiresAt).toLocaleDateString()}` : ""}
+                                    </Badge>
+                                </div>
+
                                 <div className="flex justify-between items-center text-xs sm:text-sm text-muted-foreground gap-2">
                                     <span className="truncate">{user._count?.sessions || 0} Sessions</span>
                                     <span className="truncate">Joined {new Date(user.createdAt).toLocaleDateString()}</span>
@@ -248,7 +280,8 @@ export default function UsersPage() {
                                         name: user.name || "",
                                         email: user.email,
                                         password: "",
-                                        role: user.role
+                                        role: user.role,
+                                        plan: user.plan || "FREE"
                                     });
                                     setShowForm(true);
                                 }}>

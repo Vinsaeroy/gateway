@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import { waManager } from "@/modules/whatsapp/manager";
-import { getAuthenticatedUser, canAccessSession } from "@/lib/api-auth";
+import { canAccessSession } from "@/lib/api-auth";
+import { enforceApiQuota } from "@/lib/rate-limit";
 import { prisma } from "@/lib/prisma";
 
 /**
@@ -13,10 +14,9 @@ export async function POST(
     { params }: { params: Promise<{ sessionId: string; jid: string }> }
 ) {
     try {
-        const user = await getAuthenticatedUser(request);
-        if (!user) {
-            return NextResponse.json({ status: false, message: "Unauthorized", error: "Unauthorized" }, { status: 401 });
-        }
+        const gate = await enforceApiQuota(request);
+        if (gate.error) return gate.error;
+        const { user } = gate;
 
         const { sessionId, jid: rawJid } = await params;
         const jid = decodeURIComponent(rawJid);
@@ -150,7 +150,7 @@ export async function POST(
         };
 
         // Process message payload (same as /send)
-        let msgPayload = message;
+        const msgPayload = message;
 
         if (msgPayload.text && mentions && Array.isArray(mentions)) {
             msgPayload.mentions = mentions;

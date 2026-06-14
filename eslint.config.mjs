@@ -10,15 +10,29 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    "marketing/**",
+    "scripts/**",
+    "A-TSUKASA-REWORK-ESM_FIX_ADEXTERNAL+JPM/**",
   ]),
   {
-    // Downgrade strict rules to warnings (these are style, not bugs)
+    // Aturan lint disesuaikan untuk codebase gateway WA (banyak bungkus
+    // library bertipe longgar spt Baileys). Yang murni gaya & BUKAN bug
+    // dimatikan; yang berpotensi menandai isu nyata tetap "warn".
     rules: {
-      "@typescript-eslint/no-explicit-any": "warn",
-      "@typescript-eslint/no-unused-vars": "warn",
-      "@typescript-eslint/ban-ts-comment": "warn",
-      "@typescript-eslint/no-non-null-asserted-optional-chain": "warn",
+      // Bukan bug — dimatikan (mengurangi noise tanpa risiko):
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/ban-ts-comment": "off",
+      "@typescript-eslint/no-non-null-asserted-optional-chain": "off",
+      "react/no-unescaped-entities": "off",
+      // Tetap warn (sinyal berguna, tidak mematahkan build):
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        { argsIgnorePattern: "^_", varsIgnorePattern: "^_", ignoreRestSiblings: true },
+      ],
       "prefer-const": "warn",
+      "react-hooks/exhaustive-deps": "warn",
+      "react-hooks/set-state-in-effect": "warn",
+      "@next/next/no-img-element": "warn",
     },
   },
 ]);

@@ -2,6 +2,7 @@ import { prisma } from "./prisma";
 import { NextRequest } from "next/server";
 import { auth } from "./auth";
 import { logger } from "./logger";
+import crypto from "crypto";
 
 // Role hierarchy for permission checks
 const ROLE_HIERARCHY = {
@@ -25,13 +26,23 @@ export async function validateApiKey(request: NextRequest) {
     try {
         const user = await prisma.user.findUnique({
             where: { apiKey },
-            select: { id: true, email: true, name: true, role: true }
+            select: { id: true, email: true, name: true, role: true, plan: true, planExpiresAt: true }
         });
 
         return user;
     } catch (error) {
-        logger.error("Auth", "API key validation error:", error);
-        return null;
+        // Fallback: kalau kolom plan/planExpiresAt belum ada di DB (belum `db push`),
+        // jangan bikin auth gagal total — anggap FREE dulu.
+        try {
+            const user = await prisma.user.findUnique({
+                where: { apiKey },
+                select: { id: true, email: true, name: true, role: true }
+            });
+            return user ? { ...user, plan: "FREE", planExpiresAt: null } : null;
+        } catch (e2) {
+            logger.error("Auth", "API key validation error:", e2);
+            return null;
+        }
     }
 }
 
@@ -51,10 +62,25 @@ export async function getAuthenticatedUser(request?: NextRequest) {
     const session = await auth();
     if (session?.user?.id) {
         // Fetch full user data including role
-        const user = await prisma.user.findUnique({
-            where: { id: session.user.id },
-            select: { id: true, email: true, name: true, role: true }
-        });
+        let user: any = null;
+        try {
+            user = await prisma.user.findUnique({
+                where: { id: session.user.id },
+                select: { id: true, email: true, name: true, role: true, plan: true, planExpiresAt: true }
+            });
+        } catch {
+            // Fallback kalau kolom plan belum ada di DB (belum `db push`)
+            try {
+                const base = await prisma.user.findUnique({
+                    where: { id: session.user.id },
+                    select: { id: true, email: true, name: true, role: true }
+                });
+                user = base ? { ...base, plan: "FREE", planExpiresAt: null } : null;
+            } catch (e) {
+                logger.error("Auth", "Session user fetch error:", e);
+                user = null;
+            }
+        }
 
         if (user) {
             return { ...user, authMethod: "session" as const };
@@ -231,7 +257,6 @@ export async function getAccessibleSessions(userId: string, userRole: string) {
  * Generate a new API key (cryptographically secure)
  */
 export function generateApiKey(): string {
-    const crypto = require("crypto");
     const randomBytes = crypto.randomBytes(24).toString("base64url");
     return `wag_${randomBytes}`;
 }

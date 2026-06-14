@@ -18,14 +18,14 @@ export default function SystemMonitorPage() {
     const fetchStats = async () => {
         try {
             const res = await fetch("/api/system/monitor");
+            if (!res.ok) return; // 401/403/500 — diam saja, jangan toast spam
             const result = await res.json();
             if (result.status) {
                 setData(result.data);
-            } else {
-                toast.error(result.message || "Failed to fetch metrics");
             }
-        } catch (error) {
-            console.error("Monitor fetch error:", error);
+        } catch {
+            // "Failed to fetch" = blip jaringan / ekstensi browser membungkus fetch.
+            // Transient & bukan bug app — diabaikan biar tidak nge-spam overlay dev.
         } finally {
             setLoading(false);
         }

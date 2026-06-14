@@ -4,10 +4,25 @@ import { authConfig } from "./src/auth.config";
 
 const authMiddleware = NextAuth(authConfig).auth;
 
-// Get the canonical public URL (without trailing slash)
-function getPublicUrl(): string {
-    const url = process.env.NEXTAUTH_URL || process.env.BASE_URL || "https://rifalos.shop";
-    return url.replace(/\/$/, "");
+// Public URL untuk normalisasi redirect.
+// Diambil dari HOST ASLI request: forwarded header (di belakang proxy/prod)
+// atau origin request (lokal = localhost). TIDAK hardcode domain, supaya
+// saat dijalankan lokal redirect tetap ke localhost, saat prod ikut domain.
+function getPublicUrl(request: NextRequest): string {
+    const fwdHost = request.headers.get("x-forwarded-host");
+    if (fwdHost) {
+        const fwdProto = request.headers.get("x-forwarded-proto") || "https";
+        return `${fwdProto}://${fwdHost}`;
+    }
+
+    const origin = request.nextUrl.origin;
+    // Hanya kalau origin bind-all (0.0.0.0) yang tak bisa di-redirect: pakai env, lalu localhost.
+    if (/^https?:\/\/0\.0\.0\.0(:\d+)?$/i.test(origin)) {
+        const envUrl = process.env.NEXTAUTH_URL || process.env.BASE_URL;
+        if (envUrl) return envUrl.replace(/\/$/, "");
+        return origin.replace("0.0.0.0", "localhost");
+    }
+    return origin;
 }
 
 export default async function middleware(request: NextRequest) {
@@ -16,7 +31,7 @@ export default async function middleware(request: NextRequest) {
     if (response?.headers) {
         const location = response.headers.get("location");
         if (location) {
-            const publicUrl = getPublicUrl();
+            const publicUrl = getPublicUrl(request);
 
             try {
                 let publicHost: URL;

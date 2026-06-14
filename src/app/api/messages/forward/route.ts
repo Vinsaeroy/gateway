@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import { waManager } from "@/modules/whatsapp/manager";
-import { getAuthenticatedUser, canAccessSession } from "@/lib/api-auth";
+import { canAccessSession } from "@/lib/api-auth";
+import { enforceApiQuota } from "@/lib/rate-limit";
 import { proto } from "@whiskeysockets/baileys";
 
 /**
@@ -11,10 +12,9 @@ import { proto } from "@whiskeysockets/baileys";
 export async function POST(request: NextRequest) {
     console.warn('[DEPRECATED] POST /api/messages/forward is deprecated. Use POST /api/messages/{sessionId}/forward instead.');
     try {
-        const user = await getAuthenticatedUser(request);
-        if (!user) {
-            return NextResponse.json({ status: false, message: "Unauthorized", error: "Unauthorized" }, { status: 401 });
-        }
+        const gate = await enforceApiQuota(request);
+        if (gate.error) return gate.error;
+        const { user } = gate;
 
         const body = await request.json();
         const { sessionId, fromJid, messageId, toJids } = body;

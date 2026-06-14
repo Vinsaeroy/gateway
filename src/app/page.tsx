@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight, Bot, Github, Zap, Shield, Globe, MessageSquare, Clock, Code, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LandingNav } from "@/components/landing/landing-nav";
+import { PricingCards } from "@/components/landing/pricing";
 import fs from "fs";
 import path from "path";
 
@@ -119,6 +120,22 @@ export default function Home() {
                 description="Connect, monitor, and control multiple distinct WhatsApp numbers from one unified dashboard."
               />
             </div>
+          </div>
+        </section>
+
+        {/* Pricing */}
+        <section id="pricing" className="py-32 relative">
+          <div className="container px-4 md:px-6 relative z-10">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl font-bold tracking-tight sm:text-5xl mb-6 text-foreground">Harga Sederhana &amp; Transparan</h2>
+              <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+                Mulai gratis, upgrade kapan saja. Pembayaran cepat via QRIS (KlikQRIS).
+              </p>
+            </div>
+            <PricingCards ctaHref="/auth/login" />
+            <p className="text-center text-sm text-muted-foreground mt-8">
+              Semua plan termasuk akses REST API. Limit dihitung per request API.
+            </p>
           </div>
         </section>
 

@@ -5,7 +5,14 @@ import { getAuthenticatedUser } from "@/lib/api-auth";
 export async function GET(request: NextRequest) {
     try {
         const config = await prisma.systemConfig.findUnique({
-            where: { id: "default" }
+            where: { id: "default" },
+            select: {
+                appName: true,
+                faviconUrl: true,
+                logoUrl: true,
+                timezone: true,
+                enableRegistration: true
+            }
         });
 
         // Public fields (needed for UI branding everywhere)

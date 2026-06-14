@@ -1,6 +1,9 @@
 import { NextResponse, NextRequest } from "next/server";
+import fs from "fs";
+import path from "path";
 import { prisma } from "@/lib/prisma";
 import { getAuthenticatedUser, canAccessSession } from "@/lib/api-auth";
+import { enforceApiQuota } from "@/lib/rate-limit";
 import { waManager } from "@/modules/whatsapp/manager";
 import { generateWAMessageContent } from "@whiskeysockets/baileys";
 import { logger } from "@/lib/logger";
@@ -39,10 +42,9 @@ export async function POST(
     { params }: { params: Promise<{ sessionId: string }> }
 ) {
     try {
-        const user = await getAuthenticatedUser(request);
-        if (!user) {
-            return NextResponse.json({ status: false, message: "Unauthorized" }, { status: 401 });
-        }
+        const gate = await enforceApiQuota(request);
+        if (gate.error) return gate.error;
+        const { user } = gate;
 
         const { sessionId } = await params;
 
@@ -101,8 +103,6 @@ export async function POST(
             let buffer: Buffer;
             try {
                 if (mediaUrl.startsWith("/api/media/")) {
-                    const fs = require("fs");
-                    const path = require("path");
                     const filename = mediaUrl.replace("/api/media/", "");
                     if (filename.includes("..") || filename.includes("/") || filename.includes("\\")) {
                         return NextResponse.json({ status: false, message: "Invalid media filename" }, { status: 400 });

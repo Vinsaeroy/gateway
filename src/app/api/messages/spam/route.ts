@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import { waManager } from "@/modules/whatsapp/manager";
-import { getAuthenticatedUser, canAccessSession } from "@/lib/api-auth";
+import { canAccessSession } from "@/lib/api-auth";
+import { enforceApiQuota } from "@/lib/rate-limit";
 
 /**
  * @deprecated This endpoint is deprecated. Use POST /api/messages/{sessionId}/{jid}/spam instead.
@@ -9,10 +10,9 @@ import { getAuthenticatedUser, canAccessSession } from "@/lib/api-auth";
 export async function POST(request: NextRequest) {
     console.warn('[DEPRECATED] POST /api/messages/spam is deprecated. Use POST /api/messages/{sessionId}/{jid}/spam instead.');
     try {
-        const user = await getAuthenticatedUser(request);
-        if (!user) {
-            return NextResponse.json({ status: false, message: "Unauthorized", error: "Unauthorized" }, { status: 401 });
-        }
+        const gate = await enforceApiQuota(request);
+        if (gate.error) return gate.error;
+        const { user } = gate;
 
         const body = await request.json();
         const { sessionId, jid, message, count = 10, delay = 500 } = body; 

@@ -299,7 +299,7 @@ export async function onMessageReceived(sessionId: string, message: any, existin
     const normalizedFrom = await resolveToPhoneJid(remoteJid, sessionId, remoteJidAlt);
 
     // "sender" is who sent it. In DM: remoteJid. In Group: participant.
-    let senderJid: string = isGroup ? (participant || "") : remoteJid;
+    const senderJid: string = isGroup ? (participant || "") : remoteJid;
     const normalizedSender = await resolveToPhoneJid(senderJid, sessionId);
     let sender: any = normalizedSender;
 

@@ -36,6 +36,21 @@ enum MessageStatus {
   FAILED
 }
 
+enum Plan {
+  FREE
+  STANDARD
+  PRO
+  ENTERPRISE
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  EXPIRED
+  FAILED
+  CANCELLED
+}
+
 model User {
   id        String   @id @default(cuid())
   name      String?
@@ -43,6 +58,11 @@ model User {
   password  String
   role      Role     @default(OWNER)
   apiKey    String?  @unique // API Key for authentication
+
+  // Billing / Plan
+  plan          Plan      @default(FREE)
+  planExpiresAt DateTime? // null = no expiry (FREE) / lifetime
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   
@@ -50,6 +70,8 @@ model User {
   webhooks  Webhook[]
   notifications Notification[]
   sessionAccesses SessionAccess[]
+  payments  Payment[]
+  apiUsages ApiUsage[]
 }
 
 model Session {
@@ -254,6 +276,13 @@ model BotConfig {
   spamDelayMin    Int     @default(1000) // MS min delay
   spamDelayMax    Int     @default(3000) // MS max delay
 
+  // Anti-Ban (humanizer) — bikin pola kirim mirip manusia biar gak gampang dibanned WA
+  antiBanEnabled  Boolean @default(true)
+  antiBanTyping   Boolean @default(true)  // simulasi "mengetik/merekam" sebelum kirim
+  antiBanReadFirst Boolean @default(false) // tandai pesan dibaca sebelum balas
+  antiBanMinDelay Int     @default(600)   // jeda manusiawi min (ms)
+  antiBanMaxDelay Int     @default(2500)  // jeda manusiawi max (ms)
+
   // Automation & Presence
   welcomeMessage  String? @db.Text
   autoRead        Boolean @default(false)
@@ -279,7 +308,13 @@ model SystemConfig {
   faviconUrl         String?
   timezone           String   @default("Asia/Jakarta")
   enableRegistration Boolean  @default(true)
-  
+
+  // Payment gateway (KlikQRIS) — diatur HANYA oleh SUPERADMIN
+  klikqrisBaseUrl    String?  @default("https://klikqris.com/api")
+  klikqrisApiKey     String?
+  klikqrisMerchantId String?
+  klikqrisEnabled    Boolean  @default(false)
+
   updatedAt          DateTime @updatedAt
 }
 
@@ -360,4 +395,47 @@ model AutoBroadcast {
   session     Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
   @@index([sessionId])
+}
+
+// Per-user API usage counter (1 row per user per day, Asia/Jakarta)
+// Daily usage  = today's row count
+// Monthly usage = SUM(count) where month = current month
+model ApiUsage {
+  id        String   @id @default(cuid())
+  userId    String
+  day       String   // "YYYY-MM-DD" in Asia/Jakarta
+  month     String   // "YYYY-MM" in Asia/Jakarta
+  count     Int      @default(0)
+  updatedAt DateTime @updatedAt
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, day])
+  @@index([userId, month])
+}
+
+// Payment / subscription purchase (QRIS via KlikQRIS)
+model Payment {
+  id           String        @id @default(cuid())
+  userId       String
+  plan         Plan
+  amount       Int           // amount in IDR (harga plan)
+  totalAmount  Int?          // nominal akhir yg ditagih (amount + kode unik dari gateway)
+  status       PaymentStatus @default(PENDING)
+  provider     String        @default("klikqris")
+  reference    String?       @unique // gateway transaction id / reference (= order_id)
+  signature    String?       @db.Text // signature dari create, dipakai validasi webhook
+  qrString     String?       @db.Text // raw QRIS payload (for rendering QR)
+  qrImageUrl   String?       @db.Text // hosted QR image url / data-uri
+  durationDays Int           @default(30)
+  paidAt       DateTime?
+  expiresAt    DateTime?     // QR / invoice expiry time
+  rawResponse  Json?         // raw provider response (debug/audit)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
 }

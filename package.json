@@ -3,9 +3,9 @@
   "version": "1.5.4",
   "private": false,
   "scripts": {
-    "dev": "npx tsx src/server/index.ts",
+    "dev": "npx tsx src/server/bootstrap.ts",
     "build": "next build",
-    "start": "npx tsx src/server/index.ts",
+    "start": "npx tsx src/server/bootstrap.ts",
     "lint": "eslint",
     "db:push": "prisma db push && prisma generate",
     "db:studio": "prisma studio",

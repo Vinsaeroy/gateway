@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import { waManager } from "@/modules/whatsapp/manager";
-import { getAuthenticatedUser, canAccessSession } from "@/lib/api-auth";
+import { canAccessSession } from "@/lib/api-auth";
+import { enforceApiQuota } from "@/lib/rate-limit";
 import Sticker from "wa-sticker-formatter";
 
 export async function POST(
@@ -9,10 +10,9 @@ export async function POST(
 ) {
     console.warn('[DEPRECATED] POST /api/chat/[sessionId]/send is deprecated. Use POST /api/messages/[sessionId]/[jid]/send instead.');
     try {
-        const user = await getAuthenticatedUser(request);
-        if (!user) {
-            return NextResponse.json({ status: false, message: "Unauthorized", error: "Unauthorized" }, { status: 401 });
-        }
+        const gate = await enforceApiQuota(request);
+        if (gate.error) return gate.error;
+        const { user } = gate;
 
         const { sessionId } = await params;
         const body = await request.json();
@@ -51,8 +51,8 @@ export async function POST(
                 const buffer = await res.arrayBuffer();
                 
                 const sticker = new Sticker(Buffer.from(buffer), {
-                    pack: msgPayload.sticker.pack || "WA-AKG Bot",
-                    author: msgPayload.sticker.author || "WA-AKG",
+                    pack: msgPayload.sticker.pack || process.env.APP_NAME || "Sticker",
+                    author: msgPayload.sticker.author || process.env.APP_NAME || "Sticker",
                     type: "full",
                     quality: 50
                 });

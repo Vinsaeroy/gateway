@@ -63,8 +63,17 @@ const checkScheduledMessages = async () => {
                 // Optionally mark as failed or leave pending
             }
         }
-    } catch (e) {
-        logger.error("Scheduler", "Error executing scheduler loop:", e);
+    } catch (e: any) {
+        const code = e?.code;
+        // Error koneksi transient (mis. Neon free-tier cold start / auto-suspend).
+        // Jangan teriak ERROR — cukup warning ringan & skip siklus, nanti dicoba lagi.
+        const connErrors = ["P1001", "P1002", "P1008", "P1017"];
+        if (connErrors.includes(code)) {
+            logger.warn("Scheduler", `Database belum siap (${code}) — skip siklus ini, dicoba lagi 30s lagi.`);
+        } else {
+            const detail = e?.message || String(e);
+            logger.error("Scheduler", `Error executing scheduler loop:${code ? ` [${code}]` : ""} ${detail}`);
+        }
     }
 };
 

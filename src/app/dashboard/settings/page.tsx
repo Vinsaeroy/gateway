@@ -8,6 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { RefreshCw, Save, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
+import { PaymentSettingsCard } from "@/components/dashboard/payment-settings";
 
 export default function SettingsPage() {
     const { data: authSession } = useSession();
@@ -187,6 +188,9 @@ export default function SettingsPage() {
                     </div>
                 </CardContent>
             </Card>
+
+            {/* Payment Gateway — SUPERADMIN only */}
+            {isSuperAdmin && <PaymentSettingsCard />}
 
             {/* System Updates */}
             <Card>

@@ -19,11 +19,26 @@ export default function StickerPage() {
     const [loading, setLoading] = useState(false);
 
     // Advanced options
-    const [pack, setPack] = useState("WA-AKG");
-    const [author, setAuthor] = useState("User");
+    const [pack, setPack] = useState("");
+    const [author, setAuthor] = useState("");
     const [quality, setQuality] = useState(50);
     const [type, setType] = useState("full");
     const [showAdvanced, setShowAdvanced] = useState(false);
+
+    // Ambil nama aplikasi (dari Settings) sebagai default pack/author — tidak hardcode.
+    useEffect(() => {
+        fetch("/api/settings/system")
+            .then((r) => r.json())
+            .then((res) => {
+                const appName = res?.data?.appName || "Sticker";
+                setPack((prev) => prev || appName);
+                setAuthor((prev) => prev || appName);
+            })
+            .catch(() => {
+                setPack((prev) => prev || "Sticker");
+                setAuthor((prev) => prev || "Sticker");
+            });
+    }, []);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const f = e.target.files?.[0];
@@ -36,7 +51,7 @@ export default function StickerPage() {
     const handleSend = async () => {
         if (!sessionId || !target || !file) return toast.error("Please fill all fields");
 
-        let jid = target.includes('@') ? target : `${target}@s.whatsapp.net`;
+        const jid = target.includes('@') ? target : `${target}@s.whatsapp.net`;
         const encodedJid = encodeURIComponent(jid);
 
         setLoading(true);

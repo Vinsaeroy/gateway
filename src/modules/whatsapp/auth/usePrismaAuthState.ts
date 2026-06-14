@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { AuthenticationCreds, AuthenticationState, BufferJSON, initAuthCreds, SignalDataTypeMap } from "@whiskeysockets/baileys";
+import { AuthenticationCreds, AuthenticationState, BufferJSON, initAuthCreds, proto, SignalDataTypeMap } from "@whiskeysockets/baileys";
 import { logger } from "@/lib/logger";
 
 export const usePrismaAuthState = async (sessionId: string): Promise<{ state: AuthenticationState, saveCreds: () => Promise<void> }> => {
@@ -60,7 +60,10 @@ export const usePrismaAuthState = async (sessionId: string): Promise<{ state: Au
                     await Promise.all(ids.map(async id => {
                         let value = await readData(type, id);
                         if (type === 'app-state-sync-key' && value) {
-                            value = BufferJSON.reviver(null, value);
+                            // Pola resmi Baileys: bungkus ke AppStateSyncKeyData
+                            // (sebelumnya pakai BufferJSON.reviver yang salah,
+                            // bikin app-state sync gak stabil setelah scan).
+                            value = proto.Message.AppStateSyncKeyData.fromObject(value);
                         }
                         if (value) {
                             data[id] = value;

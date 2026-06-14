@@ -1,0 +1,20 @@
+{
+  "redirects": [
+    { "source": "/dashboard", "destination": "https://rifalos.shop/dashboard", "permanent": false },
+    { "source": "/dashboard/:path*", "destination": "https://rifalos.shop/dashboard/:path*", "permanent": false },
+    { "source": "/auth/:path*", "destination": "https://rifalos.shop/auth/:path*", "permanent": false },
+    { "source": "/swagger", "destination": "https://rifalos.shop/swagger", "permanent": false },
+    { "source": "/api/:path*", "destination": "https://rifalos.shop/api/:path*", "permanent": false }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" }
+      ]
+    }
+  ]
+}

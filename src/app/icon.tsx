@@ -15,13 +15,13 @@ export const contentType = "image/png";
 export default async function Icon() {
     // Default config
     let letter = "W";
-    let color = "#16a34a"; // green-600
+    const color = "#16a34a"; // green-600
 
     try {
         // Fetch system config
-        // @ts-ignore
         const config = await prisma.systemConfig.findUnique({
-            where: { id: "default" }
+            where: { id: "default" },
+            select: { appName: true }
         });
 
         if (config?.appName) {

@@ -1,7 +1,8 @@
 import { NextResponse, NextRequest } from "next/server";
 import { waManager } from "@/modules/whatsapp/manager";
 import { broadcastSchema } from "@/lib/validations";
-import { getAuthenticatedUser, canAccessSession } from "@/lib/api-auth";
+import { canAccessSession } from "@/lib/api-auth";
+import { enforceApiQuota } from "@/lib/rate-limit";
 import type { AnyMessageContent } from "@whiskeysockets/baileys";
 
 /**
@@ -10,10 +11,9 @@ import type { AnyMessageContent } from "@whiskeysockets/baileys";
 export async function POST(request: NextRequest) {
     console.warn('[DEPRECATED] POST /api/messages/broadcast is deprecated. Use POST /api/messages/{sessionId}/broadcast instead.');
     try {
-        const user = await getAuthenticatedUser(request);
-        if (!user) {
-            return NextResponse.json({ status: false, message: "Unauthorized", error: "Unauthorized" }, { status: 401 });
-        }
+        const gate = await enforceApiQuota(request);
+        if (gate.error) return gate.error;
+        const { user } = gate;
 
         const body = await request.json();
         const parseResult = broadcastSchema.safeParse(body);

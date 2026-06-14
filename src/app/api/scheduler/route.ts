@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
 
 
         // @ts-ignore
-        const systemConfig = await prisma.systemConfig.findUnique({ where: { id: "default" } });
+        const systemConfig = await prisma.systemConfig.findUnique({ where: { id: "default" }, select: { timezone: true } });
         const timezone = systemConfig?.timezone || "Asia/Jakarta";
 
         // Convert local time (sendAt) to UTC Date object using moment-timezone
