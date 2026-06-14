@@ -28,6 +28,7 @@ import {
     MessageCircleReply,
     UserPlus,
     Radio,
+    CreditCard,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
