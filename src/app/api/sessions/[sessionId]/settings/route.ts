@@ -146,12 +146,9 @@ export async function DELETE(
                 console.log("Session logout error (might be already disconnected):", e);
             }
         }
-        waManager.deleteSession(sessionId);
-
-        // Delete from database
-        await prisma.session.delete({
-            where: { sessionId }
-        });
+        // deleteSession sudah menutup socket + menghapus row DB (idempotent).
+        // Jangan delete lagi di sini (dulu bikin P2025 "record not found").
+        await waManager.deleteSession(sessionId);
 
         return NextResponse.json({ status: true, message: "Session deleted successfully" });
 

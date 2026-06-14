@@ -86,7 +86,9 @@ export class WhatsAppManager {
             instance.socket?.end(undefined);
             this.sessions.delete(sessionId);
         }
-        await prisma.session.delete({ where: { sessionId } });
+        // deleteMany is idempotent: tidak melempar P2025 kalau record sudah
+        // terhapus (mis. delete ganda / balapan event dari socket zombie).
+        await prisma.session.deleteMany({ where: { sessionId } });
     }
 
     /**
