@@ -23,19 +23,24 @@ export async function validateApiKey(request: NextRequest) {
         return null;
     }
 
+    // Key baru disimpan ter-hash (sha256). Cari berdasarkan hash DULU, lalu
+    // fallback ke plaintext untuk key lama (legacy) yang belum dimigrasi —
+    // jadi key lama tetap berfungsi sampai user generate ulang.
+    const hashed = hashApiKey(apiKey);
+
     try {
-        const user = await prisma.user.findUnique({
-            where: { apiKey },
+        const user = await prisma.user.findFirst({
+            where: { OR: [{ apiKey: hashed }, { apiKey }] },
             select: { id: true, email: true, name: true, role: true, plan: true, planExpiresAt: true }
         });
 
         return user;
-    } catch (error) {
+    } catch {
         // Fallback: kalau kolom plan/planExpiresAt belum ada di DB (belum `db push`),
         // jangan bikin auth gagal total — anggap FREE dulu.
         try {
-            const user = await prisma.user.findUnique({
-                where: { apiKey },
+            const user = await prisma.user.findFirst({
+                where: { OR: [{ apiKey: hashed }, { apiKey }] },
                 select: { id: true, email: true, name: true, role: true }
             });
             return user ? { ...user, plan: "FREE", planExpiresAt: null } : null;
@@ -259,4 +264,19 @@ export async function getAccessibleSessions(userId: string, userRole: string) {
 export function generateApiKey(): string {
     const randomBytes = crypto.randomBytes(24).toString("base64url");
     return `wag_${randomBytes}`;
+}
+
+/**
+ * Hash sebuah API key (sha256) untuk disimpan di DB.
+ * Key plaintext hanya ditampilkan sekali ke user saat generate; DB hanya menyimpan hash.
+ */
+export function hashApiKey(key: string): string {
+    return crypto.createHash("sha256").update(key).digest("hex");
+}
+
+/**
+ * Deteksi apakah nilai tersimpan sudah berupa hash (64 hex) atau masih plaintext legacy.
+ */
+export function isHashedApiKey(value: string | null | undefined): boolean {
+    return !!value && /^[a-f0-9]{64}$/.test(value);
 }

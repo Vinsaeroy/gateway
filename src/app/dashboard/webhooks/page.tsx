@@ -60,6 +60,8 @@ export default function WebhooksPage() {
     const { sessionId, sessions } = useSession(); // Get active session ID and list of sessions
     const [webhooks, setWebhooks] = useState<WebhookConfig[]>([]);
     const [apiKey, setApiKey] = useState<string | null>(null);
+    const [apiKeySet, setApiKeySet] = useState(false);
+    const [apiKeyHidden, setApiKeyHidden] = useState(false);
     const [showApiKey, setShowApiKey] = useState(false);
     const [loading, setLoading] = useState(true);
     const [showRegenConfirm, setShowRegenConfirm] = useState(false);
@@ -111,7 +113,9 @@ export default function WebhooksPage() {
             const res = await fetch("/api/user/api-key");
             if (res.ok) {
                 const data = await res.json();
-                setApiKey(data?.data?.apiKey);
+                setApiKey(data?.data?.apiKey ?? null);
+                setApiKeySet(Boolean(data?.data?.apiKeySet));
+                setApiKeyHidden(Boolean(data?.data?.hidden));
             }
         } catch (error) {
             console.error("Failed to fetch API key", error);
@@ -123,8 +127,11 @@ export default function WebhooksPage() {
             const res = await fetch("/api/user/api-key", { method: "POST" });
             if (res.ok) {
                 const data = await res.json();
-                setApiKey(data?.data?.apiKey);
-                toast.success("New API key generated!");
+                setApiKey(data?.data?.apiKey ?? null);
+                setApiKeySet(true);
+                setApiKeyHidden(false);
+                setShowApiKey(true); // tampilkan sekali, karena tidak bisa dilihat lagi nanti
+                toast.success("API key baru dibuat. Salin sekarang — tidak akan ditampilkan lagi!", { duration: 8000 });
             }
         } catch (error) {
             toast.error("Failed to generate API key");
@@ -341,6 +348,8 @@ export default function WebhooksPage() {
                         <div className="flex-1 bg-slate-100 rounded-md p-2 sm:p-3 font-mono text-xs sm:text-sm overflow-x-auto">
                             {apiKey ? (
                                 showApiKey ? apiKey : "••••••••••••••••••••••••••••••••"
+                            ) : apiKeySet && apiKeyHidden ? (
+                                <span className="text-muted-foreground">•••••••• (key tersembunyi — hanya ditampilkan sekali saat dibuat)</span>
                             ) : (
                                 <span className="text-muted-foreground">No API key generated</span>
                             )}
@@ -356,19 +365,24 @@ export default function WebhooksPage() {
                             </>
                         )}
                         <Button onClick={() => {
-                            if (apiKey) {
+                            if (apiKeySet) {
                                 setShowRegenConfirm(true);
                             } else {
                                 generateNewApiKey();
                             }
                         }}>
                             <RefreshCw className="h-4 w-4 mr-2" />
-                            {apiKey ? "Regenerate" : "Generate"}
+                            {apiKeySet ? "Regenerate" : "Generate"}
                         </Button>
                     </div>
                     {apiKey && (
                         <p className="text-xs text-muted-foreground mt-2">
                             Example: <code className="bg-slate-100 px-1 py-0.5 rounded">curl -H "X-API-Key: {apiKey?.slice(0, 10)}..." http://your-server/api/sessions</code>
+                        </p>
+                    )}
+                    {!apiKey && apiKeySet && apiKeyHidden && (
+                        <p className="text-xs text-muted-foreground mt-2">
+                            Demi keamanan, API key disimpan ter-enkripsi dan tidak bisa ditampilkan lagi. Klik <b>Regenerate</b> kalau kamu lupa/kehilangan key-nya.
                         </p>
                     )}
                 </CardContent>

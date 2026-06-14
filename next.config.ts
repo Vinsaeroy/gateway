@@ -24,11 +24,16 @@ const nextConfig: NextConfig = {
    * Auth is still enforced inside each route via getAuthenticatedUser().
    */
   async headers() {
+    // Origin yang diizinkan untuk CORS /api/*.
+    // Default "*" (tidak mengubah perilaku lama). Untuk memperketat, set env
+    // CORS_ALLOW_ORIGIN=https://domainmu.com lalu restart. Catatan: panggilan
+    // server-to-server pakai X-API-Key TIDAK terpengaruh CORS (tidak ada Origin).
+    const allowOrigin = process.env.CORS_ALLOW_ORIGIN || "*";
     return [
       {
         source: "/api/:path*",
         headers: [
-          { key: "Access-Control-Allow-Origin", value: "*" },
+          { key: "Access-Control-Allow-Origin", value: allowOrigin },
           {
             key: "Access-Control-Allow-Methods",
             value: "GET, POST, PUT, PATCH, DELETE, OPTIONS",
@@ -39,6 +44,7 @@ const nextConfig: NextConfig = {
               "Content-Type, Authorization, X-API-Key, X-Requested-With, Accept",
           },
           { key: "Access-Control-Max-Age", value: "86400" },
+          ...(allowOrigin !== "*" ? [{ key: "Vary", value: "Origin" }] : []),
         ],
       },
     ];
