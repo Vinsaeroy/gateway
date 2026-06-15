@@ -147,7 +147,7 @@ async function sendBroadcast(broadcast: any) {
                         if (fs.existsSync(filePath)) {
                             mediaSource = fs.readFileSync(filePath);
                         } else {
-                            logger.warn("AutoBroadcast", `Media file not found: ${filePath}`);
+                            logger.warn("AutoBroadcast", `Media hilang di disk (${filename}) — kemungkinan filesystem ephemeral (Railway tanpa volume). Kirim teks saja. Pasang volume persisten di /app/data untuk memperbaiki.`);
                             // Skip media — send as text only
                             await instance.socket.sendMessage(jid, { text: broadcast.message });
                             sentCount++;
