@@ -6,6 +6,10 @@ import { PricingCards } from "@/components/landing/pricing";
 import fs from "fs";
 import path from "path";
 
+// Harga plan bisa diubah SUPERADMIN dan disimpan di DB. Halaman ini HARUS dynamic
+// supaya selalu membaca harga terbaru, bukan versi statis hasil build.
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "RifalosID | Premium WhatsApp Gateway",
   description: "A powerful, self-hosted dashboard to manage your WhatsApp sessions, schedules, and auto-replies. Built for modern businesses.",
