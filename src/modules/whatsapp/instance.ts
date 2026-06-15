@@ -37,6 +37,18 @@ export class WhatsAppInstance {
 
     isStopped: boolean = false;
 
+    // Watchdog support:
+    // - autoReconnect: dimatikan saat sesi diambil alih koneksi lain (replaced)
+    //   supaya watchdog tidak memicu "perang koneksi". Dihidupkan lagi saat init.
+    // - initializing/lastInitAt: cegah watchdog double-init saat handshake berjalan.
+    autoReconnect: boolean = true;
+    initializing: boolean = false;
+    lastInitAt: number = 0;
+
+    get reconnectPending(): boolean {
+        return this.reconnectTimer !== null;
+    }
+
     constructor(sessionId: string, userId: string, io: Server) {
         this.sessionId = sessionId;
         this.userId = userId;
@@ -44,6 +56,15 @@ export class WhatsAppInstance {
     }
 
     async init() {
+        // Init = kita memang ingin sesi ini hidup. Reset flag supaya:
+        // - sesi yang sebelumnya di-stop bisa start lagi (QR muncul),
+        // - sesi yang sebelumnya "replaced" boleh auto-reconnect lagi.
+        this.isStopped = false;
+        this.autoReconnect = true;
+        this.initializing = true;
+        this.lastInitAt = Date.now();
+
+        try {
         const sessionData = await prisma.session.findUnique({
             where: { sessionId: this.sessionId },
             include: { botConfig: true }
@@ -108,6 +129,9 @@ export class WhatsAppInstance {
         this.socket.ev.on("connection.update", async (update) => {
             await this.handleConnectionUpdate(update);
         });
+        } finally {
+            this.initializing = false;
+        }
     }
 
     async handleConnectionUpdate(update: Partial<ConnectionState>) {
@@ -206,6 +230,7 @@ export class WhatsAppInstance {
                 } else if (isReplaced) {
                     // Sesi diambil alih koneksi lain. JANGAN reconnect (hindari perang koneksi).
                     // Credential TIDAK dihapus — user bisa Start lagi manual kalau memang mau pindah ke sini.
+                    this.autoReconnect = false; // watchdog juga tidak boleh reconnect otomatis
                     logger.warn("Instance", `Session ${this.sessionId} digantikan koneksi lain (connectionReplaced). Reconnect dihentikan. Pastikan sesi WhatsApp ini tidak dipakai di tempat lain (mis. server lokal + Railway bersamaan), lalu Start ulang bila perlu.`);
                     this.socket = null;
                 }

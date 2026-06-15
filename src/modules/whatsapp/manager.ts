@@ -8,6 +8,7 @@ export class WhatsAppManager {
     private static instance: WhatsAppManager;
     private sessions: Map<string, WhatsAppInstance> = new Map();
     public io: Server | null = null;
+    private watchdogInterval: NodeJS.Timeout | null = null;
 
     private constructor() {
         initScheduler();
@@ -39,6 +40,65 @@ export class WhatsAppManager {
             await instance.init();
         }
         logger.success("Manager", `Loaded ${sessions.length} sessions.`);
+
+        // Watchdog auto-reconnect berjalan di background (server-side) supaya
+        // sesi yang putus sendiri (network blip, idle timeout, dll) otomatis
+        // konek lagi tanpa user harus refresh / start manual.
+        this.startWatchdog();
+    }
+
+    /**
+     * Watchdog: tiap 45 detik memeriksa semua sesi.
+     * 1. Sesi yang harusnya hidup tapi DISCONNECTED → reconnect otomatis.
+     * 2. Sesi di DB yang harusnya hidup tapi hilang dari memori → di-load ulang.
+     * Sesi yang di-stop user atau diambil alih koneksi lain (replaced) dilewati.
+     */
+    startWatchdog() {
+        if (this.watchdogInterval) return;
+        this.watchdogInterval = setInterval(() => {
+            this.runWatchdog().catch((e) => logger.debug("Watchdog", "tick error (non-fatal)", e));
+        }, 45_000);
+        logger.info("Manager", "Session watchdog aktif (auto-reconnect tiap 45s).");
+    }
+
+    stopWatchdog() {
+        if (this.watchdogInterval) {
+            clearInterval(this.watchdogInterval);
+            this.watchdogInterval = null;
+        }
+    }
+
+    private async runWatchdog() {
+        if (!this.io) return;
+
+        // 1) Reconnect sesi in-memory yang mati.
+        for (const [sessionId, inst] of this.sessions) {
+            if (inst.isStopped || !inst.autoReconnect) continue;
+            if (inst.status === "CONNECTED" || inst.status === "SCAN_QR") continue;
+            if (inst.initializing || inst.reconnectPending) continue;
+            // Beri waktu handshake setelah init terakhir sebelum coba lagi.
+            if (Date.now() - inst.lastInitAt < 60_000) continue;
+
+            logger.info("Watchdog", `Auto-reconnect sesi ${sessionId} (status ${inst.status})`);
+            inst.init().catch((e) => logger.error("Watchdog", `Reconnect ${sessionId} gagal:`, e));
+        }
+
+        // 2) Load ulang sesi yang harusnya jalan tapi hilang dari memori.
+        try {
+            const dbSessions = await prisma.session.findMany({
+                where: { status: { notIn: ["LOGGED_OUT", "STOPPED"] } },
+                select: { sessionId: true, userId: true },
+            });
+            for (const s of dbSessions) {
+                if (this.sessions.has(s.sessionId)) continue;
+                logger.info("Watchdog", `Load ulang sesi yang hilang: ${s.sessionId}`);
+                const inst = new WhatsAppInstance(s.sessionId, s.userId, this.io);
+                this.sessions.set(s.sessionId, inst);
+                inst.init().catch((e) => logger.error("Watchdog", `Init ${s.sessionId} gagal:`, e));
+            }
+        } catch {
+            // DB error → lewati, coba lagi tick berikutnya.
+        }
     }
 
     async createSession(userId: string, name: string, customSessionId?: string) {

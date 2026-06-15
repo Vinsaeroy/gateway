@@ -123,10 +123,17 @@ export default function SessionDetailPage() {
         fetchMetrics();
         const metricsInterval = setInterval(fetchMetrics, 3000);
 
+        // Polling status di background (tanpa reload) — fallback kalau socket
+        // melewatkan event connection.update.
+        const statusInterval = setInterval(() => {
+            if (document.visibilityState === "visible") fetchSession();
+        }, 15000);
+
         return () => {
             socketInstance.disconnect();
             clearInterval(interval);
             clearInterval(metricsInterval);
+            clearInterval(statusInterval);
         };
     }, [sessionId]);
 

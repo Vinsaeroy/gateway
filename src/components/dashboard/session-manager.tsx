@@ -55,8 +55,15 @@ export function SessionManager({ user }: { user: any }) {
 
         setSocket(socketInstance);
 
+        // Polling fallback (background, tanpa reload halaman): kalau socket
+        // sempat putus / ada event yang terlewat, status tetap ter-update.
+        const pollInterval = setInterval(() => {
+            if (document.visibilityState === "visible") fetchSessions();
+        }, 20000);
+
         return () => {
             socketInstance.disconnect();
+            clearInterval(pollInterval);
         };
     }, []);
 
