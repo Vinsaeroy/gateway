@@ -3,6 +3,7 @@ import { ArrowRight, Bot, Zap, Shield, Globe, MessageSquare, Clock, Code, Chevro
 import { Button } from "@/components/ui/button";
 import { LandingNav } from "@/components/landing/landing-nav";
 import { PricingCards } from "@/components/landing/pricing";
+import { headers } from "next/headers";
 import fs from "fs";
 import path from "path";
 
@@ -20,7 +21,7 @@ export const metadata = {
   },
 };
 
-export default function Home() {
+export default async function Home() {
   const packagePath = path.join(process.cwd(), "package.json");
   let version = "v1.2.0";
   try {
@@ -29,6 +30,10 @@ export default function Home() {
   } catch (error) {
     console.error("Failed to read package.json", error);
   }
+
+  // Domain aktif (ikut host yang sedang dipakai), untuk mockup window bar.
+  const hdrs = await headers();
+  const host = hdrs.get("x-forwarded-host") || hdrs.get("host") || "dashboard";
 
   return (
     <div className="flex min-h-screen flex-col overflow-hidden selection:bg-primary/30 selection:text-primary-foreground">
@@ -87,7 +92,7 @@ export default function Home() {
                     <span className="h-3 w-3 rounded-full bg-red-400/70" />
                     <span className="h-3 w-3 rounded-full bg-amber-400/70" />
                     <span className="h-3 w-3 rounded-full bg-emerald-400/70" />
-                    <span className="ml-3 text-xs text-muted-foreground font-mono">app.rifalosid.com/dashboard</span>
+                    <span className="ml-3 text-xs text-muted-foreground font-mono truncate">{host}/dashboard</span>
                   </div>
                   <div className="grid grid-cols-3 gap-4 p-5 sm:p-7">
                     <MockStat icon={<Activity className="h-4 w-4 text-emerald-500" />} label="Sesi Aktif" value="12" />
