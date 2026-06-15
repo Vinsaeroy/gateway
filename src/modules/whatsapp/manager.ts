@@ -26,8 +26,11 @@ export class WhatsAppManager {
 
     async loadSessions() {
         if (!this.io) throw new Error("Socket.IO not initialized in WhatsAppManager");
+        // Jangan auto-start session yang LOGGED_OUT atau yang sengaja di-STOP user.
+        // (Dulu STOPPED ikut ke-load → setelah container restart, session yang
+        //  sudah di-stop malah connect sendiri.)
         const sessions = await prisma.session.findMany({
-            where: { status: { not: "LOGGED_OUT" } }
+            where: { status: { notIn: ["LOGGED_OUT", "STOPPED"] } }
         });
 
         for (const session of sessions) {
