@@ -49,6 +49,25 @@ export class WhatsAppInstance {
         return this.reconnectTimer !== null;
     }
 
+    /**
+     * Cek apakah websocket Baileys benar-benar masih hidup.
+     * Kadang status internal "CONNECTED" tapi websocket sudah mati diam-diam
+     * (zombie) tanpa memicu event close → pesan gagal terkirim. Watchdog pakai
+     * ini untuk memaksa reconnect. Defensif: kalau tidak yakin, anggap hidup
+     * supaya tidak reconnect palsu.
+     */
+    isSocketAlive(): boolean {
+        try {
+            const ws: any = (this.socket as any)?.ws;
+            if (!ws) return false;
+            if (typeof ws.isOpen === "boolean") return ws.isOpen;
+            if (typeof ws.readyState === "number") return ws.readyState === 1; // 1 = OPEN
+            return true;
+        } catch {
+            return true;
+        }
+    }
+
     constructor(sessionId: string, userId: string, io: Server) {
         this.sessionId = sessionId;
         this.userId = userId;

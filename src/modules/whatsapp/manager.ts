@@ -74,7 +74,18 @@ export class WhatsAppManager {
         // 1) Reconnect sesi in-memory yang mati.
         for (const [sessionId, inst] of this.sessions) {
             if (inst.isStopped || !inst.autoReconnect) continue;
-            if (inst.status === "CONNECTED" || inst.status === "SCAN_QR") continue;
+
+            // Sesi yang "CONNECTED" tapi websocket sebenarnya mati (zombie):
+            // paksa reconnect supaya benar-benar online 24 jam.
+            if (inst.status === "CONNECTED") {
+                if (!inst.isSocketAlive() && Date.now() - inst.lastInitAt > 60_000 && !inst.initializing) {
+                    logger.warn("Watchdog", `Sesi ${sessionId} CONNECTED tapi socket mati (zombie) → reconnect`);
+                    inst.init().catch((e) => logger.error("Watchdog", `Reconnect zombie ${sessionId} gagal:`, e));
+                }
+                continue;
+            }
+
+            if (inst.status === "SCAN_QR") continue;
             if (inst.initializing || inst.reconnectPending) continue;
             // Beri waktu handshake setelah init terakhir sebelum coba lagi.
             if (Date.now() - inst.lastInitAt < 60_000) continue;

@@ -58,6 +58,7 @@ const handle = app.getRequestHandler();
 
 app.prepare().then(() => {
   let heartbeatInterval: NodeJS.Timeout | null = null;
+  let keepAliveInterval: NodeJS.Timeout | null = null;
 
   const server = createServer(async (req, res) => {
     try {
@@ -156,6 +157,27 @@ app.prepare().then(() => {
     // Interval ping
     heartbeatInterval = setInterval(sendHeartbeat, 30000);
     // --------------------------------
+
+    // --- Self keep-alive (anti idle-sleep) ---
+    // Beberapa platform (mis. Render free) menidurkan service kalau tidak ada
+    // trafik HTTP masuk → sesi WhatsApp ikut mati. Ping URL publik sendiri
+    // secara berkala membuat platform menganggap service tetap aktif.
+    // Hanya jalan kalau BASE_URL di-set ke URL publik (https) & tidak dinonaktifkan.
+    const baseUrl = process.env.BASE_URL || "";
+    const keepAliveEnabled = baseUrl.startsWith("https://") && process.env.DISABLE_KEEPALIVE !== "true";
+    if (keepAliveEnabled) {
+      const selfPing = async () => {
+        try {
+          await fetch(`${baseUrl.replace(/\/$/, "")}/api/health`, { method: "GET" });
+        } catch {
+          // diam-diam gagal, coba lagi interval berikutnya
+        }
+      };
+      // Ping tiap 4 menit (di bawah ambang idle-sleep umum ~15 menit).
+      keepAliveInterval = setInterval(selfPing, 4 * 60 * 1000);
+      logger.info("Server", `Self keep-alive aktif → ${baseUrl}/api/health (tiap 4 menit)`);
+    }
+    // --------------------------------
   });
 
   // --- Graceful Shutdown ---
@@ -174,6 +196,7 @@ app.prepare().then(() => {
 
     // Clear heartbeat
     if (heartbeatInterval) clearInterval(heartbeatInterval);
+    if (keepAliveInterval) clearInterval(keepAliveInterval);
 
     // Close socket.io connections
     try {
