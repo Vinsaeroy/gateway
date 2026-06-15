@@ -2,6 +2,7 @@ import { NextResponse, NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthenticatedUser, canAccessSession } from "@/lib/api-auth";
 import { validateExternalUrl } from "@/lib/url-security";
+import { enforceCapability } from "@/lib/rate-limit";
 
 export async function GET(request: NextRequest) {
     console.warn('[DEPRECATED] GET /api/webhooks is deprecated. Use GET /api/webhooks/{sessionId} instead.');
@@ -28,6 +29,9 @@ export async function POST(request: NextRequest) {
     if (!user) {
         return NextResponse.json({ status: false, message: "Unauthorized", error: "Unauthorized" }, { status: 401 });
     }
+
+    const capGate = await enforceCapability(request, "webhook");
+    if (capGate.error) return capGate.error;
 
     try {
         const body = await request.json();
