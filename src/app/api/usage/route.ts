@@ -1,9 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthenticatedUser } from "@/lib/api-auth";
 import { getUsage } from "@/lib/rate-limit";
-import { effectivePlan, getPlanConfig } from "@/lib/plans";
+import { effectivePlan, CAPABILITIES, type Capability } from "@/lib/plans";
+import { getMergedPlan } from "@/lib/plans-store";
 
-// GET /api/usage — pemakaian API user saat ini + limit plannya.
+export const dynamic = "force-dynamic";
+
+function allCapsTrue(): Record<Capability, boolean> {
+    const o = {} as Record<Capability, boolean>;
+    for (const c of CAPABILITIES) o[c.id] = true;
+    return o;
+}
+
+// GET /api/usage — pemakaian API user saat ini + limit + kapabilitas plannya.
 export async function GET(request: NextRequest) {
     const user = await getAuthenticatedUser(request);
     if (!user) {
@@ -15,7 +24,7 @@ export async function GET(request: NextRequest) {
 
     const plan = effectivePlan(user as any);
 
-    // SUPERADMIN: tampilkan unlimited (tidak terikat plan/kuota)
+    // SUPERADMIN: unlimited + semua kapabilitas aktif.
     if ((user as any).role === "SUPERADMIN") {
         return NextResponse.json({
             status: true,
@@ -29,20 +38,22 @@ export async function GET(request: NextRequest) {
                 monthlyLimit: -1,
                 dailyRemaining: -1,
                 monthlyRemaining: -1,
-                unlimited: true
+                unlimited: true,
+                capabilities: allCapsTrue()
             }
         });
     }
 
     const usage = await getUsage(user.id, plan);
-    const cfg = getPlanConfig(plan);
+    const cfg = await getMergedPlan(plan);
 
     return NextResponse.json({
         status: true,
         data: {
             ...usage,
             planName: cfg.name,
-            planExpiresAt: (user as any).planExpiresAt ?? null
+            planExpiresAt: (user as any).planExpiresAt ?? null,
+            capabilities: cfg.capabilities
         }
     });
 }

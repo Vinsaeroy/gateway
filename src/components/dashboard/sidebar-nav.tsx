@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
@@ -51,6 +51,7 @@ interface NavItem {
     external?: boolean;
     superadminOnly?: boolean;
     allowedRoles?: string[];
+    capability?: string;
 }
 
 const navGroups: NavGroup[] = [
@@ -65,8 +66,8 @@ const navGroups: NavGroup[] = [
         label: "Messaging",
         items: [
             { href: "/dashboard/chat", label: "Chat", icon: MessageSquare },
-            { href: "/dashboard/broadcast", label: "Broadcast", icon: Megaphone },
-            { href: "/dashboard/sticker", label: "Sticker Maker", icon: ImageIcon },
+            { href: "/dashboard/broadcast", label: "Broadcast", icon: Megaphone, capability: "broadcast" },
+            { href: "/dashboard/sticker", label: "Sticker Maker", icon: ImageIcon, capability: "sticker" },
         ],
     },
     {
@@ -81,12 +82,12 @@ const navGroups: NavGroup[] = [
         label: "Automation",
         items: [
             { href: "/dashboard/bot-settings", label: "Bot Settings", icon: Bot },
-            { href: "/dashboard/autoreply", label: "Auto Reply", icon: MessageCircleReply },
+            { href: "/dashboard/autoreply", label: "Auto Reply", icon: MessageCircleReply, capability: "autoReply" },
             { href: "/dashboard/profile", label: "Bot Profile", icon: UserCircle },
-            { href: "/dashboard/scheduler", label: "Scheduler", icon: CalendarClock },
-            { href: "/dashboard/auto-broadcast", label: "Auto Broadcast", icon: Radio },
-            { href: "/dashboard/jpm-swgc", label: "JPM SWGC", icon: Megaphone },
-            { href: "/dashboard/webhooks", label: "Webhooks & API", icon: Webhook },
+            { href: "/dashboard/scheduler", label: "Scheduler", icon: CalendarClock, capability: "scheduler" },
+            { href: "/dashboard/auto-broadcast", label: "Auto Broadcast", icon: Radio, capability: "autoBroadcast" },
+            { href: "/dashboard/jpm-swgc", label: "JPM SWGC", icon: Megaphone, capability: "jpm" },
+            { href: "/dashboard/webhooks", label: "Webhooks & API", icon: Webhook, capability: "webhook" },
         ],
     },
     {
@@ -122,6 +123,21 @@ export function SidebarNav() {
     // @ts-ignore
     const userRole = session?.user?.role;
 
+    // Kapabilitas plan user (untuk sembunyikan menu fitur yang tidak aktif di plannya).
+    const [caps, setCaps] = useState<Record<string, boolean> | null>(null);
+    useEffect(() => {
+        let active = true;
+        fetch("/api/usage")
+            .then((r) => (r.ok ? r.json() : null))
+            .then((d) => {
+                if (active && d?.data?.capabilities) setCaps(d.data.capabilities);
+            })
+            .catch(() => {});
+        return () => {
+            active = false;
+        };
+    }, []);
+
     // Track collapsed groups — all expanded by default
     const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
 
@@ -141,6 +157,8 @@ export function SidebarNav() {
                     const visibleItems = group.items.filter((item) => {
                         if (item.superadminOnly && userRole !== "SUPERADMIN") return false;
                         if (item.allowedRoles && (!userRole || !item.allowedRoles.includes(userRole))) return false;
+                        // Sembunyikan fitur yang dimatikan di plan user (SUPERADMIN: /api/usage balikin semua true).
+                        if (item.capability && caps && caps[item.capability] === false) return false;
                         return true;
                     });
                     if (visibleItems.length === 0) return null;
