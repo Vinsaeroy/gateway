@@ -132,6 +132,9 @@ export class WhatsAppInstance {
             if (connection === "close") {
                 const code = (lastDisconnect?.error as any)?.output?.statusCode;
                 const isLoggedOut = code === DisconnectReason.loggedOut;
+                // connectionReplaced (440): sesi diambil alih device/instance LAIN
+                // (mis. app dibuka di tempat lain, atau 2 server pakai sesi yang sama).
+                const isReplaced = code === DisconnectReason.connectionReplaced;
 
                 // Stop the periodic group sync interval
                 if (this.groupSyncInterval) {
@@ -139,8 +142,9 @@ export class WhatsAppInstance {
                     this.groupSyncInterval = null;
                 }
 
-                // Only reconnect if NOT logged out AND NOT explicitly stopped
-                const shouldReconnect = !isLoggedOut && !this.isStopped;
+                // Only reconnect if NOT logged out, NOT replaced, AND NOT explicitly stopped.
+                // Reconnect saat "replaced" = perang koneksi (konek-disconnect terus) → jangan.
+                const shouldReconnect = !isLoggedOut && !isReplaced && !this.isStopped;
 
                 // Determine status based on reason
                 if (isLoggedOut) {
@@ -198,6 +202,11 @@ export class WhatsAppInstance {
                 } else if (this.isStopped) {
                     // Stopped: preserve credentials for future restart
                     logger.warn("Instance", `Session ${this.sessionId} stopped. Credentials preserved for auto-login.`);
+                    this.socket = null;
+                } else if (isReplaced) {
+                    // Sesi diambil alih koneksi lain. JANGAN reconnect (hindari perang koneksi).
+                    // Credential TIDAK dihapus — user bisa Start lagi manual kalau memang mau pindah ke sini.
+                    logger.warn("Instance", `Session ${this.sessionId} digantikan koneksi lain (connectionReplaced). Reconnect dihentikan. Pastikan sesi WhatsApp ini tidak dipakai di tempat lain (mis. server lokal + Railway bersamaan), lalu Start ulang bila perlu.`);
                     this.socket = null;
                 }
             }

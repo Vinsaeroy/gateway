@@ -64,15 +64,15 @@ export async function GET(
 
         const uptime = instance.startTime ? Date.now() - instance.startTime.getTime() : 0;
 
-        let pingStatus = "Unknown";
+        // Sampai sini status pasti CONNECTED (sudah di-guard di atas), jadi ping = Online.
+        // (Cek socket.ws.readyState tidak reliable di Baileys 7.x → dulu selalu "Unknown".)
+        let pingStatus = "Online";
         try {
-            if (instance.socket && instance.socket.ws) {
-                const ws = instance.socket.ws as any;
-                if (ws.readyState === 1) { // OPEN
-                    pingStatus = "Online";
-                }
+            const ws = instance.socket?.ws as any;
+            if (ws && typeof ws.readyState === "number" && ws.readyState !== 1) {
+                pingStatus = "Reconnecting";
             }
-        } catch (e) { }
+        } catch { /* abaikan, tetap Online */ }
 
 
 

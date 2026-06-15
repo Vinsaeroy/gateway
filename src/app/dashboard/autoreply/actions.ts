@@ -3,7 +3,23 @@
 import { prisma } from "@/lib/prisma";
 import { canAccessSession } from "@/lib/api-auth";
 import { getAuthenticatedUserForAction } from "@/lib/server-action-auth";
+import { effectivePlan, planAllows } from "@/lib/plans";
+import { getMergedPlan } from "@/lib/plans-store";
 import { Prisma } from "@prisma/client";
+
+// Gating kapabilitas "autoReply" untuk server action (tanpa NextRequest).
+async function assertAutoReplyAllowed(user: { id: string; role?: string }) {
+    if (user.role === "SUPERADMIN") return;
+    const u = await prisma.user.findUnique({
+        where: { id: user.id },
+        select: { plan: true, planExpiresAt: true },
+    });
+    const plan = effectivePlan(u || {});
+    const cfg = await getMergedPlan(plan);
+    if (!planAllows(cfg, "autoReply")) {
+        throw new Error(`Fitur Auto Reply tidak tersedia di plan ${plan}. Upgrade plan untuk mengaktifkannya.`);
+    }
+}
 
 // Fetch rules directly from DB without API call
 export async function getAutoReplies(sessionId: string) {
@@ -49,6 +65,8 @@ export async function createAutoReply(sessionId: string, data: { keyword: string
     if (!canAccess) {
         throw new Error("Forbidden");
     }
+
+    await assertAutoReplyAllowed(nextAuthSession);
 
     const session = await prisma.session.findUnique({
         where: { sessionId: sessionId },

@@ -11,7 +11,7 @@ import Sticker from "wa-sticker-formatter";
 export async function POST(request: NextRequest) {
     console.warn('[DEPRECATED] POST /api/messages/sticker is deprecated. Use POST /api/messages/{sessionId}/{jid}/sticker instead.');
     try {
-        const gate = await enforceApiQuota(request);
+        const gate = await enforceApiQuota(request, "sticker");
         if (gate.error) return gate.error;
         const { user } = gate;
 

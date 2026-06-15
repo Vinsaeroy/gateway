@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthenticatedUser, canAccessSession } from "@/lib/api-auth";
+import { enforceCapability } from "@/lib/rate-limit";
 
 // GET: List auto broadcasts for a session
 export async function GET(
@@ -37,6 +38,9 @@ export async function POST(
     const { sessionId } = await params;
     const user = await getAuthenticatedUser(request);
     if (!user) return NextResponse.json({ status: false, message: "Unauthorized" }, { status: 401 });
+
+    const capGate = await enforceCapability(request, "autoBroadcast");
+    if (capGate.error) return capGate.error;
 
     const canAccess = await canAccessSession(user.id, user.role, sessionId);
     if (!canAccess) return NextResponse.json({ status: false, message: "Forbidden" }, { status: 403 });

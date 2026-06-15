@@ -2,7 +2,18 @@ import { prisma } from "@/lib/prisma";
 import type { WASocket, GroupMetadata } from "@whiskeysockets/baileys";
 import { logger } from "@/lib/logger";
 
+// Debounce sync per-session: hindari spam groupFetchAllParticipating yang
+// memicu "rate-overlimit" dari WhatsApp (mis. saat reconnect beruntun).
+const lastSyncAt = new Map<string, number>();
+const SYNC_DEBOUNCE_MS = 60_000;
+
 export async function syncGroups(sock: WASocket, sessionId: string) {
+    const now = Date.now();
+    if (now - (lastSyncAt.get(sessionId) || 0) < SYNC_DEBOUNCE_MS) {
+        logger.debug("Store", `Group sync dilewati (baru saja sync) untuk session ${sessionId}`);
+        return;
+    }
+    lastSyncAt.set(sessionId, now);
     try {
         // Verify session exists and get the actual database ID
         const session = await prisma.session.findUnique({
@@ -59,6 +70,14 @@ export async function syncGroups(sock: WASocket, sessionId: string) {
         }
         logger.success("Store", `Synced ${groupList.length} groups for session ${sessionId}`);
     } catch (e) {
-        logger.error("Store", "Failed to sync groups", e);
+        const msg = (e as any)?.message || String(e);
+        // rate-overlimit / 429 = WhatsApp throttle. Bukan error fatal — coba lagi nanti.
+        if (msg.includes("rate-overlimit") || msg.includes("429") || msg.includes("rate-limit")) {
+            // Reset debounce supaya bisa dicoba lagi pada sync berikutnya (periodik 10 menit).
+            lastSyncAt.delete(sessionId);
+            logger.warn("Store", `Group sync ditunda — kena rate-limit WhatsApp. Akan dicoba lagi otomatis.`);
+        } else {
+            logger.error("Store", "Failed to sync groups", e);
+        }
     }
 }
