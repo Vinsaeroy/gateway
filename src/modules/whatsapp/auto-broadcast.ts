@@ -32,45 +32,55 @@ export function startAutoBroadcast() {
             const now = new Date();
 
             // Find all active auto broadcasts
+            // Scan ringan: jangan load mediaUrl (bisa besar/data URI) tiap menit.
             const broadcasts = await prisma.autoBroadcast.findMany({
                 where: { isActive: true },
-                include: {
-                    session: {
-                        select: { sessionId: true, status: true, userId: true }
-                    }
+                select: {
+                    id: true,
+                    lastSentAt: true,
+                    intervalMin: true,
+                    session: { select: { sessionId: true, status: true, userId: true } }
                 }
             });
 
-            for (const broadcast of broadcasts) {
+            for (const b of broadcasts) {
                 // Skip if session is not connected
-                if (broadcast.session.status !== "CONNECTED") continue;
+                if (b.session.status !== "CONNECTED") continue;
 
                 // Plan gating: skip kalau plan pemilik tidak mengizinkan auto-broadcast.
-                if (!(await userPlanAllows(broadcast.session.userId, "autoBroadcast"))) continue;
+                if (!(await userPlanAllows(b.session.userId, "autoBroadcast"))) continue;
 
                 // Skip if this broadcast is already being sent
-                if (activeBroadcasts.has(broadcast.id)) continue;
+                if (activeBroadcasts.has(b.id)) continue;
 
                 // Check if it's time to send
-                const lastSent = broadcast.lastSentAt;
-                const intervalMs = broadcast.intervalMin * 60 * 1000;
-
-                if (lastSent && (now.getTime() - lastSent.getTime()) < intervalMs) {
+                const intervalMs = b.intervalMin * 60 * 1000;
+                if (b.lastSentAt && (now.getTime() - b.lastSentAt.getTime()) < intervalMs) {
                     continue; // Not yet time
                 }
 
                 // Mark as active BEFORE sending to prevent double trigger
-                activeBroadcasts.add(broadcast.id);
+                activeBroadcasts.add(b.id);
 
                 // Update lastSentAt IMMEDIATELY to prevent next cron tick from picking it up
                 await prisma.autoBroadcast.update({
-                    where: { id: broadcast.id },
+                    where: { id: b.id },
                     data: { lastSentAt: now }
                 });
 
+                // Load full broadcast (termasuk mediaUrl) HANYA saat benar-benar mengirim.
+                const full = await prisma.autoBroadcast.findUnique({
+                    where: { id: b.id },
+                    include: { session: { select: { sessionId: true } } }
+                });
+                if (!full) {
+                    activeBroadcasts.delete(b.id);
+                    continue;
+                }
+
                 // Send in background (don't block the loop)
-                sendBroadcast(broadcast).finally(() => {
-                    activeBroadcasts.delete(broadcast.id);
+                sendBroadcast(full).finally(() => {
+                    activeBroadcasts.delete(b.id);
                 });
             }
         } catch (error: any) {
@@ -123,8 +133,11 @@ async function sendBroadcast(broadcast: any) {
                     const mediaContent: any = {};
                     let mediaSource: any;
 
-                    // Check if media is local file or URL
-                    if (broadcast.mediaUrl.startsWith("/api/media/")) {
+                    // Tentukan sumber media: data URI (DB) / file lokal (legacy) / URL eksternal.
+                    if (broadcast.mediaUrl.startsWith("data:")) {
+                        const base64 = broadcast.mediaUrl.split(",")[1] || "";
+                        mediaSource = Buffer.from(base64, "base64");
+                    } else if (broadcast.mediaUrl.startsWith("/api/media/")) {
                         // Local file — read from disk
                         const filename = broadcast.mediaUrl.replace("/api/media/", "");
 

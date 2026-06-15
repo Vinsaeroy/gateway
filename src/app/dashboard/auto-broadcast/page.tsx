@@ -318,7 +318,7 @@ export default function AutoBroadcastPage() {
                                 />
                                 {mediaUrl && (
                                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                        <span>✅ {mediaType}: {mediaUrl.split("/").pop()}</span>
+                                        <span>✅ {mediaType} siap dikirim</span>
                                         <Button size="sm" variant="ghost" onClick={() => { setMediaUrl(""); setMediaType(""); }}>
                                             Remove
                                         </Button>
