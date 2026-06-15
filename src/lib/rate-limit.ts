@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "./prisma";
 import { getAuthenticatedUser } from "./api-auth";
 import { effectivePlan, getPlanConfig, type PlanId } from "./plans";
+import { getMergedPlan } from "./plans-store";
 import { logger } from "./logger";
 
 /**
@@ -38,7 +39,7 @@ function remaining(limit: number, used: number): number {
  */
 export async function getUsage(userId: string, plan: PlanId): Promise<UsageInfo> {
     const { day, month } = jakartaParts();
-    const cfg = getPlanConfig(plan);
+    const cfg = await getMergedPlan(plan);
 
     const [today, monthAgg] = await Promise.all([
         prisma.apiUsage.findUnique({ where: { userId_day: { userId, day } } }),
@@ -71,7 +72,7 @@ export interface ConsumeResult {
  */
 export async function consumeQuota(userId: string, plan: PlanId): Promise<ConsumeResult> {
     const { day, month } = jakartaParts();
-    const cfg = getPlanConfig(plan);
+    const cfg = await getMergedPlan(plan);
     const usage = await getUsage(userId, plan);
 
     if (cfg.dailyLimit >= 0 && usage.dayCount >= cfg.dailyLimit) {

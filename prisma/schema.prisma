@@ -315,6 +315,10 @@ model SystemConfig {
   klikqrisMerchantId String?
   klikqrisEnabled    Boolean  @default(false)
 
+  // Override konfigurasi plan/pricing (harga, limit, benefit) — diatur SUPERADMIN.
+  // Bentuk: { FREE: {...}, STANDARD: {...}, ... } meng-override default di lib/plans.ts
+  planConfig         Json?
+
   updatedAt          DateTime @updatedAt
 }
 

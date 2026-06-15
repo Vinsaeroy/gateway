@@ -1,8 +1,13 @@
 import { NextResponse } from "next/server";
-import { PLANS, PLAN_ORDER } from "@/lib/plans";
+import { PLAN_ORDER } from "@/lib/plans";
+import { getMergedPlans } from "@/lib/plans-store";
 
-// Publik: daftar plan + harga + limit. Dipakai landing & halaman pricing.
+export const dynamic = "force-dynamic";
+
+// Publik: daftar plan + harga + limit (sudah termasuk override SUPERADMIN dari DB).
+// Dipakai landing & halaman pricing.
 export async function GET() {
-    const plans = PLAN_ORDER.map((id) => PLANS[id]);
+    const all = await getMergedPlans();
+    const plans = PLAN_ORDER.map((id) => all[id]);
     return NextResponse.json({ status: true, data: plans });
 }
