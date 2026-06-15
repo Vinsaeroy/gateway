@@ -7,20 +7,28 @@ import { getMergedPlans } from "@/lib/plans-store";
 export async function PricingCards({ ctaHref = "/dashboard/billing" }: { ctaHref?: string }) {
     const all = await getMergedPlans();
     return (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 max-w-7xl mx-auto items-stretch">
-            {PLAN_ORDER.map((id) => {
-                const plan = all[id];
-                const isFree = plan.price === 0;
-                const isCustom = plan.price === null;
+        <div className="relative">
+            {/* Mobile: geser ke samping (snap scroll). Desktop: grid. */}
+            <div
+                className="flex md:grid md:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6 max-w-7xl mx-auto items-stretch
+                           overflow-x-auto md:overflow-visible snap-x snap-mandatory
+                           px-5 md:px-0 pb-5 md:pb-0 -mx-1 md:mx-auto
+                           [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+            >
+                {PLAN_ORDER.map((id) => {
+                    const plan = all[id];
+                    const isFree = plan.price === 0;
+                    const isCustom = plan.price === null;
 
-                // Benefit = fitur aktif (dari toggle) + benefit teks tambahan.
-                const capBenefits = CAPABILITIES.filter((c) => plan.capabilities?.[c.id]).map((c) => c.label);
-                const benefits = [...capBenefits, ...(plan.features || [])];
+                    // Benefit = fitur aktif (dari toggle) + benefit teks tambahan.
+                    const capBenefits = CAPABILITIES.filter((c) => plan.capabilities?.[c.id]).map((c) => c.label);
+                    const benefits = [...capBenefits, ...(plan.features || [])];
 
                 return (
                     <div
                         key={plan.id}
-                        className={`relative flex flex-col p-8 rounded-[2rem] glass-panel hover-lift overflow-hidden ${
+                        className={`relative flex flex-col p-7 sm:p-8 rounded-[1.75rem] glass-panel hover-lift overflow-hidden
+                            snap-center shrink-0 md:shrink w-[82%] sm:w-[360px] md:w-auto ${
                             plan.highlight
                                 ? "ring-2 ring-primary shadow-2xl shadow-primary/20"
                                 : "border border-border"
@@ -69,6 +77,10 @@ export async function PricingCards({ ctaHref = "/dashboard/billing" }: { ctaHref
                     </div>
                 );
             })}
+            </div>
+
+            {/* Hint geser di mobile */}
+            <p className="md:hidden text-center text-xs text-muted-foreground mt-1">← geser untuk lihat plan lain →</p>
         </div>
     );
 }
