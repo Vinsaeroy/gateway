@@ -1,15 +1,21 @@
 import Link from "next/link";
 import { Check, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { PLANS, PLAN_ORDER, formatIDR } from "@/lib/plans";
+import { PLAN_ORDER, formatIDR, CAPABILITIES } from "@/lib/plans";
+import { getMergedPlans } from "@/lib/plans-store";
 
-export function PricingCards({ ctaHref = "/dashboard/billing" }: { ctaHref?: string }) {
+export async function PricingCards({ ctaHref = "/dashboard/billing" }: { ctaHref?: string }) {
+    const all = await getMergedPlans();
     return (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 max-w-7xl mx-auto items-stretch">
             {PLAN_ORDER.map((id) => {
-                const plan = PLANS[id];
+                const plan = all[id];
                 const isFree = plan.price === 0;
                 const isCustom = plan.price === null;
+
+                // Benefit = fitur aktif (dari toggle) + benefit teks tambahan.
+                const capBenefits = CAPABILITIES.filter((c) => plan.capabilities?.[c.id]).map((c) => c.label);
+                const benefits = [...capBenefits, ...(plan.features || [])];
 
                 return (
                     <div
@@ -44,8 +50,8 @@ export function PricingCards({ ctaHref = "/dashboard/billing" }: { ctaHref?: str
                         </p>
 
                         <ul className="space-y-3 mb-8 flex-1">
-                            {plan.features.map((f) => (
-                                <li key={f} className="flex items-start gap-3 text-sm text-foreground/80">
+                            {benefits.map((f, i) => (
+                                <li key={`${f}-${i}`} className="flex items-start gap-3 text-sm text-foreground/80">
                                     <Check className="h-5 w-5 text-primary shrink-0" />
                                     <span>{f}</span>
                                 </li>

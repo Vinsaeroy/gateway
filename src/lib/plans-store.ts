@@ -16,6 +16,7 @@ const OVERRIDABLE: (keyof PlanConfig)[] = [
     "monthlyLimit",
     "maxSessions",
     "highlight",
+    "capabilities",
     "features",
 ];
 
@@ -40,8 +41,13 @@ export async function getMergedPlans(): Promise<Record<PlanId, PlanConfig>> {
                 if (o && typeof o === "object") {
                     for (const key of OVERRIDABLE) {
                         if (o[key] !== undefined && o[key] !== null) {
-                            // @ts-expect-error index assign
-                            merged[id][key] = o[key];
+                            if (key === "capabilities" && typeof o[key] === "object") {
+                                // deep-merge supaya toggle yang tidak dikirim tetap pakai default
+                                merged[id].capabilities = { ...merged[id].capabilities, ...(o[key] as object) } as Record<string, boolean> as any;
+                            } else {
+                                // @ts-expect-error index assign
+                                merged[id][key] = o[key];
+                            }
                         }
                     }
                     merged[id].id = id; // id tidak boleh di-override

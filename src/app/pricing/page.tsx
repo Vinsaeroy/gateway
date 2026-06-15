@@ -8,6 +8,9 @@ export const metadata = {
     description: "Pilih plan yang sesuai kebutuhanmu. Mulai gratis, bayar via QRIS."
 };
 
+// Render dinamis supaya perubahan plan/pricing dari SUPERADMIN langsung tampil.
+export const dynamic = "force-dynamic";
+
 export default function PricingPage() {
     return (
         <div className="flex min-h-screen flex-col overflow-hidden">

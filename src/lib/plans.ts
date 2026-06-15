@@ -12,6 +12,27 @@
 
 export type PlanId = "FREE" | "STANDARD" | "PRO" | "ENTERPRISE";
 
+// Fitur yang bisa di-on/off per plan (toggle). Dipakai untuk gating akses +
+// otomatis tampil sebagai benefit di halaman pricing.
+export type Capability =
+    | "autoReply"
+    | "broadcast"
+    | "autoBroadcast"
+    | "scheduler"
+    | "webhook"
+    | "jpm"
+    | "sticker";
+
+export const CAPABILITIES: { id: Capability; label: string }[] = [
+    { id: "autoReply", label: "Auto Reply" },
+    { id: "broadcast", label: "Broadcast" },
+    { id: "autoBroadcast", label: "Auto Broadcast" },
+    { id: "scheduler", label: "Scheduler / Pesan Terjadwal" },
+    { id: "webhook", label: "Webhook & API Events" },
+    { id: "jpm", label: "JPM SW GC" },
+    { id: "sticker", label: "Sticker Maker" },
+];
+
 export interface PlanConfig {
     id: PlanId;
     name: string;
@@ -27,7 +48,9 @@ export interface PlanConfig {
     maxSessions: number;
     /** Ditandai "paling populer" di UI */
     highlight?: boolean;
-    /** Daftar fitur yang ditampilkan di kartu pricing */
+    /** Fitur on/off per plan (gating + ditampilkan sebagai benefit) */
+    capabilities: Record<Capability, boolean>;
+    /** Daftar benefit TAMBAHAN (teks bebas) di kartu pricing */
     features: string[];
 }
 
@@ -40,6 +63,15 @@ export const PLANS: Record<PlanId, PlanConfig> = {
         dailyLimit: 100,
         monthlyLimit: 1000,
         maxSessions: 1,
+        capabilities: {
+            autoReply: true,
+            broadcast: false,
+            autoBroadcast: false,
+            scheduler: false,
+            webhook: false,
+            jpm: false,
+            sticker: true,
+        },
         features: [
             "1 sesi WhatsApp",
             "100 request / hari",
@@ -58,6 +90,15 @@ export const PLANS: Record<PlanId, PlanConfig> = {
         monthlyLimit: 20000,
         maxSessions: 3,
         highlight: true,
+        capabilities: {
+            autoReply: true,
+            broadcast: true,
+            autoBroadcast: false,
+            scheduler: true,
+            webhook: true,
+            jpm: false,
+            sticker: true,
+        },
         features: [
             "3 sesi WhatsApp",
             "1.000 request / hari",
@@ -75,6 +116,15 @@ export const PLANS: Record<PlanId, PlanConfig> = {
         dailyLimit: 5000,
         monthlyLimit: 100000,
         maxSessions: 10,
+        capabilities: {
+            autoReply: true,
+            broadcast: true,
+            autoBroadcast: true,
+            scheduler: true,
+            webhook: true,
+            jpm: true,
+            sticker: true,
+        },
         features: [
             "10 sesi WhatsApp",
             "5.000 request / hari",
@@ -92,6 +142,15 @@ export const PLANS: Record<PlanId, PlanConfig> = {
         dailyLimit: -1,
         monthlyLimit: -1,
         maxSessions: -1,
+        capabilities: {
+            autoReply: true,
+            broadcast: true,
+            autoBroadcast: true,
+            scheduler: true,
+            webhook: true,
+            jpm: true,
+            sticker: true,
+        },
         features: [
             "Sesi WhatsApp unlimited",
             "Request unlimited",
@@ -108,6 +167,11 @@ export const PLAN_ORDER: PlanId[] = ["FREE", "STANDARD", "PRO", "ENTERPRISE"];
 export function getPlanConfig(plan: string | null | undefined): PlanConfig {
     const id = (plan || "FREE").toUpperCase() as PlanId;
     return PLANS[id] || PLANS.FREE;
+}
+
+/** Cek apakah sebuah plan mengizinkan kapabilitas tertentu. */
+export function planAllows(cfg: PlanConfig, cap: Capability): boolean {
+    return cfg?.capabilities?.[cap] !== false;
 }
 
 /**

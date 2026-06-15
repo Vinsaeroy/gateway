@@ -42,7 +42,7 @@ export async function POST(
     { params }: { params: Promise<{ sessionId: string }> }
 ) {
     try {
-        const gate = await enforceApiQuota(request);
+        const gate = await enforceApiQuota(request, "jpm");
         if (gate.error) return gate.error;
         const { user } = gate;
 

@@ -10,6 +10,16 @@ import { Switch } from "@/components/ui/switch";
 import { RefreshCw, Save, Tag } from "lucide-react";
 import { toast } from "sonner";
 
+const CAPABILITIES: { id: string; label: string }[] = [
+    { id: "autoReply", label: "Auto Reply" },
+    { id: "broadcast", label: "Broadcast" },
+    { id: "autoBroadcast", label: "Auto Broadcast" },
+    { id: "scheduler", label: "Scheduler" },
+    { id: "webhook", label: "Webhook & API Events" },
+    { id: "jpm", label: "JPM SW GC" },
+    { id: "sticker", label: "Sticker Maker" },
+];
+
 interface Plan {
     id: string;
     name: string;
@@ -19,6 +29,7 @@ interface Plan {
     monthlyLimit: number;
     maxSessions: number;
     highlight?: boolean;
+    capabilities?: Record<string, boolean>;
     features: string[];
 }
 
@@ -44,6 +55,14 @@ export function PlanEditorCard() {
         setPlans((prev) => prev.map((p, i) => (i === idx ? { ...p, ...patch } : p)));
     };
 
+    const toggleCap = (idx: number, capId: string, val: boolean) => {
+        setPlans((prev) =>
+            prev.map((p, i) =>
+                i === idx ? { ...p, capabilities: { ...(p.capabilities || {}), [capId]: val } } : p
+            )
+        );
+    };
+
     const save = async () => {
         setSaving(true);
         try {
@@ -57,6 +76,7 @@ export function PlanEditorCard() {
                     monthlyLimit: p.monthlyLimit,
                     maxSessions: p.maxSessions,
                     highlight: p.highlight,
+                    capabilities: p.capabilities,
                     features: p.features,
                 };
             }
@@ -136,9 +156,24 @@ export function PlanEditorCard() {
                         </div>
 
                         <div className="grid gap-1">
-                            <Label className="text-xs">Benefit (satu per baris)</Label>
+                            <Label className="text-xs">Fitur (on/off) — jadi benefit + kontrol akses</Label>
+                            <div className="grid sm:grid-cols-2 gap-2 rounded-md border border-border/50 p-3">
+                                {CAPABILITIES.map((cap) => (
+                                    <label key={cap.id} className="flex items-center justify-between gap-2 text-sm">
+                                        <span>{cap.label}</span>
+                                        <Switch
+                                            checked={p.capabilities?.[cap.id] !== false}
+                                            onCheckedChange={(c) => toggleCap(idx, cap.id, c)}
+                                        />
+                                    </label>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="grid gap-1">
+                            <Label className="text-xs">Benefit tambahan (teks bebas, satu per baris)</Label>
                             <textarea
-                                className={`${inputClass} h-28 py-2`}
+                                className={`${inputClass} h-24 py-2`}
                                 value={(p.features || []).join("\n")}
                                 onChange={(e) => update(idx, { features: e.target.value.split("\n") })}
                             />

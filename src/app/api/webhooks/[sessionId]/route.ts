@@ -2,6 +2,7 @@ import { NextResponse, NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthenticatedUser, canAccessSession } from "@/lib/api-auth";
 import { validateExternalUrl } from "@/lib/url-security";
+import { enforceCapability } from "@/lib/rate-limit";
 
 export async function GET(
     request: NextRequest,
@@ -57,10 +58,9 @@ export async function POST(
     request: NextRequest,
     { params }: { params: Promise<{ sessionId: string }> }
 ) {
-    const user = await getAuthenticatedUser(request);
-    if (!user) {
-        return NextResponse.json({ status: false, message: "Unauthorized", error: "Unauthorized" }, { status: 401 });
-    }
+    const gate = await enforceCapability(request, "webhook");
+    if (gate.error) return gate.error;
+    const user = gate.user;
 
     const { sessionId } = await params;
 

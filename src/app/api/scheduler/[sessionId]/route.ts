@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthenticatedUser, canAccessSession } from "@/lib/api-auth";
+import { enforceCapability } from "@/lib/rate-limit";
 import moment from "moment-timezone";
 
 // GET: List Scheduled Messages
@@ -55,6 +56,9 @@ export async function POST(
         if (!user) {
             return NextResponse.json({ status: false, message: "Unauthorized", error: "Unauthorized" }, { status: 401 });
         }
+
+        const capGate = await enforceCapability(request, "scheduler");
+        if (capGate.error) return capGate.error;
 
         const body = await request.json();
         const { jid, content, sendAt, mediaUrl, mediaType } = body;

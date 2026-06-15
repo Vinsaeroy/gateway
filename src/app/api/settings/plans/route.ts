@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthenticatedUser } from "@/lib/api-auth";
 import { getMergedPlans, savePlanOverrides } from "@/lib/plans-store";
-import { PLAN_ORDER } from "@/lib/plans";
+import { PLAN_ORDER, CAPABILITIES } from "@/lib/plans";
 
 export const dynamic = "force-dynamic";
 
@@ -43,6 +43,11 @@ export async function POST(request: NextRequest) {
         if (o.monthlyLimit !== undefined) entry.monthlyLimit = Number(o.monthlyLimit);
         if (o.maxSessions !== undefined) entry.maxSessions = Number(o.maxSessions);
         if (o.highlight !== undefined) entry.highlight = Boolean(o.highlight);
+        if (o.capabilities && typeof o.capabilities === "object") {
+            const caps: Record<string, boolean> = {};
+            for (const c of CAPABILITIES) caps[c.id] = Boolean(o.capabilities[c.id]);
+            entry.capabilities = caps;
+        }
         if (o.features !== undefined) {
             entry.features = Array.isArray(o.features)
                 ? o.features.map((f: unknown) => String(f)).filter((f: string) => f.trim() !== "")

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "./prisma";
 import { getAuthenticatedUser } from "./api-auth";
-import { effectivePlan, getPlanConfig, type PlanId } from "./plans";
+import { effectivePlan, getPlanConfig, planAllows, type Capability, type PlanId } from "./plans";
 import { getMergedPlan } from "./plans-store";
 import { logger } from "./logger";
 
@@ -112,7 +112,7 @@ type EnforceResult =
  * Melakukan: autentikasi → cek plan efektif → konsumsi 1 quota.
  * Balikin 401 kalau tak terotentikasi, 429 kalau limit habis.
  */
-export async function enforceApiQuota(request: NextRequest): Promise<EnforceResult> {
+export async function enforceApiQuota(request: NextRequest, capability?: Capability): Promise<EnforceResult> {
     const user = await getAuthenticatedUser(request);
     if (!user) {
         return {
@@ -123,7 +123,7 @@ export async function enforceApiQuota(request: NextRequest): Promise<EnforceResu
         };
     }
 
-    // SUPERADMIN: plan unlimited — lewati kuota sepenuhnya (tidak dihitung, tidak dibatasi)
+    // SUPERADMIN: plan unlimited — lewati kuota & gating kapabilitas sepenuhnya
     if ((user as any).role === "SUPERADMIN") {
         return {
             user,
@@ -140,6 +140,24 @@ export async function enforceApiQuota(request: NextRequest): Promise<EnforceResu
     }
 
     const plan = effectivePlan(user as any);
+
+    // Gating kapabilitas: tolak kalau fitur dimatikan di plan user.
+    if (capability) {
+        const cfg = await getMergedPlan(plan);
+        if (!planAllows(cfg, capability)) {
+            return {
+                error: NextResponse.json(
+                    {
+                        status: false,
+                        message: `Fitur ini tidak tersedia di plan ${plan}. Upgrade plan untuk mengaksesnya.`,
+                        error: "feature_not_in_plan",
+                        data: { plan, capability }
+                    },
+                    { status: 403 }
+                )
+            };
+        }
+    }
 
     try {
         const result = await consumeQuota(user.id, plan);
@@ -184,4 +202,48 @@ export async function enforceApiQuota(request: NextRequest): Promise<EnforceResu
             monthlyRemaining: -1
         } as UsageInfo)) };
     }
+}
+
+
+/**
+ * Cek auth + kapabilitas plan TANPA mengonsumsi kuota.
+ * Untuk endpoint konfigurasi (buat webhook, scheduler, auto-reply, dll):
+ *   const gate = await enforceCapability(request, "webhook");
+ *   if (gate.error) return gate.error;
+ *   const { user } = gate;
+ */
+export async function enforceCapability(
+    request: NextRequest,
+    capability: Capability
+): Promise<
+    | { user: NonNullable<Awaited<ReturnType<typeof getAuthenticatedUser>>>; error?: undefined }
+    | { error: NextResponse; user?: undefined }
+> {
+    const user = await getAuthenticatedUser(request);
+    if (!user) {
+        return {
+            error: NextResponse.json(
+                { status: false, message: "Unauthorized", error: "Unauthorized" },
+                { status: 401 }
+            )
+        };
+    }
+    if ((user as any).role === "SUPERADMIN") return { user };
+
+    const plan = effectivePlan(user as any);
+    const cfg = await getMergedPlan(plan);
+    if (!planAllows(cfg, capability)) {
+        return {
+            error: NextResponse.json(
+                {
+                    status: false,
+                    message: `Fitur ini tidak tersedia di plan ${plan}. Upgrade plan untuk mengaksesnya.`,
+                    error: "feature_not_in_plan",
+                    data: { plan, capability }
+                },
+                { status: 403 }
+            )
+        };
+    }
+    return { user };
 }

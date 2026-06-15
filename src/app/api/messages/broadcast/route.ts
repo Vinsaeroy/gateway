@@ -11,7 +11,7 @@ import type { AnyMessageContent } from "@whiskeysockets/baileys";
 export async function POST(request: NextRequest) {
     console.warn('[DEPRECATED] POST /api/messages/broadcast is deprecated. Use POST /api/messages/{sessionId}/broadcast instead.');
     try {
-        const gate = await enforceApiQuota(request);
+        const gate = await enforceApiQuota(request, "broadcast");
         if (gate.error) return gate.error;
         const { user } = gate;
 
