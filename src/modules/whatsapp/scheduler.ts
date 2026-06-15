@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { waManager } from "./manager";
 import { logger } from "@/lib/logger";
+import { userPlanAllows } from "@/lib/plans-store";
 
 const checkScheduledMessages = async () => {
     try {
@@ -19,6 +20,16 @@ const checkScheduledMessages = async () => {
         }
 
         for (const msg of pendingMessages) {
+            // Plan gating: skip kalau plan pemilik session tidak mengizinkan scheduler.
+            const ownerSess = await prisma.session.findUnique({
+                where: { id: msg.sessionId },
+                select: { userId: true }
+            });
+            if (ownerSess && !(await userPlanAllows(ownerSess.userId, "scheduler"))) {
+                logger.debug("Scheduler", `Skip msg ${msg.id}: plan tidak mengizinkan scheduler`);
+                continue;
+            }
+
             const instance = waManager.getInstance(msg.sessionId);
 
             if (instance?.socket) {

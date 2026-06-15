@@ -4,6 +4,7 @@ import fs from "fs";
 import { prisma } from "@/lib/prisma";
 import { waManager } from "./manager";
 import { logger } from "@/lib/logger";
+import { userPlanAllows } from "@/lib/plans-store";
 
 // Lock to prevent double execution
 let isRunning = false;
@@ -35,7 +36,7 @@ export function startAutoBroadcast() {
                 where: { isActive: true },
                 include: {
                     session: {
-                        select: { sessionId: true, status: true }
+                        select: { sessionId: true, status: true, userId: true }
                     }
                 }
             });
@@ -43,6 +44,9 @@ export function startAutoBroadcast() {
             for (const broadcast of broadcasts) {
                 // Skip if session is not connected
                 if (broadcast.session.status !== "CONNECTED") continue;
+
+                // Plan gating: skip kalau plan pemilik tidak mengizinkan auto-broadcast.
+                if (!(await userPlanAllows(broadcast.session.userId, "autoBroadcast"))) continue;
 
                 // Skip if this broadcast is already being sent
                 if (activeBroadcasts.has(broadcast.id)) continue;

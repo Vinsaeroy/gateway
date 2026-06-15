@@ -6,6 +6,7 @@ import path from "path";
 import pino from "pino";
 import { resolveToPhoneJidBySessionId as resolveToPhoneJid, isLidJid } from "./jid-utils";
 import { logger } from "./logger";
+import { userPlanAllows } from "./plans-store";
 
 // Event types that can trigger webhooks
 export type WebhookEventType =
@@ -92,6 +93,9 @@ export async function dispatchWebhook(
             logger.warn("Webhook", `Dispatch: Session ${sessionId} not found`);
             return;
         }
+
+        // Plan gating: kalau plan pemilik session tidak mengizinkan webhook, jangan kirim.
+        if (!(await userPlanAllows(session.userId, "webhook"))) return;
 
         // Find all active webhooks for this user/session and anyone having shared access
         const accesses = await prisma.sessionAccess.findMany({

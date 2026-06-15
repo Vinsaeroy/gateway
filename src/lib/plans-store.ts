@@ -2,7 +2,7 @@
 // SUPERADMIN bisa mengubah harga/limit/benefit via dashboard; perubahan tersimpan
 // di DB dan di-merge di sini. Ada cache in-memory singkat supaya tidak query DB tiap request.
 import { prisma } from "./prisma";
-import { PLANS, PLAN_ORDER, type PlanConfig, type PlanId } from "./plans";
+import { PLANS, PLAN_ORDER, planAllows, effectivePlan, type PlanConfig, type PlanId, type Capability } from "./plans";
 
 let cache: { data: Record<PlanId, PlanConfig>; at: number } | null = null;
 const TTL_MS = 60_000;
@@ -96,4 +96,45 @@ export async function savePlanOverrides(input: Record<string, Partial<PlanConfig
 
 export function invalidatePlansCache() {
     cache = null;
+    userCapCache.clear();
+}
+
+// Cache hasil cek kapabilitas per user (60s) supaya runtime (per pesan/cron)
+// tidak query DB terus-menerus.
+const userCapCache = new Map<string, { allowed: boolean; at: number }>();
+const USER_CAP_TTL_MS = 60_000;
+
+/**
+ * Cek apakah PLAN milik user (pemilik session) mengizinkan sebuah kapabilitas.
+ * Dipakai di eksekusi background (auto-reply, scheduler, auto-broadcast) supaya
+ * fitur yang dimatikan di plan benar-benar berhenti, bukan cuma disembunyikan.
+ * SUPERADMIN selalu diizinkan. Fail-open kalau cek gagal (jangan blokir karena error DB).
+ */
+export async function userPlanAllows(userId: string, cap: Capability): Promise<boolean> {
+    if (!userId) return true;
+    const key = `${userId}:${cap}`;
+    const cached = userCapCache.get(key);
+    if (cached && Date.now() - cached.at < USER_CAP_TTL_MS) return cached.allowed;
+
+    let allowed = true;
+    try {
+        const u = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { role: true, plan: true, planExpiresAt: true },
+        });
+        if (!u) {
+            allowed = true; // user tidak ketemu → jangan blokir (fail-open)
+        } else if (u.role === "SUPERADMIN") {
+            allowed = true;
+        } else {
+            const plan = effectivePlan(u as any);
+            const cfg = await getMergedPlan(plan);
+            allowed = planAllows(cfg, cap);
+        }
+    } catch {
+        allowed = true; // fail-open
+    }
+
+    userCapCache.set(key, { allowed, at: Date.now() });
+    return allowed;
 }
