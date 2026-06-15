@@ -114,7 +114,7 @@ export class WhatsAppManager {
             instance.isStopped = true; // Prevent auto-reconnect
             instance.socket?.end(undefined);
             instance.status = "STOPPED";
-            this.io?.to(sessionId).emit("connection.update", { status: "STOPPED", qr: null });
+            this.io?.to(sessionId).emit("connection.update", { sessionId, status: "STOPPED", qr: null });
             await prisma.session.update({
                 where: { sessionId },
                 data: { status: "STOPPED" }

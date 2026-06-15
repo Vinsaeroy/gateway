@@ -120,7 +120,7 @@ export class WhatsAppInstance {
                 this.status = "SCAN_QR";
 
                 // Emit QR to Socket Room
-                this.io?.to(this.sessionId).emit("connection.update", { status: this.status, qr });
+                this.io?.to(this.sessionId).emit("connection.update", { sessionId: this.sessionId, status: this.status, qr });
 
                 // Update DB
                 await prisma.session.update({
@@ -151,7 +151,7 @@ export class WhatsAppInstance {
                     this.status = "DISCONNECTED";
                 }
 
-                this.io?.to(this.sessionId).emit("connection.update", { status: this.status, qr: null });
+                this.io?.to(this.sessionId).emit("connection.update", { sessionId: this.sessionId, status: this.status, qr: null });
 
                 // Webhook: beri tahu integrasi eksternal status terkini (tanpa QR).
                 onConnectionUpdate(this.sessionId, this.status);
@@ -215,7 +215,7 @@ export class WhatsAppInstance {
                     this.reconnectTimer = null;
                 }
 
-                this.io?.to(this.sessionId).emit("connection.update", { status: this.status, qr: null });
+                this.io?.to(this.sessionId).emit("connection.update", { sessionId: this.sessionId, status: this.status, qr: null });
 
                 // Webhook: status CONNECTED ke integrasi eksternal.
                 onConnectionUpdate(this.sessionId, this.status);
@@ -300,6 +300,7 @@ export class WhatsAppInstance {
 
             // Emit update
             this.io?.to(this.sessionId).emit("connection.update", {
+                sessionId: this.sessionId,
                 status: this.status,
                 qr: this.qr,
                 pairingCode: code

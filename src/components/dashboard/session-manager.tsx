@@ -60,6 +60,18 @@ export function SessionManager({ user }: { user: any }) {
         };
     }, []);
 
+    // Gabung ke room tiap session supaya update status real-time diterima
+    // (server emit ke room `sessionId`). Tanpa ini, status baru update saat refresh.
+    useEffect(() => {
+        if (!socket) return;
+        const join = () => sessions.forEach(s => socket.emit("join-session", s.sessionId));
+        join();
+        socket.on("connect", join); // join ulang kalau socket reconnect
+        return () => {
+            socket.off("connect", join);
+        };
+    }, [socket, sessions]);
+
     const fetchSessions = () => {
         fetch('/api/sessions').then(res => res.json()).then(responseData => {
             const data = responseData?.data || [];

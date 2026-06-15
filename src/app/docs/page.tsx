@@ -4,11 +4,28 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import Link from 'next/link';
 import { DocsClient } from './docs-client';
+import { prisma } from '@/lib/prisma';
+import type { Metadata } from 'next';
 
-export const metadata = {
-    title: 'Public API Documentation - WA-AKG',
-    description: 'Complete API reference for WA-AKG WhatsApp Gateway',
-};
+// Nama app dari Settings (DB) → env APP_NAME → fallback "WA-AKG".
+async function getAppName(): Promise<string> {
+    try {
+        const cfg = await prisma.systemConfig.findUnique({
+            where: { id: 'default' },
+            select: { appName: true },
+        });
+        if (cfg?.appName) return cfg.appName;
+    } catch { /* ignore */ }
+    return process.env.APP_NAME || 'WA-AKG';
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+    const appName = await getAppName();
+    return {
+        title: `Public API Documentation - ${appName}`,
+        description: `Complete API reference for ${appName} WhatsApp Gateway`,
+    };
+}
 
 // Interface for Nested TOC
 export interface TocItem {
@@ -25,6 +42,7 @@ export interface TocSection {
 export default async function PublicDocsPage() {
     const filePath = path.join(process.cwd(), 'docs', 'API_DOCUMENTATION.md');
     const packagePath = path.join(process.cwd(), 'package.json');
+    const appName = await getAppName();
     let content = '';
     let version = 'v1.0.0';
 
@@ -81,8 +99,8 @@ export default async function PublicDocsPage() {
             <header className="bg-white border-b sticky top-0 z-30 shadow-sm/50">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                        <span className="text-xl font-extrabold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                            WA-AKG
+                        <span className="text-xl font-extrabold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent" translate="no">
+                            {appName}
                         </span>
                         <span className="px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold tracking-wide border border-blue-200">
                             {version}
