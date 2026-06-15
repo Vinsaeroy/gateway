@@ -4,7 +4,7 @@
   "private": false,
   "scripts": {
     "dev": "npx tsx src/server/bootstrap.ts",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "npx tsx src/server/bootstrap.ts",
     "lint": "eslint",
     "db:push": "prisma db push && prisma generate",
