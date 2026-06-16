@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import type { WASocket, WAMessage } from "@whiskeysockets/baileys";
-import { downloadMediaMessage, jidNormalizedUser, areJidsSameUser } from "@whiskeysockets/baileys";
+import { downloadMediaMessage, areJidsSameUser } from "@whiskeysockets/baileys";
 import Sticker from "wa-sticker-formatter";
 import sharp from "sharp";
 import fs from "fs/promises";
@@ -45,6 +45,62 @@ function isGroupJid(jid: string) {
 }
 
 /**
+ * Bungkus socket supaya semua sendMessage dari command interaktif pakai
+ * skipQueue:true → kirim instan tanpa delay anti-ban "mengetik" (yang bikin
+ * respon command terasa lemot). Method lain (groupMetadata, dll) diteruskan apa adanya.
+ */
+function makeFastSock(sock: WASocket): WASocket {
+    return new Proxy(sock, {
+        get(target, prop) {
+            if (prop === "sendMessage") {
+                return (jid: string, content: any, options?: any) =>
+                    (target.sendMessage as any)(jid, content, { ...(options || {}), skipQueue: true });
+            }
+            const val = (target as any)[prop];
+            return typeof val === "function" ? val.bind(target) : val;
+        },
+    }) as WASocket;
+}
+
+// Cache metadata grup singkat supaya command grup tidak fetch ulang tiap kali
+// (mengurangi latensi & rate-limit). TTL pendek karena admin/anggota bisa berubah.
+const groupMetaCache = new Map<string, { meta: any; at: number }>();
+const GROUP_META_TTL = 15_000;
+
+async function getGroupMetadataCached(sock: WASocket, jid: string): Promise<any> {
+    const cached = groupMetaCache.get(jid);
+    if (cached && Date.now() - cached.at < GROUP_META_TTL) return cached.meta;
+    const meta = await sock.groupMetadata(jid);
+    groupMetaCache.set(jid, { meta, at: Date.now() });
+    return meta;
+}
+
+function safeSameUser(a?: string, b?: string): boolean {
+    if (!a || !b) return false;
+    try {
+        return areJidsSameUser(a, b);
+    } catch {
+        return false;
+    }
+}
+
+/**
+ * Cek apakah salah satu identitas kandidat (nomor/LID) cocok dengan peserta
+ * yang berstatus admin. WhatsApp baru memakai LID (@lid) untuk id peserta,
+ * jadi bot/sender harus dicocokkan terhadap id, jid, lid, dan phoneNumber.
+ */
+function matchesAdmin(participants: any[], candidates: (string | null | undefined)[]): boolean {
+    const cands = candidates.filter(Boolean) as string[];
+    if (!cands.length) return false;
+    return participants.some((p: any) => {
+        const isAdm = p.admin === "admin" || p.admin === "superadmin";
+        if (!isAdm) return false;
+        const fields = [p.id, p.jid, p.lid, p.phoneNumber].filter(Boolean);
+        return cands.some((c) => fields.some((f) => safeSameUser(f, c)));
+    });
+}
+
+/**
  * Pastikan: di grup, pengirim admin (atau owner/fromMe), dan bot adalah admin.
  * Mengembalikan metadata kalau lolos, atau pesan error.
  */
@@ -58,22 +114,28 @@ async function requireGroupAdmin(
 
     let metadata: any;
     try {
-        metadata = await sock.groupMetadata(remoteJid);
+        metadata = await getGroupMetadataCached(sock, remoteJid);
     } catch {
         return { ok: false, error: "❌ Gagal ambil data grup." };
     }
 
     const participants = metadata.participants || [];
-    const isAdmin = (jid: string) =>
-        participants.some(
-            (p: any) => p.id && areJidsSameUser(p.id, jid) && (p.admin === "admin" || p.admin === "superadmin")
-        );
 
-    const botJid = jidNormalizedUser(sock.user?.id || "");
-    const botIsAdmin = isAdmin(botJid);
+    // Bot bisa diidentifikasi lewat nomor (id) ATAU LID — cek keduanya.
+    const botCandidates = [sock.user?.id, (sock.user as any)?.lid];
+    const botIsAdmin = matchesAdmin(participants, botCandidates);
 
-    const senderJid = msg.key.participant || (msg as any).participant || "";
-    const senderIsAdmin = fromMe || isAdmin(senderJid);
+    // Sender juga bisa datang sebagai nomor atau LID tergantung versi/grup.
+    const k: any = msg.key;
+    const ctx: any = msg.message?.extendedTextMessage?.contextInfo;
+    const senderCandidates = [
+        k.participant,
+        k.participantAlt,
+        k.participantPn,
+        (msg as any).participant,
+        ctx?.participant,
+    ];
+    const senderIsAdmin = fromMe || matchesAdmin(participants, senderCandidates);
 
     if (!senderIsAdmin) return { ok: false, error: "❌ Khusus admin grup." };
     if (!botIsAdmin) return { ok: false, error: "❌ Jadikan bot sebagai admin grup dulu." };
@@ -97,6 +159,9 @@ export async function handleBotCommand(
     msg: WAMessage
 ) {
     if (!sock || !msg.message || !msg.key.remoteJid) return;
+
+    // Semua balasan command lewat fast-send (tanpa delay anti-ban) → responsif.
+    sock = makeFastSock(sock);
 
     const remoteJid = msg.key.remoteJid;
     const fromMe = msg.key.fromMe || false;
@@ -412,7 +477,7 @@ _Made with ❤️_
                     await sock.sendMessage(remoteJid, { text: "❌ Hanya untuk grup." }, { quoted: msg });
                     return;
                 }
-                const metadata = await sock.groupMetadata(remoteJid);
+                const metadata = await getGroupMetadataCached(sock, remoteJid);
                 const parts = metadata.participants || [];
                 const mentions = parts.map((p: any) => p.id);
                 const note = args.join(" ").trim();
@@ -429,7 +494,7 @@ _Made with ❤️_
                     await sock.sendMessage(remoteJid, { text: "❌ Hanya untuk grup." }, { quoted: msg });
                     return;
                 }
-                const metadata = await sock.groupMetadata(remoteJid);
+                const metadata = await getGroupMetadataCached(sock, remoteJid);
                 const mentions = (metadata.participants || []).map((p: any) => p.id);
                 const teks = args.join(" ").trim() || "📢";
                 await sock.sendMessage(remoteJid, { text: teks, mentions });

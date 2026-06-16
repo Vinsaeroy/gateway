@@ -130,6 +130,12 @@ export class WhatsAppInstance {
         const sock = this.socket;
         const sessionId = this.sessionId;
         this.socket.sendMessage = async function (jid: string, content: any, options?: any) {
+            // Command interaktif (kick, ping, dll) pakai skipQueue:true → kirim
+            // instan tanpa delay "mengetik". Anti-ban hanya untuk auto-reply/broadcast.
+            if (options?.skipQueue) {
+                const { skipQueue, ...rest } = options;
+                return originalSendMessage(jid, content, rest);
+            }
             // Anti-spam throttle (antri sesuai rate limit)
             await antispam.enqueue(sessionId, jid, content);
             // Anti-ban humanizer (presence "mengetik" + jeda manusiawi)
