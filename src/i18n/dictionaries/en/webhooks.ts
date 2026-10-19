@@ -1,0 +1,118 @@
+const webhooks = {
+    title: "Webhooks & API",
+    apiKey: {
+        title: "API Key",
+        description: "Use this key to authenticate API requests. Include it in the X-API-Key header.",
+        hidden: "•••••••• (key hidden — only shown once when created)",
+        none: "No API key generated",
+        generate: "Generate",
+        regenerate: "Regenerate",
+        exampleLabel: "Example:",
+        hiddenNoteA: "For security, the API key is stored encrypted and cannot be shown again. Click ",
+        hiddenNoteB: " if you forgot/lost your key.",
+        regenTitle: "Regenerate API Key?",
+        regenDescription: "This will invalidate your current API key. All existing integrations using the old key will stop working immediately. This action cannot be undone.",
+        cancel: "Cancel",
+        createdToast: "New API key created. Copy it now — it will not be shown again!",
+        generateFail: "Failed to generate API key",
+    },
+    events: {
+        messageReceived: {
+            label: "Message Received",
+            description: "When a new message is received",
+        },
+        messageSent: {
+            label: "Message Sent",
+            description: "When a message is sent",
+        },
+        messageStatus: {
+            label: "Message Status",
+            description: "When message status changes (delivered, read)",
+        },
+        connectionUpdate: {
+            label: "Connection Update",
+            description: "When session connects/disconnects",
+        },
+        groupUpdate: {
+            label: "Group Update",
+            description: "When group info changes",
+        },
+        groupJoined: {
+            label: "Group Joined",
+            description: "When you join or are added to a new group",
+        },
+        groupParticipant: {
+            label: "Group Member",
+            description: "When participants join, leave, or change roles",
+        },
+        contactUpdate: {
+            label: "Contact Update",
+            description: "When contact info changes",
+        },
+        statusUpdate: {
+            label: "Status/Story",
+            description: "When a status is posted or viewed",
+        },
+        messageEdited: {
+            label: "Message Edited",
+            description: "When a message is edited",
+        },
+        messageDeleted: {
+            label: "Message Deleted",
+            description: "When a message is revoked/deleted",
+        },
+    },
+    section: {
+        title: "Webhooks",
+        description: "Send real-time events to external URLs when activities happen in WhatsApp.",
+        add: "Add Webhook",
+    },
+    form: {
+        newTitle: "New Webhook",
+        name: "Name",
+        namePlaceholder: "My Server",
+        url: "Webhook URL",
+        secret: "Secret (optional, for HMAC signature)",
+        secretPlaceholder: "your-secret-key",
+        events: "Events",
+        cancel: "Cancel",
+        create: "Create Webhook",
+        editTitle: "Edit Webhook",
+        editDescription: "Modify the webhook endpoint configuration and subscribed events.",
+        save: "Save Changes",
+    },
+    list: {
+        loading: "Loading...",
+        empty: "No webhooks configured for this session. Click \"{name}\" to create one.",
+        active: "Active",
+        inactive: "Inactive",
+        testing: "Testing...",
+        test: "Test",
+        edit: "Edit",
+        eventsToggle: "Events (click to toggle)",
+    },
+    delete: {
+        title: "Are you absolutely sure?",
+        description: "This action cannot be undone. This will permanently delete the webhook configuration.",
+        cancel: "Cancel",
+        confirm: "Delete",
+    },
+    toasts: {
+        required: "Name, URL, and at least one event are required",
+        noSession: "No active session selected",
+        created: "Webhook created!",
+        createFail: "Failed to create webhook",
+        error: "An error occurred",
+        updated: "Webhook updated!",
+        updateFail: "Failed to update webhook",
+        testOk: "Webhook OK!",
+        testFail: "Webhook test failed",
+        testError: "Failed to run webhook test",
+        eventsFail: "Failed to update webhook events",
+        deleted: "Webhook deleted",
+        deleteFail: "Failed to delete webhook",
+        copied: "Copied to clipboard!",
+    },
+} as const;
+
+export default webhooks;

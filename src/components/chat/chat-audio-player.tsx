@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { Play, Pause, RotateCcw, Volume2, Download, AlertCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/i18n/react";
 
 interface ChatAudioPlayerProps {
     src: string;
@@ -13,6 +14,7 @@ interface ChatAudioPlayerProps {
 }
 
 export function ChatAudioPlayer({ src, fromMe = false, fileName, onDownload }: ChatAudioPlayerProps) {
+    const { t } = useTranslation();
     const audioRef = useRef<HTMLAudioElement | null>(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [duration, setDuration] = useState(0);
@@ -190,7 +192,7 @@ export function ChatAudioPlayer({ src, fromMe = false, fileName, onDownload }: C
                             onTouchEnd={() => setIsSeeking(false)}
                             disabled={isError || duration === 0}
                             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
-                            aria-label="Seek Audio"
+                            aria-label={t("chat.audio.seek")}
                         />
                     </div>
 
@@ -215,7 +217,7 @@ export function ChatAudioPlayer({ src, fromMe = false, fileName, onDownload }: C
                             ? "bg-white/20 text-white hover:bg-white/30"
                             : "bg-muted text-foreground hover:bg-muted/80"
                     )}
-                    title="Change speed"
+                    title={t("chat.audio.changeSpeed")}
                 >
                     {playbackRate}x
                 </button>
@@ -231,7 +233,7 @@ export function ChatAudioPlayer({ src, fromMe = false, fileName, onDownload }: C
                             "h-7 w-7 rounded-full flex-shrink-0 opacity-75 hover:opacity-100",
                             fromMe ? "text-white hover:bg-white/20" : "text-muted-foreground hover:bg-muted"
                         )}
-                        title="Download audio"
+                        title={t("chat.audio.download")}
                     >
                         <Download className="h-3.5 w-3.5" />
                     </Button>
@@ -240,7 +242,7 @@ export function ChatAudioPlayer({ src, fromMe = false, fileName, onDownload }: C
 
             {isError && (
                 <p className={cn("text-[10px]", fromMe ? "text-white/90" : "text-destructive")}>
-                    Audio could not be loaded directly.
+                    {t("chat.audio.loadError")}
                 </p>
             )}
         </div>

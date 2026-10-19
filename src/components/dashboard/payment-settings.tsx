@@ -8,10 +8,12 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Save, CreditCard, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslation } from "@/i18n/react";
 
 // Kartu pengaturan payment gateway KlikQRIS — HANYA dirender untuk SUPERADMIN.
 // API key disimpan di server (DB) & tidak pernah ditampilkan utuh.
 export function PaymentSettingsCard() {
+    const { t } = useTranslation();
     const [loading, setLoading] = useState(false);
     const [saving, setSaving] = useState(false);
     const [keySet, setKeySet] = useState(false);
@@ -64,14 +66,14 @@ export function PaymentSettingsCard() {
             });
             const data = await res.json();
             if (res.ok && data.status) {
-                toast.success("Pengaturan pembayaran disimpan");
+                toast.success(t("billing.payment.saveOk"));
                 setForm((f) => ({ ...f, klikqrisApiKey: "" }));
                 load();
             } else {
-                toast.error(data.message || "Gagal menyimpan");
+                toast.error(data.message || t("billing.payment.saveError"));
             }
         } catch {
-            toast.error("Gagal menyimpan pengaturan pembayaran");
+            toast.error(t("billing.payment.saveException"));
         } finally {
             setSaving(false);
         }
@@ -81,19 +83,18 @@ export function PaymentSettingsCard() {
         <Card>
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                    <CreditCard className="h-5 w-5" /> Payment Gateway (KlikQRIS)
+                    <CreditCard className="h-5 w-5" /> {t("billing.payment.title")}
                 </CardTitle>
                 <CardDescription>
-                    Khusus SUPERADMIN. API key disimpan aman di server dan dipakai untuk semua
-                    transaksi upgrade plan.
+                    {t("billing.payment.description")}
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
                 <div className="flex items-center justify-between rounded-lg border p-3">
                     <div>
-                        <Label>Aktifkan pembayaran</Label>
+                        <Label>{t("billing.payment.enable")}</Label>
                         <p className="text-xs text-muted-foreground">
-                            Kalau mati, tombol upgrade plan akan menolak checkout.
+                            {t("billing.payment.enableHint")}
                         </p>
                     </div>
                     <Switch
@@ -103,7 +104,7 @@ export function PaymentSettingsCard() {
                 </div>
 
                 <div className="space-y-2">
-                    <Label>Base URL</Label>
+                    <Label>{t("billing.payment.baseUrl")}</Label>
                     <Input
                         value={form.klikqrisBaseUrl}
                         onChange={(e) => setForm((f) => ({ ...f, klikqrisBaseUrl: e.target.value }))}
@@ -112,7 +113,7 @@ export function PaymentSettingsCard() {
                 </div>
 
                 <div className="space-y-2">
-                    <Label>Merchant ID (id_merchant)</Label>
+                    <Label>{t("billing.payment.merchantId")}</Label>
                     <Input
                         value={form.klikqrisMerchantId}
                         onChange={(e) => setForm((f) => ({ ...f, klikqrisMerchantId: e.target.value }))}
@@ -121,21 +122,21 @@ export function PaymentSettingsCard() {
                 </div>
 
                 <div className="space-y-2">
-                    <Label>API Key (x-api-key)</Label>
+                    <Label>{t("billing.payment.apiKey")}</Label>
                     <Input
                         type="password"
                         value={form.klikqrisApiKey}
                         onChange={(e) => setForm((f) => ({ ...f, klikqrisApiKey: e.target.value }))}
-                        placeholder={keySet ? `Tersimpan (${keyMasked || "••••"}) — isi untuk ganti` : "API_KEY_ANDA"}
+                        placeholder={keySet ? t("billing.payment.apiKeyPlaceholderSaved", { masked: keyMasked || "••••" }) : t("billing.payment.apiKeyPlaceholder")}
                     />
                     <p className="text-xs text-muted-foreground">
-                        Kosongkan kalau tidak ingin mengubah API key yang sudah tersimpan.
+                        {t("billing.payment.apiKeyHint")}
                     </p>
                 </div>
 
                 <Button onClick={save} disabled={saving || loading} className="w-full">
                     {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-                    Simpan Pengaturan Pembayaran
+                    {t("billing.payment.save")}
                 </Button>
             </CardContent>
         </Card>

@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { SessionGuard } from "@/components/dashboard/session-guard";
+import { useTranslation } from "@/i18n/react";
 
 export const WAP_COLORS = [
     "#FF0000", "#FF7F00", "#FFFF00", "#00FF00", "#0000FF",
@@ -64,6 +65,7 @@ interface Contact {
 }
 
 export default function LabelsPage() {
+    const { t } = useTranslation();
     const { sessionId } = useSession();
     const [labels, setLabels] = useState<LabelData[]>([]);
     const [loading, setLoading] = useState(false);
@@ -105,11 +107,11 @@ export default function LabelsPage() {
             if (res.ok && data.data?.labels) {
                 setLabels(data.data.labels);
             } else {
-                toast.error(data.message || "Failed to load labels");
+                toast.error(data.message || t("labels.toast.loadFailed"));
             }
         } catch (error) {
             console.error(error);
-            toast.error("Error fetching labels");
+            toast.error(t("labels.toast.fetchError"));
         } finally {
             setLoading(false);
         }
@@ -118,7 +120,7 @@ export default function LabelsPage() {
     const handleCreate = async () => {
         if (!sessionId) return;
         if (!currentName.trim()) {
-            toast.error("Label name is required");
+            toast.error(t("labels.toast.nameRequired"));
             return;
         }
 
@@ -132,16 +134,16 @@ export default function LabelsPage() {
             const data = await res.json();
 
             if (res.ok) {
-                toast.success("Label created successfully");
+                toast.success(t("labels.toast.created"));
                 setIsCreateOpen(false);
                 resetForm();
                 fetchLabels();
             } else {
-                toast.error(data.message || "Failed to create label");
+                toast.error(data.message || t("labels.toast.createFailed"));
             }
         } catch (error) {
             console.error(error);
-            toast.error("Error creating label");
+            toast.error(t("labels.toast.createError"));
         } finally {
             setSubmitting(false);
         }
@@ -150,7 +152,7 @@ export default function LabelsPage() {
     const handleEdit = async () => {
         if (!sessionId || !currentLabelId) return;
         if (!currentName.trim()) {
-            toast.error("Label name is required");
+            toast.error(t("labels.toast.nameRequired"));
             return;
         }
 
@@ -164,16 +166,16 @@ export default function LabelsPage() {
             const data = await res.json();
 
             if (res.ok) {
-                toast.success("Label updated successfully");
+                toast.success(t("labels.toast.updated"));
                 setIsEditOpen(false);
                 resetForm();
                 fetchLabels();
             } else {
-                toast.error(data.message || "Failed to update label");
+                toast.error(data.message || t("labels.toast.updateFailed"));
             }
         } catch (error) {
             console.error(error);
-            toast.error("Error updating label");
+            toast.error(t("labels.toast.updateError"));
         } finally {
             setSubmitting(false);
         }
@@ -188,17 +190,17 @@ export default function LabelsPage() {
             const data = await res.json();
 
             if (res.ok) {
-                toast.success("Label deleted successfully");
+                toast.success(t("labels.toast.deleted"));
                 if (expandedLabelId === labelId) {
                     setExpandedLabelId(null);
                 }
                 fetchLabels();
             } else {
-                toast.error(data.message || "Failed to delete label");
+                toast.error(data.message || t("labels.toast.deleteFailed"));
             }
         } catch (error) {
             console.error(error);
-            toast.error("Error deleting label");
+            toast.error(t("labels.toast.deleteError"));
         }
     };
 
@@ -280,17 +282,17 @@ export default function LabelsPage() {
             });
 
             if (res.ok) {
-                toast.success("Chat assigned to label");
+                toast.success(t("labels.toast.assigned"));
                 fetchLabels();
                 if (expandedLabelId === assignLabelId) {
                     fetchChatLabels(assignLabelId);
                 }
             } else {
                 const data = await res.json();
-                toast.error(data.message || "Failed to assign label");
+                toast.error(data.message || t("labels.toast.assignFailed"));
             }
         } catch (error) {
-            toast.error("Error assigning label");
+            toast.error(t("labels.toast.assignError"));
         }
     };
 
@@ -304,23 +306,23 @@ export default function LabelsPage() {
             });
 
             if (res.ok) {
-                toast.success("Chat removed from label");
+                toast.success(t("labels.toast.removed"));
                 fetchLabels();
                 if (expandedLabelId === labelId) {
                     fetchChatLabels(labelId);
                 }
             } else {
-                toast.error("Failed to remove label");
+                toast.error(t("labels.toast.removeFailed"));
             }
         } catch (error) {
-            toast.error("Error removing label");
+            toast.error(t("labels.toast.removeError"));
         }
     };
 
     // --- Color Picker Component ---
     const ColorPicker = () => (
         <div className="space-y-2">
-            <Label>Color</Label>
+            <Label>{t("labels.colorLabel")}</Label>
             <div className="grid grid-cols-10 gap-1.5 mt-2">
                 {WAP_COLORS.map((hex, index) => (
                     <div
@@ -339,8 +341,8 @@ export default function LabelsPage() {
             <div className="max-w-5xl space-y-6">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                    <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Chat Labels</h1>
-                    <p className="text-sm text-muted-foreground">Organize chats with color-coded labels. Click a label to manage assigned chats.</p>
+                    <h1 className="text-xl sm:text-2xl font-bold tracking-tight">{t("labels.page.title")}</h1>
+                    <p className="text-sm text-muted-foreground">{t("labels.page.subtitle")}</p>
                 </div>
 
                 <Dialog open={isCreateOpen} onOpenChange={(open) => {
@@ -350,30 +352,30 @@ export default function LabelsPage() {
                     <DialogTrigger asChild>
                         <Button>
                             <Plus className="w-4 h-4 mr-2" />
-                            New Label
+                            {t("labels.newLabel")}
                         </Button>
                     </DialogTrigger>
                     <DialogContent>
                         <DialogHeader>
-                            <DialogTitle>Create New Label</DialogTitle>
-                            <DialogDescription>Add a new color-coded label for organizing chats.</DialogDescription>
+                            <DialogTitle>{t("labels.create.title")}</DialogTitle>
+                            <DialogDescription>{t("labels.create.description")}</DialogDescription>
                         </DialogHeader>
                         <div className="space-y-4 py-4">
                             <div className="space-y-2">
-                                <Label>Label Name</Label>
+                                <Label>{t("labels.nameLabel")}</Label>
                                 <Input
                                     value={currentName}
                                     onChange={(e) => setCurrentName(e.target.value)}
-                                    placeholder="e.g. VIP Customer"
+                                    placeholder={t("labels.namePlaceholder")}
                                 />
                             </div>
                             <ColorPicker />
                         </div>
                         <DialogFooter>
-                            <Button variant="outline" onClick={() => setIsCreateOpen(false)}>Cancel</Button>
+                            <Button variant="outline" onClick={() => setIsCreateOpen(false)}>{t("labels.cancel")}</Button>
                             <Button onClick={handleCreate} disabled={submitting || !currentName.trim()}>
                                 {submitting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
-                                Create Label
+                                {t("labels.createAction")}
                             </Button>
                         </DialogFooter>
                     </DialogContent>
@@ -388,9 +390,9 @@ export default function LabelsPage() {
                 <Card className="border-dashed shadow-none bg-muted/30">
                     <CardContent className="flex flex-col items-center justify-center py-12 text-center">
                         <Tag className="w-12 h-12 text-muted-foreground/50 mb-4" />
-                        <h3 className="text-lg font-semibold">No labels found</h3>
-                        <p className="text-muted-foreground mb-4">You haven't created any chat labels yet.</p>
-                        <Button variant="outline" onClick={() => setIsCreateOpen(true)}>Create your first label</Button>
+                        <h3 className="text-lg font-semibold">{t("labels.empty.title")}</h3>
+                        <p className="text-muted-foreground mb-4">{t("labels.empty.description")}</p>
+                        <Button variant="outline" onClick={() => setIsCreateOpen(true)}>{t("labels.empty.action")}</Button>
                     </CardContent>
                 </Card>
             ) : (
@@ -408,7 +410,9 @@ export default function LabelsPage() {
                                         <Tag className="w-4 h-4 shrink-0" style={{ color: label.colorHex }} />
                                         <span className="font-semibold truncate">{label.name}</span>
                                         <Badge variant="secondary" className="font-normal text-xs shrink-0">
-                                            {label._count.chatLabels} chat{label._count.chatLabels !== 1 ? "s" : ""}
+                                            {label._count.chatLabels === 1
+                                                ? t("labels.chatCount", { count: label._count.chatLabels })
+                                                : t("labels.chatCountOther", { count: label._count.chatLabels })}
                                         </Badge>
                                         {expandedLabelId === label.id
                                             ? <ChevronUp className="w-4 h-4 text-muted-foreground shrink-0" />
@@ -428,7 +432,7 @@ export default function LabelsPage() {
                                             }}
                                         >
                                             <UserCheck className="w-3.5 h-3.5 mr-1" />
-                                            <span className="hidden sm:inline text-xs">Assign</span>
+                                            <span className="hidden sm:inline text-xs">{t("labels.assign")}</span>
                                         </Button>
                                         <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground" onClick={() => openEditModal(label)}>
                                             <Pencil className="w-3.5 h-3.5" />
@@ -441,15 +445,15 @@ export default function LabelsPage() {
                                             </AlertDialogTrigger>
                                             <AlertDialogContent>
                                                 <AlertDialogHeader>
-                                                    <AlertDialogTitle>Delete label?</AlertDialogTitle>
+                                                    <AlertDialogTitle>{t("labels.delete.title")}</AlertDialogTitle>
                                                     <AlertDialogDescription>
-                                                        This will permanently delete the <strong>{label.name}</strong> label and remove it from all assigned chats.
+                                                        {t("labels.delete.descriptionBefore")} <strong>{label.name}</strong> {t("labels.delete.descriptionAfter")}
                                                     </AlertDialogDescription>
                                                 </AlertDialogHeader>
                                                 <AlertDialogFooter>
-                                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                    <AlertDialogCancel>{t("labels.cancel")}</AlertDialogCancel>
                                                     <AlertDialogAction onClick={() => handleDelete(label.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                                                        Delete
+                                                        {t("labels.delete.confirm")}
                                                     </AlertDialogAction>
                                                 </AlertDialogFooter>
                                             </AlertDialogContent>
@@ -463,12 +467,12 @@ export default function LabelsPage() {
                                         {chatLabelsLoading ? (
                                             <div className="flex items-center justify-center py-4">
                                                 <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-                                                <span className="ml-2 text-sm text-muted-foreground">Loading chats...</span>
+                                                <span className="ml-2 text-sm text-muted-foreground">{t("labels.assignedChats.loading")}</span>
                                             </div>
                                         ) : chatLabels.length === 0 ? (
                                             <div className="text-center py-4">
                                                 <MessageSquare className="h-8 w-8 text-muted-foreground/30 mx-auto mb-2" />
-                                                <p className="text-sm text-muted-foreground">No chats assigned to this label yet.</p>
+                                                <p className="text-sm text-muted-foreground">{t("labels.assignedChats.empty")}</p>
                                                 <Button
                                                     variant="outline" size="sm" className="mt-2"
                                                     onClick={() => {
@@ -478,7 +482,7 @@ export default function LabelsPage() {
                                                         setIsAssignOpen(true);
                                                     }}
                                                 >
-                                                    <UserCheck className="w-3.5 h-3.5 mr-1.5" /> Assign a chat
+                                                    <UserCheck className="w-3.5 h-3.5 mr-1.5" /> {t("labels.assignChat")}
                                                 </Button>
                                             </div>
                                         ) : (
@@ -503,7 +507,7 @@ export default function LabelsPage() {
                                                             variant="ghost" size="icon"
                                                             className="h-7 w-7 text-destructive/70 hover:text-destructive hover:bg-destructive/10 shrink-0"
                                                             onClick={() => removeChatFromLabel(label.id, cl.chatJid)}
-                                                            title="Remove from label"
+                                                            title={t("labels.assignedChats.removeFromLabel")}
                                                         >
                                                             <X className="w-3.5 h-3.5" />
                                                         </Button>
@@ -526,25 +530,25 @@ export default function LabelsPage() {
             }}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Edit Label</DialogTitle>
-                        <DialogDescription>Update the label name or color.</DialogDescription>
+                        <DialogTitle>{t("labels.edit.title")}</DialogTitle>
+                        <DialogDescription>{t("labels.edit.description")}</DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
                         <div className="space-y-2">
-                            <Label>Label Name</Label>
+                            <Label>{t("labels.nameLabel")}</Label>
                             <Input
                                 value={currentName}
                                 onChange={(e) => setCurrentName(e.target.value)}
-                                placeholder="e.g. VIP Customer"
+                                placeholder={t("labels.namePlaceholder")}
                             />
                         </div>
                         <ColorPicker />
                     </div>
                     <DialogFooter>
-                        <Button variant="outline" onClick={() => setIsEditOpen(false)}>Cancel</Button>
+                        <Button variant="outline" onClick={() => setIsEditOpen(false)}>{t("labels.cancel")}</Button>
                         <Button onClick={handleEdit} disabled={submitting || !currentName.trim()}>
                             {submitting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
-                            Save Changes
+                            {t("labels.saveChanges")}
                         </Button>
                     </DialogFooter>
                 </DialogContent>
@@ -561,14 +565,14 @@ export default function LabelsPage() {
             }}>
                 <DialogContent className="max-w-md">
                     <DialogHeader>
-                        <DialogTitle>Assign Chat to Label</DialogTitle>
-                        <DialogDescription>Search for a contact or enter a JID to assign to this label.</DialogDescription>
+                        <DialogTitle>{t("labels.assignDialog.title")}</DialogTitle>
+                        <DialogDescription>{t("labels.assignDialog.description")}</DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4">
                         <div className="relative">
                             <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                             <Input
-                                placeholder="Search contacts or enter JID..."
+                                placeholder={t("labels.assignDialog.searchPlaceholder")}
                                 className="pl-9"
                                 value={contactSearch}
                                 onChange={(e) => setContactSearch(e.target.value)}
@@ -594,27 +598,27 @@ export default function LabelsPage() {
                                             {(c.name || c.notify || c.jid).charAt(0).toUpperCase()}
                                         </div>
                                         <div className="min-w-0 flex-1">
-                                            <p className="text-sm font-medium truncate">{c.name || c.notify || "Unknown"}</p>
+                                            <p className="text-sm font-medium truncate">{c.name || c.notify || t("labels.assignDialog.unknown")}</p>
                                             <p className="text-[11px] text-muted-foreground font-mono truncate">{c.jid}</p>
                                         </div>
-                                        <Badge variant="outline" className="text-[10px] shrink-0">Assign</Badge>
+                                        <Badge variant="outline" className="text-[10px] shrink-0">{t("labels.assign")}</Badge>
                                     </button>
                                 ))
                             ) : contactSearch.trim() ? (
                                 <div className="text-center py-6 space-y-3">
-                                    <p className="text-sm text-muted-foreground">No contacts found</p>
+                                    <p className="text-sm text-muted-foreground">{t("labels.assignDialog.empty")}</p>
                                     {contactSearch.includes("@") && (
                                         <Button
                                             variant="outline" size="sm"
                                             onClick={() => assignChatToLabel(contactSearch.trim())}
                                         >
-                                            Assign &quot;{contactSearch.trim()}&quot; directly
+                                            {t("labels.assignDialog.directly", { name: contactSearch.trim() })}
                                         </Button>
                                     )}
                                 </div>
                             ) : (
                                 <p className="text-sm text-muted-foreground text-center py-6">
-                                    Type to search contacts...
+                                    {t("labels.assignDialog.typeToSearch")}
                                 </p>
                             )}
                         </div>

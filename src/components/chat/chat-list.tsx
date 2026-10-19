@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MessageSquarePlus, Search, MessageCircle, X, Users, User, Radio, RefreshCw } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useTranslation } from "@/i18n/react";
 
 import { cn } from "@/lib/utils";
 import { createAppSocket } from "@/lib/socket-client";
@@ -32,6 +33,7 @@ interface ChatListProps {
 }
 
 export function ChatList({ sessionId, onSelectChat, selectedJid, externalProfilePics }: ChatListProps) {
+    const { t } = useTranslation();
     const [chats, setChats] = useState<ChatContact[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
@@ -202,7 +204,7 @@ export function ChatList({ sessionId, onSelectChat, selectedJid, externalProfile
     };
 
     const getMessagePreview = (chat: ChatContact): string => {
-        if (!chat.lastMessage?.content) return "No messages yet";
+        if (!chat.lastMessage?.content) return t("chat.list.noMessages");
         const content = chat.lastMessage.content;
         if (chat.lastMessage.type !== "TEXT") {
             return `📎 ${chat.lastMessage.type.charAt(0) + chat.lastMessage.type.slice(1).toLowerCase()}`;
@@ -218,7 +220,7 @@ export function ChatList({ sessionId, onSelectChat, selectedJid, externalProfile
         if (diffDays === 0) {
             return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         } else if (diffDays === 1) {
-            return "Yesterday";
+            return t("chat.list.yesterday");
         } else if (diffDays < 7) {
             return date.toLocaleDateString([], { weekday: 'short' });
         }
@@ -270,7 +272,7 @@ export function ChatList({ sessionId, onSelectChat, selectedJid, externalProfile
             {/* Header */}
             <div className="px-3 pt-3 pb-2 space-y-2 flex-shrink-0">
                 <div className="flex justify-between items-center">
-                    <h3 className="font-semibold text-base text-foreground">Chats</h3>
+                    <h3 className="font-semibold text-base text-foreground">{t("chat.list.title")}</h3>
                     <div className="flex items-center gap-1">
                         <Button
                             variant="ghost"
@@ -278,7 +280,7 @@ export function ChatList({ sessionId, onSelectChat, selectedJid, externalProfile
                             className="h-8 w-8 rounded-lg"
                             onClick={refreshChats}
                             disabled={refreshing}
-                            title="Refresh chats, groups, and channels"
+                            title={t("chat.list.refreshTitle")}
                         >
                             <RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
                         </Button>
@@ -301,7 +303,7 @@ export function ChatList({ sessionId, onSelectChat, selectedJid, externalProfile
                 <div className="relative">
                     <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
                     <Input
-                        placeholder="Search chats..."
+                        placeholder={t("chat.list.searchPlaceholder")}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="h-8 pl-8 text-sm bg-muted/50 border-0 rounded-lg focus-visible:ring-1"
@@ -317,7 +319,7 @@ export function ChatList({ sessionId, onSelectChat, selectedJid, externalProfile
                         onClick={() => setActiveTab("all")}
                     >
                         <MessageCircle className="h-3 w-3" />
-                        All
+                        {t("chat.list.tabs.all")}
                     </Button>
                     <Button
                         variant={activeTab === "personal" ? "default" : "ghost"}
@@ -326,7 +328,7 @@ export function ChatList({ sessionId, onSelectChat, selectedJid, externalProfile
                         onClick={() => setActiveTab("personal")}
                     >
                         <User className="h-3 w-3" />
-                        Personal
+                        {t("chat.list.tabs.personal")}
                     </Button>
                     <Button
                         variant={activeTab === "groups" ? "default" : "ghost"}
@@ -335,7 +337,7 @@ export function ChatList({ sessionId, onSelectChat, selectedJid, externalProfile
                         onClick={() => setActiveTab("groups")}
                     >
                         <Users className="h-3 w-3" />
-                        Groups
+                        {t("chat.list.tabs.groups")}
                     </Button>
                     <Button
                         variant={activeTab === "channels" ? "default" : "ghost"}
@@ -344,14 +346,14 @@ export function ChatList({ sessionId, onSelectChat, selectedJid, externalProfile
                         onClick={() => setActiveTab("channels")}
                     >
                         <Radio className="h-3 w-3" />
-                        Channels
+                        {t("chat.list.tabs.channels")}
                     </Button>
                 </div>
 
                 {/* New Chat Form */}
                 {isNewChatOpen && (
                     <div className="p-2.5 bg-muted/30 rounded-lg space-y-2 border border-border/40">
-                        <Label className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">Phone Number</Label>
+                        <Label className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">{t("chat.list.newChat.phoneLabel")}</Label>
                         <div className="flex gap-1.5">
                             <Input
                                 placeholder="628123456789"
@@ -360,7 +362,7 @@ export function ChatList({ sessionId, onSelectChat, selectedJid, externalProfile
                                 onKeyDown={(e) => e.key === "Enter" && handleStartNewChat()}
                                 className="h-8 text-sm"
                             />
-                            <Button size="sm" className="h-8 px-3" onClick={handleStartNewChat}>Go</Button>
+                            <Button size="sm" className="h-8 px-3" onClick={handleStartNewChat}>{t("chat.list.newChat.go")}</Button>
                         </div>
                     </div>
                 )}
@@ -383,14 +385,14 @@ export function ChatList({ sessionId, onSelectChat, selectedJid, externalProfile
                         </div>
                         <p className="text-sm text-muted-foreground">
                             {searchQuery
-                                ? "No chats match your search"
+                                ? t("chat.list.empty.search")
                                 : activeTab === "groups"
-                                ? "No group chats"
+                                ? t("chat.list.empty.groups")
                                 : activeTab === "channels"
-                                ? "No channels"
+                                ? t("chat.list.empty.channels")
                                 : activeTab === "personal"
-                                ? "No personal chats"
-                                : "No chats yet"}
+                                ? t("chat.list.empty.personal")
+                                : t("chat.list.empty.all")}
                         </p>
                     </div>
                 ) : (

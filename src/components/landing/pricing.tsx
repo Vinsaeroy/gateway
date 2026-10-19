@@ -1,10 +1,14 @@
 import Link from "next/link";
 import { Check, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { PLAN_ORDER, formatIDR, CAPABILITIES } from "@/lib/plans";
+import { PLAN_ORDER, CAPABILITIES } from "@/lib/plans";
 import { getMergedPlans } from "@/lib/plans-store";
+import { getServerLocale, getT } from "@/i18n/server";
+import { formatCurrency, formatNumber } from "@/i18n/format";
 
 export async function PricingCards({ ctaHref = "/dashboard/billing" }: { ctaHref?: string }) {
+    const t = await getT();
+    const locale = await getServerLocale();
     const all = await getMergedPlans();
     return (
         <div className="relative">
@@ -21,7 +25,7 @@ export async function PricingCards({ ctaHref = "/dashboard/billing" }: { ctaHref
                     const isCustom = plan.price === null;
 
                     // Benefit = fitur aktif (dari toggle) + benefit teks tambahan.
-                    const capBenefits = CAPABILITIES.filter((c) => plan.capabilities?.[c.id]).map((c) => c.label);
+                    const capBenefits = CAPABILITIES.filter((c) => plan.capabilities?.[c.id]).map((c) => t(`plans.capabilities.${c.id}`));
                     const benefits = [...capBenefits, ...(plan.features || [])];
 
                 return (
@@ -36,7 +40,7 @@ export async function PricingCards({ ctaHref = "/dashboard/billing" }: { ctaHref
                     >
                         {plan.highlight && (
                             <div className="absolute top-0 right-0 flex items-center gap-1 rounded-bl-2xl bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground">
-                                <Sparkles className="h-3.5 w-3.5" /> Populer
+                                <Sparkles className="h-3.5 w-3.5" /> {t("plans.popular")}
                             </div>
                         )}
 
@@ -44,17 +48,17 @@ export async function PricingCards({ ctaHref = "/dashboard/billing" }: { ctaHref
 
                         <div className="mt-4 mb-1 flex items-end gap-1">
                             <span className="text-4xl font-extrabold text-foreground">
-                                {formatIDR(plan.price)}
+                                {isCustom ? t("plans.price.custom") : isFree ? t("plans.price.free") : formatCurrency(plan.price ?? 0, locale)}
                             </span>
                             {!isFree && !isCustom && (
-                                <span className="text-muted-foreground text-sm mb-1">/bulan</span>
+                                <span className="text-muted-foreground text-sm mb-1">{t("plans.price.perMonth")}</span>
                             )}
                         </div>
 
                         <p className="text-sm text-muted-foreground mb-6">
                             {plan.monthlyLimit < 0
-                                ? "Request tanpa batas"
-                                : `${plan.monthlyLimit.toLocaleString("id-ID")} request / bulan`}
+                                ? t("plans.limits.unlimitedRequests")
+                                : t("plans.limits.requestsPerMonth", { count: formatNumber(plan.monthlyLimit, locale) })}
                         </p>
 
                         <ul className="space-y-3 mb-8 flex-1">
@@ -71,7 +75,7 @@ export async function PricingCards({ ctaHref = "/dashboard/billing" }: { ctaHref
                                 className="w-full rounded-full h-12"
                                 variant={plan.highlight ? "default" : "glass"}
                             >
-                                {isFree ? "Mulai Gratis" : isCustom ? "Hubungi Kami" : `Pilih ${plan.name}`}
+                                {isFree ? t("plans.cta.startFree") : isCustom ? t("plans.cta.contactUs") : t("plans.cta.choose", { name: plan.name })}
                             </Button>
                         </Link>
                     </div>
@@ -80,7 +84,7 @@ export async function PricingCards({ ctaHref = "/dashboard/billing" }: { ctaHref
             </div>
 
             {/* Hint geser di mobile */}
-            <p className="md:hidden text-center text-xs text-muted-foreground mt-1">← geser untuk lihat plan lain →</p>
+            <p className="md:hidden text-center text-xs text-muted-foreground mt-1">{t("plans.landing.swipeHint")}</p>
         </div>
     );
 }

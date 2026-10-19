@@ -3,8 +3,10 @@
 import { useEffect, useState } from "react";
 import SwaggerUI from "swagger-ui-react";
 import "swagger-ui-react/swagger-ui.css";
+import { useTranslation } from "@/i18n/react";
 
 export default function ApiDocsPage() {
+    const { t } = useTranslation();
     const [authorized, setAuthorized] = useState(false);
     const [loading, setLoading] = useState(true);
     const [username, setUsername] = useState("");
@@ -50,18 +52,18 @@ export default function ApiDocsPage() {
                 const ct = res.headers.get("content-type") || "";
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 if (!ct.includes("application/json"))
-                    throw new Error("Respons bukan JSON (mungkin ke-redirect / error server)");
+                    throw new Error(t("docs.swagger.errors.notJson"));
                 return res.json();
             })
             .then((json) => {
                 if (!active) return;
                 if (!json || typeof json !== "object" || !json.openapi)
-                    throw new Error("Spesifikasi OpenAPI tidak valid");
+                    throw new Error(t("docs.swagger.errors.invalidSpec"));
                 setSpec(json);
             })
             .catch((e) => {
                 if (!active) return;
-                setSpecError(e?.message || "Gagal memuat dokumentasi");
+                setSpecError(e?.message || t("docs.swagger.errors.loadFailed"));
             })
             .finally(() => {
                 if (active) setSpecLoading(false);
@@ -83,7 +85,7 @@ export default function ApiDocsPage() {
             setAuthorized(true);
             setError("");
         } else {
-            setError("Invalid credentials");
+            setError(t("docs.swagger.invalidCredentials"));
         }
     };
 
@@ -97,7 +99,7 @@ export default function ApiDocsPage() {
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-screen bg-gray-50">
-                <div className="text-gray-600">Loading...</div>
+                <div className="text-gray-600">{t("docs.swagger.loading")}</div>
             </div>
         );
     }
@@ -108,38 +110,38 @@ export default function ApiDocsPage() {
                 <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md">
                     <div className="text-center mb-6">
                         <h1 className="text-3xl font-bold text-gray-800 mb-2">
-                            WA-AKG API Documentation
+                            {t("docs.swagger.authTitle")}
                         </h1>
                         <p className="text-gray-600 text-sm">
-                            Please authenticate to access Swagger UI
+                            {t("docs.swagger.authSubtitle")}
                         </p>
                     </div>
 
                     <form onSubmit={handleLogin} className="space-y-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Username
+                                {t("docs.swagger.username")}
                             </label>
                             <input
                                 type="text"
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
                                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                                placeholder="Enter username"
+                                placeholder={t("docs.swagger.usernamePlaceholder")}
                                 required
                             />
                         </div>
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Password
+                                {t("docs.swagger.password")}
                             </label>
                             <input
                                 type="password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                                placeholder="Enter password"
+                                placeholder={t("docs.swagger.passwordPlaceholder")}
                                 required
                             />
                         </div>
@@ -154,15 +156,15 @@ export default function ApiDocsPage() {
                             type="submit"
                             className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
                         >
-                            Access Documentation
+                            {t("docs.swagger.accessButton")}
                         </button>
                     </form>
 
                     <div className="mt-6 text-center text-sm text-gray-500">
-                        <p>Default credentials:</p>
+                        <p>{t("docs.swagger.defaultCredentials")}</p>
                         <p className="font-mono mt-1">
-                            Username: <span className="font-semibold">admin</span> |
-                            Password: <span className="font-semibold">admin123</span>
+                            {t("docs.swagger.defaultUsernameLabel")} <span className="font-semibold">admin</span> |
+                            {" "}{t("docs.swagger.defaultPasswordLabel")} <span className="font-semibold">admin123</span>
                         </p>
                     </div>
                 </div>
@@ -175,27 +177,27 @@ export default function ApiDocsPage() {
             <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4 shadow-lg">
                 <div className="container mx-auto flex justify-between items-center">
                     <div>
-                        <h1 className="text-2xl font-bold">WA-AKG API Documentation</h1>
+                        <h1 className="text-2xl font-bold">{t("docs.swagger.authTitle")}</h1>
                         <p className="text-blue-100 text-sm mt-1">
-                            Interactive API documentation with 58+ endpoints
+                            {t("docs.swagger.subtitle")}
                         </p>
                     </div>
                     <button
                         onClick={handleLogout}
                         className="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition-colors text-sm font-medium"
                     >
-                        Logout
+                        {t("docs.swagger.logout")}
                     </button>
                 </div>
             </div>
 
             <div className="container mx-auto">
                 {specLoading && (
-                    <div className="p-10 text-center text-gray-600">Memuat dokumentasi…</div>
+                    <div className="p-10 text-center text-gray-600">{t("docs.swagger.loadingSpec")}</div>
                 )}
                 {specError && (
                     <div className="m-6 p-5 rounded-lg border border-red-200 bg-red-50 text-red-700">
-                        <p className="font-semibold mb-1">Gagal memuat dokumentasi API</p>
+                        <p className="font-semibold mb-1">{t("docs.swagger.loadFailedTitle")}</p>
                         <p className="text-sm mb-3">{specError}</p>
                         <a
                             href="/api/docs"
@@ -203,7 +205,7 @@ export default function ApiDocsPage() {
                             rel="noreferrer"
                             className="text-sm font-medium underline hover:text-red-900"
                         >
-                            Buka spesifikasi mentah (/api/docs)
+                            {t("docs.swagger.rawSpecLink")}
                         </a>
                     </div>
                 )}

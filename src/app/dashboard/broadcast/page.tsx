@@ -14,6 +14,8 @@ import type { Socket } from "socket.io-client";
 
 import { useSession } from "@/components/dashboard/session-provider";
 import { SessionGuard } from "@/components/dashboard/session-guard";
+import { useTranslation } from "@/i18n/react";
+import { formatNumber } from "@/i18n/format";
 
 interface BroadcastProgress {
     broadcastId: string;
@@ -30,6 +32,7 @@ interface BroadcastProgress {
 
 export default function BroadcastPage() {
     const { sessionId } = useSession();
+    const { t, locale } = useTranslation();
     const [contacts, setContacts] = useState("");
     const [message, setMessage] = useState("");
     const [delay, setDelay] = useState([2000]);
@@ -52,9 +55,9 @@ export default function BroadcastPage() {
             if (data.status === "completed") {
                 setLoading(false);
                 if (data.failed === 0) {
-                    toast.success(`Broadcast selesai! ${data.sent} pesan terkirim.`);
+                    toast.success(t("broadcast.toasts.completedOk", { sent: data.sent }));
                 } else {
-                    toast.warning(`Broadcast selesai. ${data.sent} terkirim, ${data.failed} gagal.`);
+                    toast.warning(t("broadcast.toasts.completedPartial", { sent: data.sent, failed: data.failed }));
                 }
             }
         });
@@ -67,8 +70,8 @@ export default function BroadcastPage() {
     }, [sessionId]);
 
     const handleSend = async () => {
-        if (!sessionId) return toast.error("No active session found");
-        if (!message.trim()) return toast.error("Message cannot be empty");
+        if (!sessionId) return toast.error(t("broadcast.toasts.noSession"));
+        if (!message.trim()) return toast.error(t("broadcast.toasts.emptyMessage"));
         setLoading(true);
         setBroadcastProgress(null);
 
@@ -79,7 +82,7 @@ export default function BroadcastPage() {
             });
 
             if (recipients.length === 0) {
-                toast.error("No recipients specified");
+                toast.error(t("broadcast.toasts.noRecipients"));
                 setLoading(false);
                 return;
             }
@@ -98,14 +101,14 @@ export default function BroadcastPage() {
             const data = await res.json();
 
             if (res.ok) {
-                toast.info(`Broadcast dimulai untuk ${recipients.length} penerima...`);
+                toast.info(t("broadcast.toasts.started", { count: recipients.length }));
             } else {
-                toast.error(data.message || "Failed to start broadcast");
+                toast.error(data.message || t("broadcast.toasts.startFail"));
                 setLoading(false);
             }
         } catch (e) {
             console.error(e);
-            toast.error("Error sending broadcast");
+            toast.error(t("broadcast.toasts.sendFail"));
             setLoading(false);
         }
     };
@@ -114,27 +117,27 @@ export default function BroadcastPage() {
 
     const formatJid = (jid: string) => {
         if (!jid) return "-";
-        return jid.replace("@s.whatsapp.net", "").replace("@g.us", " (Group)");
+        return jid.replace("@s.whatsapp.net", "").replace("@g.us", t("broadcast.progress.groupSuffix"));
     };
 
     return (
         <SessionGuard>
             <div className="space-y-6">
                 <div>
-                    <h2 className="text-xl sm:text-3xl font-bold tracking-tight">Broadcast / Blast</h2>
-                    <p className="text-muted-foreground text-sm mt-1">Kirim pesan massal ke banyak penerima sekaligus.</p>
+                    <h2 className="text-xl sm:text-3xl font-bold tracking-tight">{t("broadcast.page.title")}</h2>
+                    <p className="text-muted-foreground text-sm mt-1">{t("broadcast.page.subtitle")}</p>
                 </div>
 
                 <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2">
                     {/* Recipients Card */}
                     <Card>
                         <CardHeader>
-                            <CardTitle>Recipients</CardTitle>
-                            <CardDescription>Enter phone numbers separated by comma or new line.</CardDescription>
+                            <CardTitle>{t("broadcast.recipients.title")}</CardTitle>
+                            <CardDescription>{t("broadcast.recipients.description")}</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="space-y-2">
-                                <Label>Target Numbers (e.g., 628123456789)</Label>
+                                <Label>{t("broadcast.recipients.label")}</Label>
                                 <Textarea
                                     placeholder={"628123456789\n628987654321"}
                                     className="min-h-[200px] font-mono text-sm"
@@ -142,7 +145,7 @@ export default function BroadcastPage() {
                                     onChange={e => setContacts(e.target.value)}
                                     disabled={loading}
                                 />
-                                <p className="text-xs text-muted-foreground">{recipientCount} numbers identified</p>
+                                <p className="text-xs text-muted-foreground">{t("broadcast.recipients.identified", { count: formatNumber(recipientCount, locale) })}</p>
                             </div>
                         </CardContent>
                     </Card>
@@ -150,13 +153,13 @@ export default function BroadcastPage() {
                     {/* Message Card */}
                     <Card>
                         <CardHeader>
-                            <CardTitle>Message Content</CardTitle>
+                            <CardTitle>{t("broadcast.message.title")}</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="space-y-2">
-                                <Label>Message</Label>
+                                <Label>{t("broadcast.message.label")}</Label>
                                 <Textarea
-                                    placeholder="Type your message here..."
+                                    placeholder={t("broadcast.message.placeholder")}
                                     className="min-h-[150px]"
                                     value={message}
                                     onChange={e => setMessage(e.target.value)}
@@ -166,7 +169,7 @@ export default function BroadcastPage() {
 
                             <div className="space-y-4 pt-4">
                                 <div className="space-y-2">
-                                    <Label>Delay: {(delay[0] / 1000).toFixed(1)}s</Label>
+                                    <Label>{t("broadcast.message.delayLabel", { value: (delay[0] / 1000).toFixed(1) })}</Label>
                                     <Slider
                                         defaultValue={[2000]}
                                         min={1000}
@@ -176,7 +179,7 @@ export default function BroadcastPage() {
                                         onValueChange={setDelay}
                                         disabled={loading}
                                     />
-                                    <p className="text-xs text-muted-foreground">Delay antar pesan (+ random tambahan untuk menghindari ban).</p>
+                                    <p className="text-xs text-muted-foreground">{t("broadcast.message.delayHint")}</p>
                                 </div>
 
                                 <Button
@@ -185,7 +188,7 @@ export default function BroadcastPage() {
                                     disabled={loading || !sessionId || recipientCount === 0 || !message.trim()}
                                 >
                                     {loading ? <RefreshCw className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
-                                    {loading ? "Broadcasting..." : "Start Broadcast"}
+                                    {loading ? t("broadcast.message.running") : t("broadcast.message.start")}
                                 </Button>
                             </div>
                         </CardContent>
@@ -204,29 +207,29 @@ export default function BroadcastPage() {
                                 {broadcastProgress.status === "running" ? (
                                     <>
                                         <Radio className="h-5 w-5 text-blue-500 animate-pulse" />
-                                        <span>Broadcast In Progress</span>
+                                        <span>{t("broadcast.progress.running")}</span>
                                     </>
                                 ) : broadcastProgress.failed === 0 ? (
                                     <>
                                         <CheckCircle2 className="h-5 w-5 text-green-500" />
-                                        <span>Broadcast Completed</span>
+                                        <span>{t("broadcast.progress.completed")}</span>
                                     </>
                                 ) : (
                                     <>
                                         <AlertTriangle className="h-5 w-5 text-yellow-500" />
-                                        <span>Broadcast Completed with Errors</span>
+                                        <span>{t("broadcast.progress.completedWithErrors")}</span>
                                     </>
                                 )}
                             </CardTitle>
                             <CardDescription>
-                                ID: {broadcastProgress.broadcastId}
+                                {t("broadcast.progress.id", { id: broadcastProgress.broadcastId })}
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             {/* Progress Bar */}
                             <div className="space-y-2">
                                 <div className="flex justify-between text-sm">
-                                    <span className="text-muted-foreground">Progress</span>
+                                    <span className="text-muted-foreground">{t("broadcast.progress.label")}</span>
                                     <span className="font-mono font-medium">
                                         {broadcastProgress.sent + broadcastProgress.failed} / {broadcastProgress.total}
                                         {" "}({broadcastProgress.progress || 0}%)
@@ -240,13 +243,13 @@ export default function BroadcastPage() {
                                 <div className="bg-background rounded-lg p-3 text-center border">
                                     <div className="text-2xl font-bold text-green-600">{broadcastProgress.sent}</div>
                                     <div className="text-xs text-muted-foreground flex items-center justify-center gap-1 mt-1">
-                                        <CheckCircle2 className="h-3 w-3" /> Terkirim
+                                        <CheckCircle2 className="h-3 w-3" /> {t("broadcast.progress.sent")}
                                     </div>
                                 </div>
                                 <div className="bg-background rounded-lg p-3 text-center border">
                                     <div className="text-2xl font-bold text-red-500">{broadcastProgress.failed}</div>
                                     <div className="text-xs text-muted-foreground flex items-center justify-center gap-1 mt-1">
-                                        <XCircle className="h-3 w-3" /> Gagal
+                                        <XCircle className="h-3 w-3" /> {t("broadcast.progress.failed")}
                                     </div>
                                 </div>
                                 <div className="bg-background rounded-lg p-3 text-center border">
@@ -254,7 +257,7 @@ export default function BroadcastPage() {
                                         {broadcastProgress.total - broadcastProgress.sent - broadcastProgress.failed}
                                     </div>
                                     <div className="text-xs text-muted-foreground flex items-center justify-center gap-1 mt-1">
-                                        <Clock className="h-3 w-3" /> Menunggu
+                                        <Clock className="h-3 w-3" /> {t("broadcast.progress.waiting")}
                                     </div>
                                 </div>
                             </div>
@@ -263,7 +266,7 @@ export default function BroadcastPage() {
                             {broadcastProgress.status === "running" && broadcastProgress.current && (
                                 <div className="flex items-center gap-2 text-sm px-3 py-2 bg-muted/50 rounded-lg">
                                     <RefreshCw className="h-3.5 w-3.5 animate-spin text-blue-500" />
-                                    <span className="text-muted-foreground">Terakhir dikirim ke:</span>
+                                    <span className="text-muted-foreground">{t("broadcast.progress.lastSentTo")}</span>
                                     <span className="font-mono font-medium">{formatJid(broadcastProgress.current)}</span>
                                 </div>
                             )}
@@ -273,7 +276,7 @@ export default function BroadcastPage() {
                                 <div className="space-y-2">
                                     <h4 className="text-sm font-semibold text-red-600 flex items-center gap-1.5">
                                         <XCircle className="h-4 w-4" />
-                                        Failed Recipients ({broadcastProgress.errors.length})
+                                        {t("broadcast.progress.failedRecipients", { count: broadcastProgress.errors.length })}
                                     </h4>
                                     <div className="max-h-40 overflow-y-auto bg-red-50 dark:bg-red-950/30 rounded-lg p-2 space-y-1">
                                         {broadcastProgress.errors.map((err, i) => (

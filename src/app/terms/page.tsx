@@ -1,12 +1,17 @@
 import Link from "next/link";
 import { ArrowLeft, ShieldCheck, Scale } from "lucide-react";
+import { getT } from "@/i18n/server";
 
-export const metadata = {
-    title: "Terms of Service | WA-AKG",
-    description: "Terms of Service and Usage Guidelines for WA-AKG.",
-};
+export async function generateMetadata() {
+    const t = await getT();
+    return {
+        title: `${t("legal.terms.title")} | WA-AKG`,
+        description: t("legal.terms.metaDescription"),
+    };
+}
 
-export default function TermsPage() {
+export default async function TermsPage() {
+    const t = await getT();
     return (
         <div className="min-h-screen bg-background relative overflow-hidden py-24 selection:bg-primary/30 selection:text-primary-foreground">
             {/* Ambient background glows */}
@@ -17,7 +22,7 @@ export default function TermsPage() {
 
                 <Link href="/" className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground mb-8 transition-colors group">
                     <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
-                    Back to Home
+                    {t("legal.terms.backToHome")}
                 </Link>
 
                 <div className="glass-panel p-8 md:p-12 rounded-3xl shadow-xl shadow-black/5 dark:shadow-black/20 animate-in fade-in slide-in-from-bottom-8 duration-700">
@@ -26,53 +31,53 @@ export default function TermsPage() {
                             <Scale className="h-8 w-8 text-primary" />
                         </div>
                         <div>
-                            <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-foreground">Terms of Service</h1>
-                            <p className="text-muted-foreground mt-2">Last updated: {new Date().toLocaleDateString()}</p>
+                            <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-foreground">{t("legal.terms.title")}</h1>
+                            <p className="text-muted-foreground mt-2">{t("legal.terms.lastUpdated", { date: new Date().toLocaleDateString() })}</p>
                         </div>
                     </div>
 
                     <div className="prose prose-slate dark:prose-invert max-w-none prose-headings:font-bold prose-headings:tracking-tight prose-a:text-primary hover:prose-a:text-primary/80 prose-p:leading-relaxed">
 
                         <p className="lead text-lg text-muted-foreground mb-8">
-                            Welcome to WA-AKG. By accessing or using our WhatsApp Gateway platform, you agree to be bound by these Terms. If you do not agree, please do not use the service.
+                            {t("legal.terms.intro")}
                         </p>
 
                         <h2 className="flex items-center gap-2 mt-8 text-2xl border-b pb-2">
                             <ShieldCheck className="h-6 w-6 text-emerald-500" />
-                            1. Data Security & Responsibility
+                            {t("legal.terms.s1.title")}
                         </h2>
                         <p>
-                            Security forms the core of our service. As a self-hosted platform, WA-AKG ensures that your data remains strictly within your own infrastructure.
+                            {t("legal.terms.s1.body")}
                         </p>
                         <ul>
-                            <li><strong>Your Data is Yours:</strong> We do not track, intercept, or sell your WhatsApp messages, contact lists, or session data. Your information is secure and not misused.</li>
-                            <li><strong>Safe Usage:</strong> You are responsible for ensuring your hardware and server environments are properly secured.</li>
-                            <li><strong>Authentication:</strong> You must safeguard your account credentials. Do not share your login details with unauthorized personnel.</li>
+                            <li><strong>{t("legal.terms.s1.yoursLabel")}</strong> {t("legal.terms.s1.yoursText")}</li>
+                            <li><strong>{t("legal.terms.s1.safeLabel")}</strong> {t("legal.terms.s1.safeText")}</li>
+                            <li><strong>{t("legal.terms.s1.authLabel")}</strong> {t("legal.terms.s1.authText")}</li>
                         </ul>
 
-                        <h2 className="mt-8 text-2xl border-b pb-2">2. Acceptable Use Policy</h2>
+                        <h2 className="mt-8 text-2xl border-b pb-2">{t("legal.terms.s2.title")}</h2>
                         <p>
-                            When utilizing WA-AKG's API, auto-replies, and broadcasting capabilities, you agree to abide by WhatsApp's official Terms of Service and Anti-Spam policies. You agree not to:
+                            {t("legal.terms.s2.body")}
                         </p>
                         <ul>
-                            <li>Send unsolicited "spam" messages or bulk promotional campaigns to users who have not explicitly opted-in.</li>
-                            <li>Use the platform to distribute malicious software, phishing links, or illegal content.</li>
-                            <li>Attempt to reverse-engineer the core API or overload the service with excessive requests.</li>
+                            <li>{t("legal.terms.s2.spam")}</li>
+                            <li>{t("legal.terms.s2.malware")}</li>
+                            <li>{t("legal.terms.s2.overload")}</li>
                         </ul>
 
-                        <h2 className="mt-8 text-2xl border-b pb-2">3. Account Integrity</h2>
+                        <h2 className="mt-8 text-2xl border-b pb-2">{t("legal.terms.s3.title")}</h2>
                         <p>
-                            WA-AKG provides tools to manage multiple WhatsApp sessions. It is crucial to monitor your active devices. If you suspect unauthorized access to your gateway dashboard, immediately change your password and revoke any connected WhatsApp sessions from your physical device.
+                            {t("legal.terms.s3.body")}
                         </p>
 
-                        <h2 className="mt-8 text-2xl border-b pb-2">4. Disclaimers and Limitations</h2>
+                        <h2 className="mt-8 text-2xl border-b pb-2">{t("legal.terms.s4.title")}</h2>
                         <p>
-                            WA-AKG is provided "as is" and without warranties of any kind. We utilize third-party libraries (such as Baileys) to connect to WhatsApp web protocols. Changes to WhatsApp's internal systems may occasionally disrupt service. We are not liable for any account suspensions or bans imposed by WhatsApp as a result of your usage.
+                            {t("legal.terms.s4.body")}
                         </p>
 
                         <div className="mt-12 p-6 bg-primary/5 rounded-2xl border border-primary/10">
-                            <p className="font-semibold mb-2">Have questions about these terms?</p>
-                            <p className="text-sm text-muted-foreground mb-0">Please review our <Link href="/docs">Documentation</Link> or reach out to the project maintainers for further clarification.</p>
+                            <p className="font-semibold mb-2">{t("legal.terms.questions")}</p>
+                            <p className="text-sm text-muted-foreground mb-0">{t("legal.terms.questionsBefore")}<Link href="/docs">{t("legal.terms.questionsLink")}</Link>{t("legal.terms.questionsAfter")}</p>
                         </div>
                     </div>
                 </div>

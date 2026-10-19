@@ -8,9 +8,11 @@ import { Badge } from "@/components/ui/badge";
 import { Activity, Cpu, HardDrive, Network, Server, MemoryStick } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
+import { useTranslation } from "@/i18n/react";
 
 export default function SystemMonitorPage() {
     const { data: session } = useSession();
+    const { t } = useTranslation();
     const [data, setData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
@@ -57,8 +59,8 @@ export default function SystemMonitorPage() {
             <div className="flex h-[80vh] items-center justify-center">
                 <div className="text-center space-y-4">
                     <Activity className="mx-auto h-12 w-12 text-red-500/50" />
-                    <h2 className="text-xl font-bold">Access Denied</h2>
-                    <p className="text-muted-foreground">Only Super Admins can view system resources.</p>
+                    <h2 className="text-xl font-bold">{t("systemMonitor.accessDenied.title")}</h2>
+                    <p className="text-muted-foreground">{t("systemMonitor.accessDenied.description")}</p>
                 </div>
             </div>
         );
@@ -68,8 +70,8 @@ export default function SystemMonitorPage() {
         return (
             <div className="p-4 sm:p-8 space-y-6">
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight">System Monitor <Badge className="ml-2" variant="outline">Live</Badge></h1>
-                    <p className="text-muted-foreground">Real-time OS and Node process metrics.</p>
+                    <h1 className="text-2xl font-bold tracking-tight">{t("systemMonitor.title")} <Badge className="ml-2" variant="outline">{t("systemMonitor.live")}</Badge></h1>
+                    <p className="text-muted-foreground">{t("systemMonitor.subtitle")}</p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-32 rounded-xl" />)}
@@ -106,20 +108,20 @@ export default function SystemMonitorPage() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-                        System Monitor
+                        {t("systemMonitor.title")}
                         <span className="relative flex h-3 w-3">
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                             <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
                         </span>
                     </h1>
-                    <p className="text-muted-foreground">Real-time OS and Node process metrics.</p>
+                    <p className="text-muted-foreground">{t("systemMonitor.subtitle")}</p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-muted-foreground bg-muted/50 px-3 py-2 rounded-lg border leading-tight">
                     <Server className="h-4 w-4 shrink-0" />
                     <span className="truncate max-w-[200px] sm:max-w-none">{data.os.distro} {data.os.release}</span>
                     <span className="hidden sm:inline">({data.os.platform})</span>
                     <span className="mx-1 opacity-50">•</span>
-                    <span>Uptime: {formatUptime(data.os.uptime)}</span>
+                    <span>{t("systemMonitor.uptime", { value: formatUptime(data.os.uptime) })}</span>
                 </div>
             </div>
 
@@ -127,18 +129,18 @@ export default function SystemMonitorPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">CPU Load</CardTitle>
+                        <CardTitle className="text-sm font-medium">{t("systemMonitor.cards.cpuLoad")}</CardTitle>
                         <Cpu className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{data.cpu.load.toFixed(1)}%</div>
                         <Progress value={data.cpu.load} className="h-2 mt-3" indicatorClassName={data.cpu.load > 85 ? "bg-red-500" : data.cpu.load > 60 ? "bg-orange-500" : "bg-blue-500"} />
-                        <p className="text-xs text-muted-foreground mt-2">{data.cpu.cores.length} Cores Average</p>
+                        <p className="text-xs text-muted-foreground mt-2">{t("systemMonitor.cards.coresAverage", { count: data.cpu.cores.length })}</p>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">System RAM</CardTitle>
+                        <CardTitle className="text-sm font-medium">{t("systemMonitor.cards.systemRam")}</CardTitle>
                         <MemoryStick className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
@@ -151,35 +153,35 @@ export default function SystemMonitorPage() {
                 </Card>
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Node.js Process</CardTitle>
+                        <CardTitle className="text-sm font-medium">{t("systemMonitor.cards.nodeProcess")}</CardTitle>
                         <Activity className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{formatBytes(data.process.rss)}</div>
                         <Progress value={processMemPercent} className="h-2 mt-3" indicatorClassName="bg-green-500" />
                         <p className="text-xs text-muted-foreground mt-2">
-                            Uptime: {formatUptime(data.process.uptime)} ΓÇö Heap: {formatBytes(data.process.heapUsed)}
+                            {t("systemMonitor.node.uptimeHeap", { uptime: formatUptime(data.process.uptime), heap: formatBytes(data.process.heapUsed) })}
                         </p>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Network Traffic</CardTitle>
+                        <CardTitle className="text-sm font-medium">{t("systemMonitor.cards.networkTraffic")}</CardTitle>
                         <Network className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold space-y-1 mt-1">
                             <div className="flex items-center text-sm">
-                                <span className="text-blue-500 font-bold w-10">Γåô RX</span>
+                                <span className="text-blue-500 font-bold w-10">{t("systemMonitor.network.rx")}</span>
                                 <span>{formatBytes(data.network[0]?.rx_sec || 0)}/s</span>
                             </div>
                             <div className="flex items-center text-sm">
-                                <span className="text-green-500 font-bold w-10">Γåæ TX</span>
+                                <span className="text-green-500 font-bold w-10">{t("systemMonitor.network.tx")}</span>
                                 <span>{formatBytes(data.network[0]?.tx_sec || 0)}/s</span>
                             </div>
                         </div>
                         <p className="text-xs text-muted-foreground mt-3 pt-1 border-t truncate">
-                            Iface: {data.network[0]?.iface || 'Unknown'} (Active)
+                            {t("systemMonitor.network.iface", { iface: data.network[0]?.iface || t("systemMonitor.network.unknown") })}
                         </p>
                     </CardContent>
                 </Card>
@@ -190,8 +192,8 @@ export default function SystemMonitorPage() {
                 {/* CPU Cores */}
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-lg">CPU Cores Breakdown</CardTitle>
-                        <CardDescription>Individual load percentage for each logical core.</CardDescription>
+                        <CardTitle className="text-lg">{t("systemMonitor.cores.title")}</CardTitle>
+                        <CardDescription>{t("systemMonitor.cores.description")}</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -200,7 +202,7 @@ export default function SystemMonitorPage() {
                                     {/* Fake progress bg */}
                                     {load > 0 && <div className={`absolute bottom-0 left-0 right-0 opacity-20 transition-all duration-300 ${load > 85 ? 'bg-red-500' : 'bg-blue-500'}`} style={{ height: `${load}%` }} />}
                                     <div className="relative z-10">
-                                        <p className="text-xs text-muted-foreground font-mono">Core {i}</p>
+                                        <p className="text-xs text-muted-foreground font-mono">{t("systemMonitor.cores.core", { index: i })}</p>
                                         <p className={`text-lg font-bold ${load > 85 ? 'text-red-500' : ''}`}>{load.toFixed(1)}%</p>
                                     </div>
                                 </div>
@@ -212,8 +214,8 @@ export default function SystemMonitorPage() {
                 {/* Storage Disks */}
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-lg">Storage Volumes</CardTitle>
-                        <CardDescription>Mounted filesystems and current space usage.</CardDescription>
+                        <CardTitle className="text-lg">{t("systemMonitor.storage.title")}</CardTitle>
+                        <CardDescription>{t("systemMonitor.storage.description")}</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6">
                         {data.disk.map((d: any, i: number) => (
@@ -235,7 +237,7 @@ export default function SystemMonitorPage() {
                         ))}
                         {data.disk.length === 0 && (
                             <div className="text-center py-6 text-muted-foreground text-sm border border-dashed rounded-lg">
-                                No disk information available
+                                {t("systemMonitor.storage.empty")}
                             </div>
                         )}
                     </CardContent>

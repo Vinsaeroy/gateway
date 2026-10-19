@@ -17,24 +17,29 @@ import {
 import { Input } from "@/components/ui/input"
 import { Bot, ArrowRight, Loader2, Eye, EyeOff } from "lucide-react";
 import Link from 'next/link';
+import { useTranslation } from "@/i18n/react";
 
-const formSchema = z.object({
-    name: z.string().min(2, "Name must be at least 2 characters"),
-    email: z.string().email("Please enter a valid email address"),
-    password: z.string().min(6, "Password must be at least 6 characters"),
-    confirmPassword: z.string()
-}).refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
-});
+const buildFormSchema = (t: (key: string) => string) =>
+    z.object({
+        name: z.string().min(2, t("auth.register.errors.nameMin")),
+        email: z.string().email(t("auth.register.errors.email")),
+        password: z.string().min(6, t("auth.register.errors.passwordMin")),
+        confirmPassword: z.string()
+    }).refine((data) => data.password === data.confirmPassword, {
+        message: t("auth.register.errors.passwordMismatch"),
+        path: ["confirmPassword"],
+    });
 
 export default function RegisterPage() {
+    const { t } = useTranslation();
     const router = useRouter();
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
+
+    const formSchema = buildFormSchema(t);
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -64,7 +69,7 @@ export default function RegisterPage() {
 
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.error || "Failed to register");
+                throw new Error(errorData.error || t("auth.register.errors.registerFailed"));
             }
 
             setSuccess(true);
@@ -73,7 +78,7 @@ export default function RegisterPage() {
             }, 2000);
 
         } catch (err: any) {
-            setError(err.message || "An unexpected error occurred");
+            setError(err.message || t("auth.register.errors.unexpected"));
         } finally {
             setLoading(false);
         }
@@ -87,8 +92,8 @@ export default function RegisterPage() {
                     <div className="h-16 w-16 bg-emerald-500 rounded-full flex items-center justify-center mb-6 shadow-lg shadow-emerald-500/30">
                         <Bot className="h-8 w-8 text-white" />
                     </div>
-                    <h2 className="text-2xl font-bold text-foreground mb-2">Registration Successful!</h2>
-                    <p className="text-muted-foreground">Redirecting you to the login page...</p>
+                    <h2 className="text-2xl font-bold text-foreground mb-2">{t("auth.register.successTitle")}</h2>
+                    <p className="text-muted-foreground">{t("auth.register.successRedirect")}</p>
                 </div>
             </div>
         );
@@ -107,8 +112,8 @@ export default function RegisterPage() {
                     <Link href="/" className="relative flex h-16 w-16 mb-4 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-400 to-primary text-white shadow-lg shadow-primary/30 hover:scale-105 transition-transform cursor-pointer">
                         <Bot className="h-8 w-8" />
                     </Link>
-                    <h1 className="text-3xl font-bold tracking-tight text-foreground">Create Account</h1>
-                    <p className="text-muted-foreground mt-2">Join us today</p>
+                    <h1 className="text-3xl font-bold tracking-tight text-foreground">{t("auth.register.title")}</h1>
+                    <p className="text-muted-foreground mt-2">{t("auth.register.subtitle")}</p>
                 </div>
 
                 <div className="glass-panel rounded-3xl p-8 shadow-2xl shadow-black/5 dark:shadow-black/40">
@@ -125,10 +130,10 @@ export default function RegisterPage() {
                                 name="name"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel className="text-foreground/80">Full Name</FormLabel>
+                                        <FormLabel className="text-foreground/80">{t("auth.register.nameLabel")}</FormLabel>
                                         <FormControl>
                                             <Input
-                                                placeholder="John Doe"
+                                                placeholder={t("auth.register.namePlaceholder")}
                                                 className="h-12 px-4 rounded-xl bg-background/50 border-white/20 dark:border-white/10 focus-visible:ring-primary/50 transition-all font-medium"
                                                 {...field}
                                             />
@@ -142,10 +147,10 @@ export default function RegisterPage() {
                                 name="email"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel className="text-foreground/80">Email</FormLabel>
+                                        <FormLabel className="text-foreground/80">{t("auth.register.emailLabel")}</FormLabel>
                                         <FormControl>
                                             <Input
-                                                placeholder="name@example.com"
+                                                placeholder={t("auth.register.emailPlaceholder")}
                                                 className="h-12 px-4 rounded-xl bg-background/50 border-white/20 dark:border-white/10 focus-visible:ring-primary/50 transition-all font-medium"
                                                 {...field}
                                             />
@@ -159,7 +164,7 @@ export default function RegisterPage() {
                                 name="password"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel className="text-foreground/80">Password</FormLabel>
+                                        <FormLabel className="text-foreground/80">{t("auth.register.passwordLabel")}</FormLabel>
                                         <FormControl>
                                             <div className="relative">
                                                 <Input
@@ -172,7 +177,7 @@ export default function RegisterPage() {
                                                     type="button"
                                                     onClick={() => setShowPassword((v) => !v)}
                                                     tabIndex={-1}
-                                                    aria-label={showPassword ? "Sembunyikan password" : "Tampilkan password"}
+                                                    aria-label={showPassword ? t("auth.register.hidePassword") : t("auth.register.showPassword")}
                                                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                                                 >
                                                     {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
@@ -188,7 +193,7 @@ export default function RegisterPage() {
                                 name="confirmPassword"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel className="text-foreground/80">Confirm Password</FormLabel>
+                                        <FormLabel className="text-foreground/80">{t("auth.register.confirmPasswordLabel")}</FormLabel>
                                         <FormControl>
                                             <div className="relative">
                                                 <Input
@@ -201,7 +206,7 @@ export default function RegisterPage() {
                                                     type="button"
                                                     onClick={() => setShowConfirm((v) => !v)}
                                                     tabIndex={-1}
-                                                    aria-label={showConfirm ? "Sembunyikan password" : "Tampilkan password"}
+                                                    aria-label={showConfirm ? t("auth.register.hidePassword") : t("auth.register.showPassword")}
                                                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                                                 >
                                                     {showConfirm ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
@@ -220,23 +225,23 @@ export default function RegisterPage() {
                                 disabled={loading}
                             >
                                 {loading ? (
-                                    <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Creating Account...</>
+                                    <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> {t("auth.register.creating")}</>
                                 ) : (
-                                    <>Register <ArrowRight className="ml-2 h-5 w-5" /></>
+                                    <>{t("auth.register.submit")} <ArrowRight className="ml-2 h-5 w-5" /></>
                                 )}
                             </Button>
                         </form>
                     </Form>
 
                     <div className="mt-6 text-xs text-center text-muted-foreground leading-relaxed">
-                        By registering, you agree to our <Link href="/terms" className="underline hover:text-foreground">Terms of Service</Link> and <Link href="/privacy" className="underline hover:text-foreground">Privacy Policy</Link>.
+                        {t("auth.register.termsNotice.before")}<Link href="/terms" className="underline hover:text-foreground">{t("auth.register.termsNotice.terms")}</Link>{t("auth.register.termsNotice.and")}<Link href="/privacy" className="underline hover:text-foreground">{t("auth.register.termsNotice.privacy")}</Link>{t("auth.register.termsNotice.after")}
                     </div>
                 </div>
 
                 <div className="mt-8 text-center text-sm text-muted-foreground">
-                    Already have an account?{" "}
+                    {t("auth.register.alreadyHaveAccount")}{" "}
                     <Link href="/auth/login" className="font-semibold text-primary hover:text-primary/80 transition-colors">
-                        Sign in
+                        {t("auth.register.signIn")}
                     </Link>
                 </div>
             </div>

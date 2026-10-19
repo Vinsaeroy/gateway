@@ -1,0 +1,118 @@
+const webhooks = {
+    title: "Webhooks & API",
+    apiKey: {
+        title: "API Key",
+        description: "Gunakan kunci ini untuk mengautentikasi permintaan API. Sertakan di header X-API-Key.",
+        hidden: "•••••••• (kunci tersembunyi — hanya ditampilkan sekali saat dibuat)",
+        none: "Belum ada API key yang dibuat",
+        generate: "Buat",
+        regenerate: "Buat Ulang",
+        exampleLabel: "Contoh:",
+        hiddenNoteA: "Demi keamanan, API key disimpan terenkripsi dan tidak bisa ditampilkan lagi. Klik ",
+        hiddenNoteB: " kalau kamu lupa/kehilangan key-nya.",
+        regenTitle: "Buat Ulang API Key?",
+        regenDescription: "Ini akan menonaktifkan API key kamu saat ini. Semua integrasi yang memakai kunci lama akan langsung berhenti berfungsi. Tindakan ini tidak dapat dibatalkan.",
+        cancel: "Batal",
+        createdToast: "API key baru dibuat. Salin sekarang — tidak akan ditampilkan lagi!",
+        generateFail: "Gagal membuat API key",
+    },
+    events: {
+        messageReceived: {
+            label: "Pesan Diterima",
+            description: "Saat pesan baru diterima",
+        },
+        messageSent: {
+            label: "Pesan Terkirim",
+            description: "Saat pesan dikirim",
+        },
+        messageStatus: {
+            label: "Status Pesan",
+            description: "Saat status pesan berubah (diterima, dibaca)",
+        },
+        connectionUpdate: {
+            label: "Pembaruan Koneksi",
+            description: "Saat sesi terhubung/terputus",
+        },
+        groupUpdate: {
+            label: "Pembaruan Grup",
+            description: "Saat info grup berubah",
+        },
+        groupJoined: {
+            label: "Grup Bergabung",
+            description: "Saat kamu bergabung atau ditambahkan ke grup baru",
+        },
+        groupParticipant: {
+            label: "Anggota Grup",
+            description: "Saat anggota bergabung, keluar, atau berubah peran",
+        },
+        contactUpdate: {
+            label: "Pembaruan Kontak",
+            description: "Saat info kontak berubah",
+        },
+        statusUpdate: {
+            label: "Status/Cerita",
+            description: "Saat status diposting atau dilihat",
+        },
+        messageEdited: {
+            label: "Pesan Diubah",
+            description: "Saat pesan diubah",
+        },
+        messageDeleted: {
+            label: "Pesan Dihapus",
+            description: "Saat pesan dicabut/dihapus",
+        },
+    },
+    section: {
+        title: "Webhooks",
+        description: "Kirim event real-time ke URL eksternal saat ada aktivitas di WhatsApp.",
+        add: "Tambah Webhook",
+    },
+    form: {
+        newTitle: "Webhook Baru",
+        name: "Nama",
+        namePlaceholder: "Server Saya",
+        url: "URL Webhook",
+        secret: "Secret (opsional, untuk tanda tangan HMAC)",
+        secretPlaceholder: "your-secret-key",
+        events: "Event",
+        cancel: "Batal",
+        create: "Buat Webhook",
+        editTitle: "Ubah Webhook",
+        editDescription: "Ubah konfigurasi endpoint webhook dan event yang berlangganan.",
+        save: "Simpan Perubahan",
+    },
+    list: {
+        loading: "Memuat...",
+        empty: "Belum ada webhook yang dikonfigurasi untuk sesi ini. Klik \"{name}\" untuk membuat.",
+        active: "Aktif",
+        inactive: "Nonaktif",
+        testing: "Menguji...",
+        test: "Uji",
+        edit: "Ubah",
+        eventsToggle: "Event (klik untuk mengaktifkan/menonaktifkan)",
+    },
+    delete: {
+        title: "Yakin sekali?",
+        description: "Tindakan ini tidak dapat dibatalkan. Konfigurasi webhook akan dihapus secara permanen.",
+        cancel: "Batal",
+        confirm: "Hapus",
+    },
+    toasts: {
+        required: "Nama, URL, dan minimal satu event wajib diisi",
+        noSession: "Tidak ada sesi aktif yang dipilih",
+        created: "Webhook dibuat!",
+        createFail: "Gagal membuat webhook",
+        error: "Terjadi kesalahan",
+        updated: "Webhook diperbarui!",
+        updateFail: "Gagal memperbarui webhook",
+        testOk: "Webhook berhasil!",
+        testFail: "Test webhook gagal",
+        testError: "Gagal menjalankan test webhook",
+        eventsFail: "Gagal memperbarui event webhook",
+        deleted: "Webhook dihapus",
+        deleteFail: "Gagal menghapus webhook",
+        copied: "Disalin ke clipboard!",
+    },
+} as const;
+
+export default webhooks;

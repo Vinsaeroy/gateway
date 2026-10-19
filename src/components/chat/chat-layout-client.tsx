@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ChatList } from "./chat-list";
 import { ChatWindow } from "./chat-window";
 import { MessageCircle } from "lucide-react";
+import { useTranslation } from "@/i18n/react";
 
 interface ChatLayoutClientProps {
     sessionId: string;
@@ -16,6 +17,7 @@ interface SelectedChat {
 }
 
 export function ChatLayoutClient({ sessionId }: ChatLayoutClientProps) {
+    const { t } = useTranslation();
     const [selectedChat, setSelectedChat] = useState<SelectedChat | null>(null);
     const [profilePicMap, setProfilePicMap] = useState<Record<string, string>>({});
 
@@ -77,10 +79,10 @@ export function ChatLayoutClient({ sessionId }: ChatLayoutClientProps) {
                                 <MessageCircle className="h-8 w-8 text-muted-foreground/40" />
                             </div>
                             <p className="text-sm text-muted-foreground hidden md:block">
-                                Select a chat to start messaging
+                                {t("chat.layout.selectChatDesktop")}
                             </p>
                             <p className="text-sm text-muted-foreground md:hidden">
-                                Select a chat from the list
+                                {t("chat.layout.selectChatMobile")}
                             </p>
                         </div>
                     </div>

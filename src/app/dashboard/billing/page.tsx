@@ -6,7 +6,10 @@ import { toast } from "sonner";
 import { Check, Sparkles, Loader2, RefreshCw, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { PLANS, PLAN_ORDER, formatIDR, type PlanId } from "@/lib/plans";
+import { PLANS, PLAN_ORDER, type PlanId } from "@/lib/plans";
+import { useTranslation } from "@/i18n/react";
+import { intlLocale } from "@/i18n/config";
+import { formatCurrency, formatNumber } from "@/i18n/format";
 
 interface UsageData {
     plan: PlanId;
@@ -32,6 +35,7 @@ interface CheckoutData {
 }
 
 function UsageBar({ label, used, limit }: { label: string; used: number; limit: number }) {
+    const { locale } = useTranslation();
     const unlimited = limit < 0;
     const pct = unlimited ? 0 : Math.min(100, Math.round((used / Math.max(1, limit)) * 100));
     return (
@@ -39,7 +43,7 @@ function UsageBar({ label, used, limit }: { label: string; used: number; limit: 
             <div className="flex justify-between text-sm mb-1">
                 <span className="text-muted-foreground">{label}</span>
                 <span className="font-medium">
-                    {used.toLocaleString("id-ID")} / {unlimited ? "∞" : limit.toLocaleString("id-ID")}
+                    {formatNumber(used, locale)} / {unlimited ? "∞" : formatNumber(limit, locale)}
                 </span>
             </div>
             <div className="h-2 rounded-full bg-muted overflow-hidden">
@@ -53,6 +57,7 @@ function UsageBar({ label, used, limit }: { label: string; used: number; limit: 
 }
 
 export default function BillingPage() {
+    const { t, locale } = useTranslation();
     const [usage, setUsage] = useState<UsageData | null>(null);
     const [loading, setLoading] = useState(true);
     const [checkout, setCheckout] = useState<CheckoutData | null>(null);
@@ -90,13 +95,13 @@ export default function BillingPage() {
                 if (status === "PAID") {
                     clearInterval(interval);
                     setPolling(false);
-                    toast.success(`Pembayaran berhasil! Plan ${checkout.planName} aktif 🎉`);
+                    toast.success(t("billing.toast.paymentSuccess", { plan: checkout.planName }));
                     setCheckout(null);
                     loadUsage();
                 } else if (["EXPIRED", "FAILED", "CANCELLED"].includes(status)) {
                     clearInterval(interval);
                     setPolling(false);
-                    toast.error(`Pembayaran ${status.toLowerCase()}. Silakan coba lagi.`);
+                    toast.error(t("billing.toast.paymentFailed", { status }));
                     setCheckout(null);
                 }
             } catch {
@@ -108,13 +113,13 @@ export default function BillingPage() {
             active = false;
             clearInterval(interval);
         };
-    }, [checkout, loadUsage]);
+    }, [checkout, loadUsage, t]);
 
     const handleBuy = async (plan: PlanId) => {
         const cfg = PLANS[plan];
         if (plan === "FREE") return;
         if (cfg.price === null) {
-            toast.info("Plan Enterprise bersifat custom. Silakan hubungi admin.");
+            toast.info(t("billing.toast.enterpriseCustom"));
             return;
         }
         setBuying(plan);
@@ -126,16 +131,16 @@ export default function BillingPage() {
             });
             const json = await res.json();
             if (!json.status) {
-                toast.error(json.message || "Gagal membuat transaksi");
+                toast.error(json.message || t("billing.toast.checkoutFailed"));
                 return;
             }
             if (!json.data.qrString && !json.data.qrImageUrl) {
-                toast.error("Gateway tidak mengembalikan QR. Cek konfigurasi KlikQRIS.");
+                toast.error(t("billing.toast.noQr"));
                 return;
             }
             setCheckout(json.data);
         } catch (e: any) {
-            toast.error(e?.message || "Gagal membuat transaksi");
+            toast.error(e?.message || t("billing.toast.checkoutFailed"));
         } finally {
             setBuying(null);
         }
@@ -144,34 +149,36 @@ export default function BillingPage() {
     return (
         <div className="space-y-8 p-4 md:p-6 max-w-6xl mx-auto">
             <div>
-                <h1 className="text-2xl font-bold tracking-tight">Billing & Plan</h1>
-                <p className="text-muted-foreground">Kelola langganan dan lihat pemakaian API kamu.</p>
+                <h1 className="text-2xl font-bold tracking-tight">{t("billing.title")}</h1>
+                <p className="text-muted-foreground">{t("billing.subtitle")}</p>
             </div>
 
             {/* Current plan + usage */}
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between">
                     <div>
-                        <CardTitle>Plan Saat Ini</CardTitle>
+                        <CardTitle>{t("billing.currentPlan.title")}</CardTitle>
                         <CardDescription>
-                            {loading ? "Memuat..." : `${usage?.planName || "Free"}`}
+                            {loading ? t("billing.currentPlan.loading") : `${usage?.planName || "Free"}`}
                             {usage?.planExpiresAt
-                                ? ` · aktif s/d ${new Date(usage.planExpiresAt).toLocaleDateString("id-ID")}`
+                                ? t("billing.currentPlan.activeUntil", {
+                                      date: new Date(usage.planExpiresAt).toLocaleDateString(intlLocale[locale])
+                                  })
                                 : ""}
                         </CardDescription>
                     </div>
-                    <Button variant="outline" size="sm" onClick={loadUsage} disabled={loading}>
+                    <Button variant="outline" size="sm" onClick={loadUsage} disabled={loading} aria-label={t("billing.refresh")}>
                         <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
                     </Button>
                 </CardHeader>
                 <CardContent className="space-y-5">
                     {usage ? (
                         <>
-                            <UsageBar label="Request hari ini" used={usage.dayCount} limit={usage.dailyLimit} />
-                            <UsageBar label="Request bulan ini" used={usage.monthCount} limit={usage.monthlyLimit} />
+                            <UsageBar label={t("billing.usage.daily")} used={usage.dayCount} limit={usage.dailyLimit} />
+                            <UsageBar label={t("billing.usage.monthly")} used={usage.monthCount} limit={usage.monthlyLimit} />
                         </>
                     ) : (
-                        <p className="text-sm text-muted-foreground">Memuat pemakaian...</p>
+                        <p className="text-sm text-muted-foreground">{t("billing.usage.loading")}</p>
                     )}
                 </CardContent>
             </Card>
@@ -181,12 +188,12 @@ export default function BillingPage() {
                 <Card className="border-primary">
                     <CardHeader className="flex flex-row items-center justify-between">
                         <div>
-                            <CardTitle>Bayar {checkout.planName}</CardTitle>
+                            <CardTitle>{t("billing.checkout.title", { plan: checkout.planName })}</CardTitle>
                             <CardDescription>
-                                Scan QRIS di bawah pakai aplikasi e-wallet / mobile banking.
+                                {t("billing.checkout.scanHint")}
                             </CardDescription>
                         </div>
-                        <Button variant="ghost" size="sm" onClick={() => setCheckout(null)}>
+                        <Button variant="ghost" size="sm" onClick={() => setCheckout(null)} aria-label={t("billing.checkout.close")}>
                             <X className="h-4 w-4" />
                         </Button>
                     </CardHeader>
@@ -200,15 +207,15 @@ export default function BillingPage() {
                             ) : null}
                         </div>
                         <div className="text-center">
-                            <p className="text-2xl font-bold">{formatIDR(checkout.totalAmount ?? checkout.amount)}</p>
+                            <p className="text-2xl font-bold">{formatCurrency(checkout.totalAmount ?? checkout.amount, locale)}</p>
                             {checkout.totalAmount && checkout.totalAmount !== checkout.amount && (
                                 <p className="text-xs text-muted-foreground">
-                                    Harga plan {formatIDR(checkout.amount)} + kode unik
+                                    {t("billing.checkout.priceBreakdown", { price: formatCurrency(checkout.amount, locale) })}
                                 </p>
                             )}
                             <p className="text-sm text-muted-foreground flex items-center justify-center gap-2 mt-1">
                                 {polling && <Loader2 className="h-4 w-4 animate-spin" />}
-                                Menunggu pembayaran...
+                                {t("billing.checkout.waiting")}
                             </p>
                         </div>
                     </CardContent>
@@ -217,7 +224,7 @@ export default function BillingPage() {
 
             {/* Plans */}
             <div>
-                <h2 className="text-lg font-semibold mb-4">Pilih Plan</h2>
+                <h2 className="text-lg font-semibold mb-4">{t("billing.choose.title")}</h2>
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                     {PLAN_ORDER.map((id) => {
                         const plan = PLANS[id];
@@ -231,14 +238,16 @@ export default function BillingPage() {
                             >
                                 {plan.highlight && (
                                     <div className="absolute top-0 right-0 flex items-center gap-1 rounded-bl-xl bg-primary px-2 py-1 text-[10px] font-semibold text-primary-foreground">
-                                        <Sparkles className="h-3 w-3" /> Populer
+                                        <Sparkles className="h-3 w-3" /> {t("plans.popular")}
                                     </div>
                                 )}
                                 <h3 className="font-bold">{plan.name}</h3>
                                 <div className="mt-2 mb-3">
-                                    <span className="text-2xl font-extrabold">{formatIDR(plan.price)}</span>
+                                    <span className="text-2xl font-extrabold">
+                                        {isCustom ? t("plans.price.custom") : isFree ? t("plans.price.free") : formatCurrency(plan.price ?? 0, locale)}
+                                    </span>
                                     {!isFree && !isCustom && (
-                                        <span className="text-muted-foreground text-xs">/bln</span>
+                                        <span className="text-muted-foreground text-xs">{t("plans.price.perMonth")}</span>
                                     )}
                                 </div>
                                 <ul className="space-y-2 mb-5 flex-1">
@@ -258,13 +267,13 @@ export default function BillingPage() {
                                     {buying === id ? (
                                         <Loader2 className="h-4 w-4 animate-spin" />
                                     ) : isCurrent ? (
-                                        "Plan Aktif"
+                                        t("billing.choose.active")
                                     ) : isFree ? (
-                                        "Default"
+                                        t("billing.choose.default")
                                     ) : isCustom ? (
-                                        "Hubungi Kami"
+                                        t("plans.cta.contactUs")
                                     ) : (
-                                        "Upgrade"
+                                        t("billing.choose.upgrade")
                                     )}
                                 </Button>
                             </div>

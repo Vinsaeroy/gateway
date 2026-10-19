@@ -1,10 +1,31 @@
 "use client";
 
 import React from "react";
+import { useTranslation } from "@/i18n/react";
 
 interface State {
     hasError: boolean;
     isTranslateError: boolean;
+}
+
+function ErrorFallback() {
+    const { t } = useTranslation();
+    return (
+        <div className="min-h-[60vh] flex items-center justify-center p-6 text-center">
+            <div className="max-w-md space-y-3">
+                <h2 className="text-lg font-semibold">{t("common.somethingWentWrong")}</h2>
+                <p className="text-sm text-muted-foreground">
+                    {t("common.errorDescription")}
+                </p>
+                <button
+                    onClick={() => window.location.reload()}
+                    className="text-sm px-4 py-2 rounded-md bg-primary text-primary-foreground"
+                >
+                    {t("common.reload")}
+                </button>
+            </div>
+        </div>
+    );
 }
 
 /**
@@ -54,22 +75,7 @@ export class TranslateSafeBoundary extends React.Component<
 
     render() {
         if (this.state.hasError && !this.state.isTranslateError) {
-            return (
-                <div className="min-h-[60vh] flex items-center justify-center p-6 text-center">
-                    <div className="max-w-md space-y-3">
-                        <h2 className="text-lg font-semibold">Something went wrong</h2>
-                        <p className="text-sm text-muted-foreground">
-                            Please refresh the page. If the problem persists, contact support.
-                        </p>
-                        <button
-                            onClick={() => window.location.reload()}
-                            className="text-sm px-4 py-2 rounded-md bg-primary text-primary-foreground"
-                        >
-                            Reload
-                        </button>
-                    </div>
-                </div>
-            );
+            return <ErrorFallback />;
         }
         return this.props.children;
     }

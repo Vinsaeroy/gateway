@@ -38,15 +38,16 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useTranslation } from "@/i18n/react";
 
 interface NavGroup {
-    label: string;
+    labelKey: string;
     items: NavItem[];
 }
 
 interface NavItem {
     href: string;
-    label: string;
+    labelKey: string;
     icon: React.ElementType;
     external?: boolean;
     superadminOnly?: boolean;
@@ -56,67 +57,68 @@ interface NavItem {
 
 const navGroups: NavGroup[] = [
     {
-        label: "Main",
+        labelKey: "nav.groups.main",
         items: [
-            { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-            { href: "/dashboard/sessions", label: "Sessions / QR", icon: QrCode },
+            { href: "/dashboard", labelKey: "nav.items.dashboard", icon: LayoutDashboard },
+            { href: "/dashboard/sessions", labelKey: "nav.items.sessions", icon: QrCode },
         ],
     },
     {
-        label: "Messaging",
+        labelKey: "nav.groups.messaging",
         items: [
-            { href: "/dashboard/chat", label: "Chat", icon: MessageSquare },
-            { href: "/dashboard/broadcast", label: "Broadcast", icon: Megaphone, capability: "broadcast" },
-            { href: "/dashboard/sticker", label: "Sticker Maker", icon: ImageIcon, capability: "sticker" },
+            { href: "/dashboard/chat", labelKey: "nav.items.chat", icon: MessageSquare },
+            { href: "/dashboard/broadcast", labelKey: "nav.items.broadcast", icon: Megaphone, capability: "broadcast" },
+            { href: "/dashboard/sticker", labelKey: "nav.items.stickerMaker", icon: ImageIcon, capability: "sticker" },
         ],
     },
     {
-        label: "Contacts",
+        labelKey: "nav.groups.contacts",
         items: [
-            { href: "/dashboard/contacts", label: "Contacts", icon: UserCheck },
-            { href: "/dashboard/groups", label: "Groups", icon: Users },
-            { href: "/dashboard/labels", label: "Labels", icon: Tag },
+            { href: "/dashboard/contacts", labelKey: "nav.items.contacts", icon: UserCheck },
+            { href: "/dashboard/groups", labelKey: "nav.items.groups", icon: Users },
+            { href: "/dashboard/labels", labelKey: "nav.items.labels", icon: Tag },
         ],
     },
     {
-        label: "Automation",
+        labelKey: "nav.groups.automation",
         items: [
-            { href: "/dashboard/bot-settings", label: "Bot Settings", icon: Bot },
-            { href: "/dashboard/autoreply", label: "Auto Reply", icon: MessageCircleReply, capability: "autoReply" },
-            { href: "/dashboard/profile", label: "Bot Profile", icon: UserCircle },
-            { href: "/dashboard/scheduler", label: "Scheduler", icon: CalendarClock, capability: "scheduler" },
-            { href: "/dashboard/auto-broadcast", label: "Auto Broadcast", icon: Radio, capability: "autoBroadcast" },
-            { href: "/dashboard/jpm-swgc", label: "JPM SWGC", icon: Megaphone, capability: "jpm" },
-            { href: "/dashboard/webhooks", label: "Webhooks & API", icon: Webhook, capability: "webhook" },
+            { href: "/dashboard/bot-settings", labelKey: "nav.items.botSettings", icon: Bot },
+            { href: "/dashboard/autoreply", labelKey: "nav.items.autoReply", icon: MessageCircleReply, capability: "autoReply" },
+            { href: "/dashboard/profile", labelKey: "nav.items.botProfile", icon: UserCircle },
+            { href: "/dashboard/scheduler", labelKey: "nav.items.scheduler", icon: CalendarClock, capability: "scheduler" },
+            { href: "/dashboard/auto-broadcast", labelKey: "nav.items.autoBroadcast", icon: Radio, capability: "autoBroadcast" },
+            { href: "/dashboard/jpm-swgc", labelKey: "nav.items.jpmSwgc", icon: Megaphone, capability: "jpm" },
+            { href: "/dashboard/webhooks", labelKey: "nav.items.webhooks", icon: Webhook, capability: "webhook" },
         ],
     },
     {
-        label: "Developer",
+        labelKey: "nav.groups.developer",
         items: [
-            { href: "/docs", label: "API Docs", icon: FileText },
-            { href: "/swagger", label: "Swagger UI", icon: Code, external: true },
+            { href: "/docs", labelKey: "nav.items.apiDocs", icon: FileText },
+            { href: "/swagger", labelKey: "nav.items.swagger", icon: Code, external: true },
         ],
     },
     {
-        label: "Account",
+        labelKey: "nav.groups.account",
         items: [
-            { href: "/dashboard/billing", label: "Billing & Plan", icon: CreditCard },
+            { href: "/dashboard/billing", labelKey: "nav.items.billing", icon: CreditCard },
         ],
     },
     {
-        label: "Administration",
+        labelKey: "nav.groups.administration",
         items: [
-            { href: "/dashboard/media", label: "Media Manager", icon: HardDrive },
-            { href: "/dashboard/sessions/access", label: "Session Access", icon: UserPlus },
-            { href: "/dashboard/users", label: "Users", icon: Users, superadminOnly: true },
-            { href: "/dashboard/settings", label: "Settings", icon: Settings },
-            { href: "/dashboard/system-monitor", label: "System Monitor", icon: Activity, superadminOnly: true },
-            { href: "/dashboard/notifications", label: "Notifications", icon: Bell, superadminOnly: true },
+            { href: "/dashboard/media", labelKey: "nav.items.mediaManager", icon: HardDrive },
+            { href: "/dashboard/sessions/access", labelKey: "nav.items.sessionAccess", icon: UserPlus },
+            { href: "/dashboard/users", labelKey: "nav.items.users", icon: Users, superadminOnly: true },
+            { href: "/dashboard/settings", labelKey: "nav.items.settings", icon: Settings },
+            { href: "/dashboard/system-monitor", labelKey: "nav.items.systemMonitor", icon: Activity, superadminOnly: true },
+            { href: "/dashboard/notifications", labelKey: "nav.items.notifications", icon: Bell, superadminOnly: true },
         ],
     },
 ];
 
 export function SidebarNav() {
+    const { t } = useTranslation();
     const pathname = usePathname();
     const { data: session } = useSession();
     const { isCollapsed, toggleCollapse } = useSidebar();
@@ -141,8 +143,8 @@ export function SidebarNav() {
     // Track collapsed groups — all expanded by default
     const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
 
-    const toggleGroup = (label: string) => {
-        setCollapsedGroups(prev => ({ ...prev, [label]: !prev[label] }));
+    const toggleGroup = (labelKey: string) => {
+        setCollapsedGroups(prev => ({ ...prev, [labelKey]: !prev[labelKey] }));
     };
 
     const isActive = (href: string) => {
@@ -163,12 +165,12 @@ export function SidebarNav() {
                     });
                     if (visibleItems.length === 0) return null;
 
-                    const isGroupCollapsed = collapsedGroups[group.label] ?? false;
+                    const isGroupCollapsed = collapsedGroups[group.labelKey] ?? false;
 
                     // "Main" group doesn't show a collapsible header
-                    if (group.label === "Main") {
+                    if (group.labelKey === "nav.groups.main") {
                         return (
-                            <div key={group.label} className="mb-1">
+                            <div key={group.labelKey} className="mb-1">
                                 {visibleItems.map((item) => (
                                     <NavLink
                                         key={item.href}
@@ -182,14 +184,14 @@ export function SidebarNav() {
                     }
 
                     return (
-                        <div key={group.label} className="mb-1">
+                        <div key={group.labelKey} className="mb-1">
                             {/* Group header — hidden when sidebar collapsed */}
                             {!isCollapsed && (
                                 <button
-                                    onClick={() => toggleGroup(group.label)}
+                                    onClick={() => toggleGroup(group.labelKey)}
                                     className="flex items-center justify-between w-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 hover:text-foreground/80 transition-colors group"
                                 >
-                                    {group.label}
+                                    {t(group.labelKey)}
                                     <ChevronDown
                                         size={12}
                                         className={`transition-transform duration-200 ${isGroupCollapsed ? "-rotate-90" : ""}`}
@@ -230,7 +232,7 @@ export function SidebarNav() {
                     ) : (
                         <>
                             <PanelLeftClose size={16} />
-                            <span>Collapse</span>
+                            <span>{t("nav.collapse")}</span>
                         </>
                     )}
                 </button>
@@ -240,6 +242,7 @@ export function SidebarNav() {
 }
 
 function NavLink({ item, active, isCollapsed }: { item: NavItem; active: boolean; isCollapsed: boolean }) {
+    const { t } = useTranslation();
     const Icon = item.icon;
 
     const linkContent = (
@@ -263,7 +266,7 @@ function NavLink({ item, active, isCollapsed }: { item: NavItem; active: boolean
                 size={isCollapsed ? 20 : 17}
                 className={`flex-shrink-0 transition-colors duration-200 ${active ? "text-primary" : "text-muted-foreground/70 group-hover:text-foreground"}`}
             />
-            {!isCollapsed && <span className="truncate">{item.label}</span>}
+            {!isCollapsed && <span className="truncate">{t(item.labelKey)}</span>}
         </Link>
     );
 
@@ -274,7 +277,7 @@ function NavLink({ item, active, isCollapsed }: { item: NavItem; active: boolean
                     {linkContent}
                 </TooltipTrigger>
                 <TooltipContent side="right" sideOffset={8}>
-                    <p className="text-xs font-medium">{item.label}</p>
+                    <p className="text-xs font-medium">{t(item.labelKey)}</p>
                 </TooltipContent>
             </Tooltip>
         );

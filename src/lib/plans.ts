@@ -23,14 +23,16 @@ export type Capability =
     | "jpm"
     | "sticker";
 
-export const CAPABILITIES: { id: Capability; label: string }[] = [
-    { id: "autoReply", label: "Auto Reply" },
-    { id: "broadcast", label: "Broadcast" },
-    { id: "autoBroadcast", label: "Auto Broadcast" },
-    { id: "scheduler", label: "Scheduler / Pesan Terjadwal" },
-    { id: "webhook", label: "Webhook & API Events" },
-    { id: "jpm", label: "JPM SW GC" },
-    { id: "sticker", label: "Sticker Maker" },
+// Label fitur pindah ke dicionário i18n (`plans.capabilities.<id>`).
+// Export tetap berbasis id — API routes cukup baca `c.id`.
+export const CAPABILITIES: { id: Capability }[] = [
+    { id: "autoReply" },
+    { id: "broadcast" },
+    { id: "autoBroadcast" },
+    { id: "scheduler" },
+    { id: "webhook" },
+    { id: "jpm" },
+    { id: "sticker" },
 ];
 
 export interface PlanConfig {

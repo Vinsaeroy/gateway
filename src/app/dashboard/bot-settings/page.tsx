@@ -19,9 +19,11 @@ import {
 import { RefreshCw, Save, AlertCircle, Bot, X, Plus, ShieldCheck, Zap, UserCheck, MessageSquarePlus } from "lucide-react";
 import { toast } from "sonner";
 import { SessionGuard } from "@/components/dashboard/session-guard";
+import { useTranslation } from "@/i18n/react";
 
 export default function BotSettingsPage() {
     const { sessionId } = useSessionProvider();
+    const { t } = useTranslation();
 
     const [botConfig, setBotConfig] = useState({
         enabled: true,
@@ -83,9 +85,9 @@ export default function BotSettingsPage() {
                     (data.data || []).map((g: any) => ({ jid: g.jid, subject: g.subject || null }))
                 );
             }
-            if (forceRefresh) toast.success("Group list refreshed");
+            if (forceRefresh) toast.success(t("botSettings.toasts.groupsRefreshed"));
         } catch {
-            if (forceRefresh) toast.error("Failed to refresh groups");
+            if (forceRefresh) toast.error(t("botSettings.toasts.groupsRefreshFail"));
         } finally {
             if (forceRefresh) setGroupsRefreshing(false);
         }
@@ -142,13 +144,13 @@ export default function BotSettingsPage() {
             });
 
             if (res.ok) {
-                toast.success("Bot configuration saved");
+                toast.success(t("botSettings.toasts.botSaved"));
             } else {
-                toast.error("Failed to save bot configuration");
+                toast.error(t("botSettings.toasts.botSaveFail"));
             }
         } catch (e) {
             console.error(e);
-            toast.error("Error saving bot configuration");
+            toast.error(t("botSettings.toasts.botSaveError"));
         } finally {
             setBotLoading(false);
         }
@@ -171,14 +173,14 @@ export default function BotSettingsPage() {
             });
 
             if (res.ok) {
-                toast.success("Privacy settings saved");
+                toast.success(t("botSettings.toasts.privacySaved"));
             } else {
                 const data = await res.json().catch(() => ({}));
-                toast.error(data.message || "Failed to save privacy settings");
+                toast.error(data.message || t("botSettings.toasts.privacySaveFail"));
             }
         } catch (e) {
             console.error(e);
-            toast.error("Error saving privacy settings");
+            toast.error(t("botSettings.toasts.privacySaveError"));
         } finally {
             setPrivacyLoading(false);
         }
@@ -211,8 +213,8 @@ export default function BotSettingsPage() {
         <SessionGuard>
             <div className="space-y-6">
                 <div>
-                    <h2 className="text-xl sm:text-3xl font-bold tracking-tight">Bot Settings</h2>
-                    <p className="text-muted-foreground text-sm mt-1">Configure bot features and session privacy for the active WhatsApp session.</p>
+                    <h2 className="text-xl sm:text-3xl font-bold tracking-tight">{t("botSettings.title")}</h2>
+                    <p className="text-muted-foreground text-sm mt-1">{t("botSettings.subtitle")}</p>
                 </div>
 
                 {/* Bot Mode & Access Section */}
@@ -220,19 +222,19 @@ export default function BotSettingsPage() {
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                             <ShieldCheck className="h-5 w-5 text-primary" />
-                            Bot Mode & Access Control
+                            {t("botSettings.mode.title")}
                         </CardTitle>
-                        <CardDescription>Configure who can interact with the bot and use commands.</CardDescription>
+                        <CardDescription>{t("botSettings.mode.description")}</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6">
                             {/* Master toggle — when off, ALL bot features (commands, auto-reply) are paused */}
                             <div className="flex items-center justify-between gap-4 rounded-lg border p-3 bg-muted/20">
                                 <div className="space-y-0.5">
                                     <Label htmlFor="bot-enabled" className="text-sm font-semibold cursor-pointer">
-                                        Bot Enabled
+                                        {t("botSettings.mode.enabledLabel")}
                                     </Label>
                                     <p className="text-xs text-muted-foreground">
-                                        Master switch — when off, the bot ignores all commands and auto-replies for this session.
+                                        {t("botSettings.mode.enabledDesc")}
                                     </p>
                                 </div>
                                 <Switch
@@ -243,18 +245,18 @@ export default function BotSettingsPage() {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label>Bot Name</Label>
+                                <Label>{t("botSettings.mode.nameLabel")}</Label>
                                 <Input
                                     placeholder="WA-AKG Bot"
                                     value={botConfig.botName}
                                     onChange={(e) => setBotConfig(prev => ({ ...prev, botName: e.target.value }))}
                                 />
-                                <p className="text-xs text-muted-foreground">The display name used by the bot in automated responses.</p>
+                                <p className="text-xs text-muted-foreground">{t("botSettings.mode.nameDesc")}</p>
                             </div>
 
                             <div className="grid sm:grid-cols-2 gap-4">
                                 <div className="grid gap-2">
-                                    <Label>Command Prefix</Label>
+                                    <Label>{t("botSettings.mode.prefixLabel")}</Label>
                                     <Input
                                         className="max-w-[100px]"
                                         placeholder="#"
@@ -262,25 +264,25 @@ export default function BotSettingsPage() {
                                         value={botConfig.prefix}
                                         onChange={(e) => setBotConfig(prev => ({ ...prev, prefix: e.target.value }))}
                                     />
-                                    <p className="text-xs text-muted-foreground">The prefix character for bot commands.</p>
+                                    <p className="text-xs text-muted-foreground">{t("botSettings.mode.prefixDesc")}</p>
                                 </div>
                                 <div className="grid gap-2">
-                                    <Label>Bot Interaction Mode</Label>
+                                    <Label>{t("botSettings.mode.modeLabel")}</Label>
                                     <Select
                                         value={botConfig.botMode}
                                         onValueChange={(v: any) => setBotConfig(prev => ({ ...prev, botMode: v }))}
                                     >
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Select Mode" />
+                                            <SelectValue placeholder={t("botSettings.mode.modePlaceholder")} />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="ALL">Public (Everyone)</SelectItem>
-                                            <SelectItem value="OWNER">Private (Owner Only)</SelectItem>
-                                            <SelectItem value="SPECIFIC">Whitelist (Selected JIDs)</SelectItem>
-                                            <SelectItem value="BLACKLIST">Blacklist (Block JIDs)</SelectItem>
+                                            <SelectItem value="ALL">{t("botSettings.mode.modeAll")}</SelectItem>
+                                            <SelectItem value="OWNER">{t("botSettings.mode.modeOwner")}</SelectItem>
+                                            <SelectItem value="SPECIFIC">{t("botSettings.mode.modeSpecific")}</SelectItem>
+                                            <SelectItem value="BLACKLIST">{t("botSettings.mode.modeBlacklist")}</SelectItem>
                                         </SelectContent>
                                     </Select>
-                                    <p className="text-xs text-muted-foreground">Control who can trigger bot commands.</p>
+                                    <p className="text-xs text-muted-foreground">{t("botSettings.mode.modeDesc")}</p>
                                 </div>
                             </div>
 
@@ -288,7 +290,7 @@ export default function BotSettingsPage() {
                                 <div className="space-y-4 pt-4 border-t border-border/50 animate-in fade-in slide-in-from-top-1 duration-200">
                                     <Label className="flex items-center gap-2">
                                         <UserCheck className="h-4 w-4" />
-                                        {botConfig.botMode === 'SPECIFIC' ? "Whitelisted Numbers" : "Blacklisted Numbers"}
+                                        {botConfig.botMode === 'SPECIFIC' ? t("botSettings.mode.whitelisted") : t("botSettings.mode.blacklisted")}
                                     </Label>
                                     <div className="flex gap-2">
                                         <Input
@@ -311,7 +313,7 @@ export default function BotSettingsPage() {
                                             </div>
                                         ))}
                                         {(botConfig.botMode === 'SPECIFIC' ? botConfig.botAllowedJids : botConfig.botBlockedJids).length === 0 && (
-                                            <p className="text-xs text-muted-foreground italic">No numbers added yet.</p>
+                                            <p className="text-xs text-muted-foreground italic">{t("botSettings.mode.noNumbers")}</p>
                                         )}
                                     </div>
                                 </div>
@@ -320,16 +322,16 @@ export default function BotSettingsPage() {
                             <div className="grid sm:grid-cols-2 gap-4 pt-4 border-t border-border/50">
                                 <div className="flex items-center justify-between space-x-2 border p-3 rounded-lg">
                                     <Label htmlFor="enable-ping" className="flex flex-col space-y-1 cursor-pointer">
-                                        <span className="font-medium">Ping Command</span>
-                                        <span className="font-normal text-[10px] text-muted-foreground">Respond to {botConfig.prefix}ping</span>
+                                        <span className="font-medium">{t("botSettings.mode.pingLabel")}</span>
+                                        <span className="font-normal text-[10px] text-muted-foreground">{t("botSettings.mode.pingDesc", { prefix: botConfig.prefix })}</span>
                                     </Label>
                                     <Switch id="enable-ping" checked={botConfig.enablePing}
                                         onCheckedChange={c => setBotConfig(prev => ({ ...prev, enablePing: c }))} />
                                 </div>
                                 <div className="flex items-center justify-between space-x-2 border p-3 rounded-lg">
                                     <Label htmlFor="enable-uptime" className="flex flex-col space-y-1 cursor-pointer">
-                                        <span className="font-medium">Uptime Command</span>
-                                        <span className="font-normal text-[10px] text-muted-foreground">Respond to {botConfig.prefix}uptime</span>
+                                        <span className="font-medium">{t("botSettings.mode.uptimeLabel")}</span>
+                                        <span className="font-normal text-[10px] text-muted-foreground">{t("botSettings.mode.uptimeDesc", { prefix: botConfig.prefix })}</span>
                                     </Label>
                                     <Switch id="enable-uptime" checked={botConfig.enableUptime}
                                         onCheckedChange={c => setBotConfig(prev => ({ ...prev, enableUptime: c }))} />
@@ -339,7 +341,7 @@ export default function BotSettingsPage() {
                             <div className="pt-2">
                                 <Button className="w-full sm:w-auto" onClick={handleSaveBot} disabled={botLoading || !sessionId}>
                                     {botLoading ? <RefreshCw className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-                                    Save Bot Configuration
+                                    {t("botSettings.mode.save")}
                                 </Button>
                             </div>
                         </CardContent>
@@ -350,24 +352,24 @@ export default function BotSettingsPage() {
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
                                 <Zap className="h-5 w-5 text-yellow-500" />
-                                Automation & Presence
+                                {t("botSettings.automation.title")}
                             </CardTitle>
-                            <CardDescription>Advanced bot automation and presence customization.</CardDescription>
+                            <CardDescription>{t("botSettings.automation.description")}</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-6">
                             <div className="grid sm:grid-cols-2 gap-4">
                                 <div className="flex items-center justify-between space-x-2 border p-3 rounded-lg">
                                     <Label htmlFor="always-online" className="flex flex-col space-y-1 cursor-pointer">
-                                        <span className="font-medium">Always Online</span>
-                                        <span className="font-normal text-[10px] text-muted-foreground">Stay "Online" even when inactive.</span>
+                                        <span className="font-medium">{t("botSettings.automation.alwaysOnlineLabel")}</span>
+                                        <span className="font-normal text-[10px] text-muted-foreground">{t("botSettings.automation.alwaysOnlineDesc")}</span>
                                     </Label>
                                     <Switch id="always-online" checked={botConfig.alwaysOnline}
                                         onCheckedChange={c => setBotConfig(prev => ({ ...prev, alwaysOnline: c }))} />
                                 </div>
                                 <div className="flex items-center justify-between space-x-2 border p-3 rounded-lg">
                                     <Label htmlFor="auto-read" className="flex flex-col space-y-1 cursor-pointer">
-                                        <span className="font-medium">Auto Read (Blue Ticks)</span>
-                                        <span className="font-normal text-[10px] text-muted-foreground">Automatically mark messages as read.</span>
+                                        <span className="font-medium">{t("botSettings.automation.autoReadLabel")}</span>
+                                        <span className="font-normal text-[10px] text-muted-foreground">{t("botSettings.automation.autoReadDesc")}</span>
                                     </Label>
                                     <Switch id="auto-read" checked={botConfig.autoRead}
                                         onCheckedChange={c => setBotConfig(prev => ({ ...prev, autoRead: c }))} />
@@ -377,21 +379,21 @@ export default function BotSettingsPage() {
                             <div className="space-y-2 border-t border-border/50 pt-4">
                                 <Label className="flex items-center gap-2">
                                     <MessageSquarePlus className="h-4 w-4 text-primary" />
-                                    Welcome Message (Beta)
+                                    {t("botSettings.automation.welcomeLabel")}
                                 </Label>
                                 <Textarea
-                                    placeholder="Hello! Welcome to our WhatsApp Bot. How can I help you today?"
+                                    placeholder={t("botSettings.automation.welcomePlaceholder")}
                                     className="min-h-[100px]"
                                     value={botConfig.welcomeMessage}
                                     onChange={(e) => setBotConfig(prev => ({ ...prev, welcomeMessage: e.target.value }))}
                                 />
-                                <p className="text-[10px] text-muted-foreground">Sent automatically to users when they message this bot for the first time.</p>
+                                <p className="text-[10px] text-muted-foreground">{t("botSettings.automation.welcomeHint")}</p>
                             </div>
 
                             <div className="pt-2">
                                 <Button className="w-full sm:w-auto" onClick={handleSaveBot} disabled={botLoading || !sessionId}>
                                     {botLoading ? <RefreshCw className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-                                    Save Automation Settings
+                                    {t("botSettings.automation.save")}
                                 </Button>
                             </div>
                         </CardContent>
@@ -400,23 +402,23 @@ export default function BotSettingsPage() {
                     {/* Media & Stickers Section */}
                     <Card>
                         <CardHeader>
-                            <CardTitle>Media & Stickers</CardTitle>
-                            <CardDescription>Configure how the bot handles media and sticker conversion.</CardDescription>
+                            <CardTitle>{t("botSettings.media.title")}</CardTitle>
+                            <CardDescription>{t("botSettings.media.description")}</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-6">
                             <div className="grid sm:grid-cols-2 gap-4">
                                 <div className="flex items-center justify-between space-x-2 border p-3 rounded-lg">
                                     <Label htmlFor="enable-sticker" className="flex flex-col space-y-1 cursor-pointer">
-                                        <span className="font-medium">Image to Sticker</span>
-                                        <span className="font-normal text-xs text-muted-foreground">Auto-convert images</span>
+                                        <span className="font-medium">{t("botSettings.media.imageToSticker")}</span>
+                                        <span className="font-normal text-xs text-muted-foreground">{t("botSettings.media.imageToStickerDesc")}</span>
                                     </Label>
                                     <Switch id="enable-sticker" checked={botConfig.enableSticker}
                                         onCheckedChange={c => setBotConfig(prev => ({ ...prev, enableSticker: c }))} />
                                 </div>
                                 <div className="flex items-center justify-between space-x-2 border p-3 rounded-lg">
                                     <Label htmlFor="enable-video-sticker" className="flex flex-col space-y-1 cursor-pointer">
-                                        <span className="font-medium">Video to Sticker</span>
-                                        <span className="font-normal text-xs text-muted-foreground">Auto-convert short videos</span>
+                                        <span className="font-medium">{t("botSettings.media.videoToSticker")}</span>
+                                        <span className="font-normal text-xs text-muted-foreground">{t("botSettings.media.videoToStickerDesc")}</span>
                                     </Label>
                                     <Switch id="enable-video-sticker" checked={botConfig.enableVideoSticker}
                                         onCheckedChange={c => setBotConfig(prev => ({ ...prev, enableVideoSticker: c }))} />
@@ -424,7 +426,7 @@ export default function BotSettingsPage() {
                             </div>
 
                             <div className="grid gap-2 border-t border-border/50 pt-4">
-                                <Label>Max Sticker Video Duration: <strong>{botConfig.maxStickerDuration}s</strong></Label>
+                                <Label>{t("botSettings.media.maxDuration")} <strong>{botConfig.maxStickerDuration}s</strong></Label>
                                 <Slider
                                     value={[botConfig.maxStickerDuration]}
                                     onValueChange={([v]) => setBotConfig(prev => ({ ...prev, maxStickerDuration: v }))}
@@ -432,24 +434,24 @@ export default function BotSettingsPage() {
                                     max={30}
                                     step={1}
                                 />
-                                <p className="text-xs text-muted-foreground">Maximum video duration (in seconds) allowed for sticker conversion.</p>
+                                <p className="text-xs text-muted-foreground">{t("botSettings.media.maxDurationDesc")}</p>
                             </div>
 
                             <div className="grid gap-2 border-t border-border/50 pt-4">
-                                <Label>Remove.bg API Key (Optional)</Label>
+                                <Label>{t("botSettings.media.removeBgLabel")}</Label>
                                 <Input
                                     type="password"
-                                    placeholder="Enter your Remove.bg API Key"
+                                    placeholder={t("botSettings.media.removeBgPlaceholder")}
                                     value={botConfig.removeBgApiKey || ""}
                                     onChange={(e) => setBotConfig(prev => ({ ...prev, removeBgApiKey: e.target.value }))}
                                 />
-                                <p className="text-xs text-muted-foreground">Enables background removal for stickers (use <code className="bg-muted px-1 rounded">nobg</code> caption).</p>
+                                <p className="text-xs text-muted-foreground">{t("botSettings.media.removeBgDescA")}<code className="bg-muted px-1 rounded">nobg</code>{t("botSettings.media.removeBgDescB")}</p>
                             </div>
 
                             <div className="pt-2">
                                 <Button className="w-full sm:w-auto" onClick={handleSaveBot} disabled={botLoading || !sessionId}>
                                     {botLoading ? <RefreshCw className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-                                    Save Media Settings
+                                    {t("botSettings.media.save")}
                                 </Button>
                             </div>
                         </CardContent>
@@ -460,17 +462,17 @@ export default function BotSettingsPage() {
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
                                 <AlertCircle className="h-5 w-5 text-orange-500" />
-                                Anti-Ban Protection (Beta)
+                                {t("botSettings.protection.title")}
                             </CardTitle>
                             <CardDescription>
-                                Prevent your WhatsApp number from being detected as spam or banned by adding intelligent random delays between outgoing messages. This applies to <strong>all</strong> actions: bot replies, auto-replies, broadcasts, scheduled messages, and API calls for this session.
+                                {t("botSettings.protection.descriptionA")}<strong>{t("botSettings.protection.descriptionB")}</strong>{t("botSettings.protection.descriptionC")}
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-6">
                             <div className="flex items-center justify-between space-x-2 border p-3 rounded-lg bg-orange-500/5 border-orange-500/20">
                                 <Label htmlFor="anti-spam" className="flex flex-col space-y-1">
-                                    <span className="font-semibold text-orange-700 dark:text-orange-400">Enable Anti-Spam Delay</span>
-                                    <span className="font-normal text-xs text-muted-foreground">When enabled, messages will be queued and sent with a random delay if the rate limit is reached. Messages are never rejected — only delayed.</span>
+                                    <span className="font-semibold text-orange-700 dark:text-orange-400">{t("botSettings.protection.enableLabel")}</span>
+                                    <span className="font-normal text-xs text-muted-foreground">{t("botSettings.protection.enableDesc")}</span>
                                 </Label>
                                 <Switch id="anti-spam" checked={botConfig.antiSpamEnabled}
                                     onCheckedChange={c => setBotConfig(prev => ({ ...prev, antiSpamEnabled: c }))} />
@@ -480,23 +482,39 @@ export default function BotSettingsPage() {
                                 <div className="grid gap-6 animate-in fade-in slide-in-from-top-1 duration-200">
                                     {/* How it works */}
                                     <div className="rounded-lg border border-blue-500/20 bg-blue-500/5 p-4 space-y-2">
-                                        <p className="text-sm font-semibold text-blue-700 dark:text-blue-400">💡 How it works</p>
+                                        <p className="text-sm font-semibold text-blue-700 dark:text-blue-400">{t("botSettings.protection.howItWorks")}</p>
                                         <p className="text-xs text-muted-foreground leading-relaxed">
-                                            The system tracks how many messages this session sends within a time window.
-                                            If the number of messages exceeds the <strong>threshold</strong> within the <strong>time window</strong>,
-                                            each subsequent message will be <strong>delayed</strong> by a random amount between <strong>Min</strong> and <strong>Max</strong> delay.
-                                            Once the time window resets (old messages expire), messages go back to normal speed.
+                                            {t("botSettings.protection.howS1")}
+                                            <strong>{t("botSettings.protection.howThreshold")}</strong>
+                                            {t("botSettings.protection.howS2")}
+                                            <strong>{t("botSettings.protection.howTimeWindow")}</strong>
+                                            {t("botSettings.protection.howS3")}
+                                            <strong>{t("botSettings.protection.howDelayed")}</strong>
+                                            {t("botSettings.protection.howS4")}
+                                            <strong>{t("botSettings.protection.howMin")}</strong>
+                                            {t("botSettings.protection.howS5")}
+                                            <strong>{t("botSettings.protection.howMax")}</strong>
+                                            {t("botSettings.protection.howS6")}
                                         </p>
                                         <p className="text-xs text-muted-foreground">
-                                            <strong>Example:</strong> With threshold = <strong>{botConfig.spamLimit}</strong> and window = <strong>{botConfig.spamInterval}s</strong> →
-                                            the first {botConfig.spamLimit} messages within {botConfig.spamInterval} seconds are sent instantly.
-                                            Message #{botConfig.spamLimit + 1} and beyond will be delayed by {botConfig.spamDelayMin}ms–{botConfig.spamDelayMax}ms each.
+                                            <strong>{t("botSettings.protection.exampleStrong")}</strong>
+                                            {t("botSettings.protection.exampleA")}
+                                            <strong>{botConfig.spamLimit}</strong>
+                                            {t("botSettings.protection.exampleB")}
+                                            <strong>{botConfig.spamInterval}s</strong>
+                                            {t("botSettings.protection.exampleC", {
+                                                limit: botConfig.spamLimit,
+                                                interval: botConfig.spamInterval,
+                                                next: botConfig.spamLimit + 1,
+                                                delayMin: botConfig.spamDelayMin,
+                                                delayMax: botConfig.spamDelayMax,
+                                            })}
                                         </p>
                                     </div>
 
                                     <div className="grid sm:grid-cols-2 gap-4">
                                         <div className="grid gap-2">
-                                            <Label className="font-semibold">Messages Threshold</Label>
+                                            <Label className="font-semibold">{t("botSettings.protection.thresholdLabel")}</Label>
                                             <Input
                                                 type="number"
                                                 value={botConfig.spamLimit}
@@ -504,12 +522,12 @@ export default function BotSettingsPage() {
                                                 min={1}
                                             />
                                             <p className="text-xs text-muted-foreground">
-                                                Number of messages allowed at full speed before delay kicks in.
-                                                <span className="text-orange-600 dark:text-orange-400"> Lower = safer but slower.</span>
+                                                {t("botSettings.protection.thresholdDesc")}
+                                                <span className="text-orange-600 dark:text-orange-400">{t("botSettings.protection.thresholdDescStrong")}</span>
                                             </p>
                                         </div>
                                         <div className="grid gap-2">
-                                            <Label className="font-semibold">Time Window (Seconds)</Label>
+                                            <Label className="font-semibold">{t("botSettings.protection.windowLabel")}</Label>
                                             <Input
                                                 type="number"
                                                 value={botConfig.spamInterval}
@@ -517,15 +535,15 @@ export default function BotSettingsPage() {
                                                 min={1}
                                             />
                                             <p className="text-xs text-muted-foreground">
-                                                The rolling window to count messages. After this time passes, the counter resets naturally.
-                                                <span className="text-orange-600 dark:text-orange-400"> Longer = more conservative.</span>
+                                                {t("botSettings.protection.windowDesc")}
+                                                <span className="text-orange-600 dark:text-orange-400">{t("botSettings.protection.windowDescStrong")}</span>
                                             </p>
                                         </div>
                                     </div>
 
                                     <div className="grid sm:grid-cols-2 gap-4">
                                         <div className="grid gap-2">
-                                            <Label className="font-semibold">Min Delay (ms)</Label>
+                                            <Label className="font-semibold">{t("botSettings.protection.minDelayLabel")}</Label>
                                             <Input
                                                 type="number"
                                                 value={botConfig.spamDelayMin}
@@ -534,11 +552,11 @@ export default function BotSettingsPage() {
                                                 step={100}
                                             />
                                             <p className="text-xs text-muted-foreground">
-                                                Minimum random delay applied. 1000ms = 1 second.
+                                                {t("botSettings.protection.minDelayDesc")}
                                             </p>
                                         </div>
                                         <div className="grid gap-2">
-                                            <Label className="font-semibold">Max Delay (ms)</Label>
+                                            <Label className="font-semibold">{t("botSettings.protection.maxDelayLabel")}</Label>
                                             <Input
                                                 type="number"
                                                 value={botConfig.spamDelayMax}
@@ -547,15 +565,14 @@ export default function BotSettingsPage() {
                                                 step={100}
                                             />
                                             <p className="text-xs text-muted-foreground">
-                                                Maximum random delay applied. 3000ms = 3 seconds.
+                                                {t("botSettings.protection.maxDelayDesc")}
                                             </p>
                                         </div>
                                     </div>
 
                                     <div className="rounded-lg border border-yellow-500/20 bg-yellow-500/5 p-3">
                                         <p className="text-xs text-muted-foreground">
-                                            ⚠️ <strong>Recommended safe settings:</strong> Threshold <strong>5</strong>, Window <strong>10s</strong>, Delay <strong>1000–3000ms</strong>.
-                                            For high-volume broadcasts, use Threshold <strong>3</strong> with Delay <strong>2000–5000ms</strong>.
+                                            ⚠️ <strong>{t("botSettings.protection.recTitle")}</strong>{t("botSettings.protection.recA")}<strong>5</strong>{t("botSettings.protection.recB")}<strong>10s</strong>{t("botSettings.protection.recC")}<strong>1000–3000ms</strong>{t("botSettings.protection.recD")}<strong>3</strong>{t("botSettings.protection.recE")}<strong>2000–5000ms</strong>.
                                         </p>
                                     </div>
                                 </div>
@@ -564,7 +581,7 @@ export default function BotSettingsPage() {
                             <div className="pt-2">
                                 <Button onClick={handleSaveBot} disabled={botLoading || !sessionId}>
                                     {botLoading ? <RefreshCw className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-                                    Save Protection Settings
+                                    {t("botSettings.protection.save")}
                                 </Button>
                             </div>
                         </CardContent>
@@ -573,15 +590,15 @@ export default function BotSettingsPage() {
                     {/* Anti-Link (Group) */}
                     <Card>
                         <CardHeader>
-                            <CardTitle>Anti-Link (Group)</CardTitle>
+                            <CardTitle>{t("botSettings.antiLink.title")}</CardTitle>
                             <CardDescription>
-                                Auto-delete messages containing links in groups. Bot must be group admin to enforce.
+                                {t("botSettings.antiLink.description")}
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="grid sm:grid-cols-2 gap-4">
                                 <div className="grid gap-2">
-                                    <Label>Mode</Label>
+                                    <Label>{t("botSettings.antiLink.modeLabel")}</Label>
                                     <Select
                                         value={botConfig.antiLinkMode}
                                         onValueChange={(v) =>
@@ -592,18 +609,18 @@ export default function BotSettingsPage() {
                                             <SelectValue />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="OFF">Off</SelectItem>
-                                            <SelectItem value="INVITE">Block WA invite links only</SelectItem>
-                                            <SelectItem value="ALL">Block ALL links</SelectItem>
+                                            <SelectItem value="OFF">{t("botSettings.antiLink.modeOff")}</SelectItem>
+                                            <SelectItem value="INVITE">{t("botSettings.antiLink.modeInvite")}</SelectItem>
+                                            <SelectItem value="ALL">{t("botSettings.antiLink.modeAll")}</SelectItem>
                                         </SelectContent>
                                     </Select>
                                     <p className="text-xs text-muted-foreground">
-                                        <code>INVITE</code> blocks <code>chat.whatsapp.com/...</code>. <code>ALL</code> blocks any URL.
+                                        <code>INVITE</code>{t("botSettings.antiLink.hintBlocks")}<code>chat.whatsapp.com/...</code>{t("botSettings.antiLink.hintBetween")}<code>ALL</code>{t("botSettings.antiLink.hintAny")}
                                     </p>
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label>Action</Label>
+                                    <Label>{t("botSettings.antiLink.actionLabel")}</Label>
                                     <Select
                                         value={botConfig.antiLinkAction}
                                         onValueChange={(v) =>
@@ -615,8 +632,8 @@ export default function BotSettingsPage() {
                                             <SelectValue />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="DELETE">Delete + Warn</SelectItem>
-                                            <SelectItem value="KICK">Warn then Kick after limit</SelectItem>
+                                            <SelectItem value="DELETE">{t("botSettings.antiLink.actionDelete")}</SelectItem>
+                                            <SelectItem value="KICK">{t("botSettings.antiLink.actionKick")}</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
@@ -624,7 +641,7 @@ export default function BotSettingsPage() {
 
                             {botConfig.antiLinkAction === "KICK" && botConfig.antiLinkMode !== "OFF" && (
                                 <div className="grid gap-2 max-w-[200px]">
-                                    <Label>Warn Limit</Label>
+                                    <Label>{t("botSettings.antiLink.warnLimit")}</Label>
                                     <Input
                                         type="number"
                                         min={1}
@@ -638,7 +655,7 @@ export default function BotSettingsPage() {
                                         }
                                     />
                                     <p className="text-xs text-muted-foreground">
-                                        Kick after this many warnings.
+                                        {t("botSettings.antiLink.warnLimitDesc")}
                                     </p>
                                 </div>
                             )}
@@ -646,7 +663,7 @@ export default function BotSettingsPage() {
                             {/* Scope: ALL groups vs SPECIFIC */}
                             {botConfig.antiLinkMode !== "OFF" && (
                                 <div className="grid gap-2">
-                                    <Label>Apply To</Label>
+                                    <Label>{t("botSettings.antiLink.applyTo")}</Label>
                                     <Select
                                         value={botConfig.antiLinkScope}
                                         onValueChange={(v) =>
@@ -657,8 +674,8 @@ export default function BotSettingsPage() {
                                             <SelectValue />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="ALL">All groups</SelectItem>
-                                            <SelectItem value="SPECIFIC">Selected groups only</SelectItem>
+                                            <SelectItem value="ALL">{t("botSettings.antiLink.scopeAll")}</SelectItem>
+                                            <SelectItem value="SPECIFIC">{t("botSettings.antiLink.scopeSpecific")}</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
@@ -668,7 +685,7 @@ export default function BotSettingsPage() {
                             {botConfig.antiLinkMode !== "OFF" && botConfig.antiLinkScope === "SPECIFIC" && (
                                 <div className="grid gap-2">
                                     <div className="flex items-center justify-between gap-2 flex-wrap">
-                                        <Label>Active Groups ({botConfig.antiLinkGroups.length} selected)</Label>
+                                        <Label>{t("botSettings.antiLink.activeGroups", { count: botConfig.antiLinkGroups.length })}</Label>
                                         <Button
                                             type="button"
                                             variant="outline"
@@ -677,18 +694,18 @@ export default function BotSettingsPage() {
                                             disabled={groupsRefreshing}
                                         >
                                             <RefreshCw className={`h-3.5 w-3.5 mr-1 ${groupsRefreshing ? "animate-spin" : ""}`} />
-                                            Refresh
+                                            {t("botSettings.antiLink.refresh")}
                                         </Button>
                                     </div>
                                     <Input
-                                        placeholder="Search groups..."
+                                        placeholder={t("botSettings.antiLink.searchPlaceholder")}
                                         value={groupSearch}
                                         onChange={(e) => setGroupSearch(e.target.value)}
                                     />
                                     <div className="max-h-56 overflow-y-auto border rounded-lg p-2 space-y-1 bg-muted/20">
                                         {groupsList.length === 0 ? (
                                             <p className="text-xs text-muted-foreground text-center py-3">
-                                                No groups found. Click Refresh to sync from WhatsApp.
+                                                {t("botSettings.antiLink.noGroups")}
                                             </p>
                                         ) : (
                                             groupsList
@@ -726,13 +743,13 @@ export default function BotSettingsPage() {
                             )}
 
                             <p className="text-xs text-muted-foreground border-l-2 border-amber-500/50 pl-3 py-1 bg-amber-500/5 rounded">
-                                ℹ️ Group admins are exempt. Bot must be admin to delete or kick.
+                                {t("botSettings.antiLink.adminNote")}
                             </p>
 
                             <div className="pt-2">
                                 <Button onClick={handleSaveBot} disabled={botLoading || !sessionId}>
                                     {botLoading ? <RefreshCw className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-                                    Save Anti-Link Settings
+                                    {t("botSettings.antiLink.save")}
                                 </Button>
                             </div>
                         </CardContent>
@@ -741,14 +758,14 @@ export default function BotSettingsPage() {
                     {/* Privacy & Utility */}
                     <Card>
                         <CardHeader>
-                            <CardTitle>Privacy & Utility</CardTitle>
-                            <CardDescription>Configure ghost mode and other features for your active session.</CardDescription>
+                            <CardTitle>{t("botSettings.privacy.title")}</CardTitle>
+                            <CardDescription>{t("botSettings.privacy.description")}</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-6">
                             <div className="flex items-center justify-between space-x-2">
                                 <Label htmlFor="ghost-mode" className="flex flex-col space-y-1">
-                                    <span>Ghost Mode</span>
-                                    <span className="font-normal text-xs text-muted-foreground">View status and read messages without sending blue ticks.</span>
+                                    <span>{t("botSettings.privacy.ghostLabel")}</span>
+                                    <span className="font-normal text-xs text-muted-foreground">{t("botSettings.privacy.ghostDesc")}</span>
                                 </Label>
                                 <Switch id="ghost-mode" checked={privacyConfig.ghostMode}
                                     onCheckedChange={c => setPrivacyConfig(prev => ({ ...prev, ghostMode: c }))} />
@@ -756,8 +773,8 @@ export default function BotSettingsPage() {
 
                             <div className="flex items-center justify-between space-x-2">
                                 <Label htmlFor="anti-delete" className="flex flex-col space-y-1">
-                                    <span>Anti-Delete</span>
-                                    <span className="font-normal text-xs text-muted-foreground">Keep messages even if the sender deletes them for everyone.</span>
+                                    <span>{t("botSettings.privacy.antiDeleteLabel")}</span>
+                                    <span className="font-normal text-xs text-muted-foreground">{t("botSettings.privacy.antiDeleteDesc")}</span>
                                 </Label>
                                 <Switch id="anti-delete" checked={privacyConfig.antiDelete}
                                     onCheckedChange={c => setPrivacyConfig(prev => ({ ...prev, antiDelete: c }))} />
@@ -766,7 +783,7 @@ export default function BotSettingsPage() {
                             <div className="pt-4">
                                 <Button onClick={handleSavePrivacy} disabled={privacyLoading || !sessionId}>
                                     {privacyLoading ? <RefreshCw className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-                                    Save Privacy Settings
+                                    {t("botSettings.privacy.save")}
                                 </Button>
                             </div>
                         </CardContent>

@@ -11,6 +11,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { UserPlus, Trash2, Shield, ShieldCheck, ShieldAlert, User, Users, Lock, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
+import { useTranslation } from "@/i18n/react";
+import { intlLocale } from "@/i18n/config";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -44,6 +46,7 @@ interface AccessEntry {
 }
 
 export default function SessionAccessPage() {
+    const { t, locale } = useTranslation();
     const { data: authSession } = useSession();
     const searchParams = useSearchParams();
     const sessionFromUrl = searchParams.get("session") || "";
@@ -88,7 +91,7 @@ export default function SessionAccessPage() {
             }
         } catch (error) {
             console.error("Failed to fetch sessions", error);
-            toast.error("Failed to load sessions");
+            toast.error(t("sessions.access.toasts.loadSessionsFailed"));
         } finally {
             setLoading(false);
         }
@@ -103,14 +106,14 @@ export default function SessionAccessPage() {
                 const data = await res.json();
                 setAccessList(data?.data || []);
             } else if (res.status === 403) {
-                toast.error("You don't have permission to manage this session's access");
+                toast.error(t("sessions.access.toasts.noPermission"));
                 setAccessList([]);
             } else {
                 setAccessList([]);
             }
         } catch (error) {
             console.error("Failed to fetch access list", error);
-            toast.error("Failed to load access list");
+            toast.error(t("sessions.access.toasts.loadAccessFailed"));
         } finally {
             setAccessLoading(false);
         }
@@ -137,14 +140,14 @@ export default function SessionAccessPage() {
             const data = await res.json();
 
             if (res.ok) {
-                toast.success(data.message || "Access granted successfully");
+                toast.success(data.message || t("sessions.access.toasts.granted"));
                 setEmail("");
                 fetchAccessList();
             } else {
-                toast.error(data.message || "Failed to grant access");
+                toast.error(data.message || t("sessions.access.toasts.grantFailed"));
             }
         } catch (error) {
-            toast.error("Failed to grant access");
+            toast.error(t("sessions.access.toasts.grantFailed"));
         } finally {
             setSubmitting(false);
         }
@@ -163,13 +166,13 @@ export default function SessionAccessPage() {
             const data = await res.json();
 
             if (res.ok) {
-                toast.success("Access revoked successfully");
+                toast.success(t("sessions.access.toasts.revoked"));
                 fetchAccessList();
             } else {
-                toast.error(data.message || "Failed to revoke access");
+                toast.error(data.message || t("sessions.access.toasts.revokeFailed"));
             }
         } catch (error) {
-            toast.error("Failed to revoke access");
+            toast.error(t("sessions.access.toasts.revokeFailed"));
         } finally {
             setRevokeTarget(null);
         }
@@ -195,7 +198,7 @@ export default function SessionAccessPage() {
         return (
             <div className="flex items-center justify-center p-12">
                 <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-                <span className="ml-2 text-muted-foreground">Loading sessions...</span>
+                <span className="ml-2 text-muted-foreground">{t("sessions.access.loadingSessions")}</span>
             </div>
         );
     }
@@ -206,10 +209,10 @@ export default function SessionAccessPage() {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <div>
                     <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
-                        <Lock className="h-5 w-5 sm:h-6 sm:w-6" /> Session Access
+                        <Lock className="h-5 w-5 sm:h-6 sm:w-6" /> {t("sessions.access.title")}
                     </h1>
                     <p className="text-sm text-muted-foreground">
-                        Share your WhatsApp sessions with other users
+                        {t("sessions.access.subtitle")}
                     </p>
                 </div>
             </div>
@@ -217,20 +220,20 @@ export default function SessionAccessPage() {
             {/* Session Selector */}
             <Card>
                 <CardHeader className="pb-3">
-                    <CardTitle className="text-base">Select Session</CardTitle>
+                    <CardTitle className="text-base">{t("sessions.access.select.title")}</CardTitle>
                     <CardDescription>
-                        Choose a session you own to manage its shared access
+                        {t("sessions.access.select.description")}
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
                     {sessions.length === 0 ? (
                         <p className="text-sm text-muted-foreground">
-                            You don&apos;t have any sessions. Create a session first.
+                            {t("sessions.access.select.empty")}
                         </p>
                     ) : (
                         <Select value={selectedSession} onValueChange={setSelectedSession}>
                             <SelectTrigger className="w-full sm:w-[360px]">
-                                <SelectValue placeholder="Select a session" />
+                                <SelectValue placeholder={t("sessions.access.select.placeholder")} />
                             </SelectTrigger>
                             <SelectContent>
                                 {sessions.map(s => (
@@ -252,20 +255,20 @@ export default function SessionAccessPage() {
                 <Card className="border-2 border-primary/20">
                     <CardHeader className="pb-3">
                         <CardTitle className="text-base flex items-center gap-2">
-                            <UserPlus className="h-4 w-4" /> Grant Access
+                            <UserPlus className="h-4 w-4" /> {t("sessions.access.grant.title")}
                         </CardTitle>
                         <CardDescription>
-                            Enter the email address of the user you want to give access to
+                            {t("sessions.access.grant.description")}
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={handleGrantAccess} className="flex flex-col sm:flex-row gap-3">
                             <div className="flex-1 space-y-1.5">
-                                <Label htmlFor="email" className="sr-only">Email</Label>
+                                <Label htmlFor="email" className="sr-only">{t("sessions.access.grant.emailLabel")}</Label>
                                 <Input
                                     id="email"
                                     type="email"
-                                    placeholder="user@example.com"
+                                    placeholder={t("sessions.access.grant.emailPlaceholder")}
                                     value={email}
                                     onChange={e => setEmail(e.target.value)}
                                     required
@@ -274,9 +277,9 @@ export default function SessionAccessPage() {
                             </div>
                             <Button type="submit" disabled={submitting || !email.trim()}>
                                 {submitting ? (
-                                    <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Granting...</>
+                                    <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> {t("sessions.access.grant.granting")}</>
                                 ) : (
-                                    <><UserPlus className="h-4 w-4 mr-2" /> Grant Access</>
+                                    <><UserPlus className="h-4 w-4 mr-2" /> {t("sessions.access.grant.submit")}</>
                                 )}
                             </Button>
                         </form>
@@ -289,21 +292,25 @@ export default function SessionAccessPage() {
                 <Card>
                     <CardHeader className="pb-3">
                         <CardTitle className="text-base flex items-center gap-2">
-                            <Users className="h-4 w-4" /> Users with Access
-                            <Badge variant="outline" className="ml-auto">{accessList.length} user{accessList.length !== 1 ? "s" : ""}</Badge>
+                            <Users className="h-4 w-4" /> {t("sessions.access.list.title")}
+                            <Badge variant="outline" className="ml-auto">
+                                {accessList.length === 1
+                                    ? t("sessions.access.list.countOne", { count: accessList.length })
+                                    : t("sessions.access.list.countMany", { count: accessList.length })}
+                            </Badge>
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
                         {accessLoading ? (
                             <div className="flex items-center justify-center py-8">
                                 <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-                                <span className="ml-2 text-sm text-muted-foreground">Loading...</span>
+                                <span className="ml-2 text-sm text-muted-foreground">{t("sessions.access.list.loading")}</span>
                             </div>
                         ) : accessList.length === 0 ? (
                             <div className="text-center py-8">
                                 <Shield className="h-10 w-10 mx-auto text-muted-foreground/30 mb-3" />
                                 <p className="text-sm text-muted-foreground">
-                                    No users have been granted access to this session yet.
+                                    {t("sessions.access.list.empty")}
                                 </p>
                             </div>
                         ) : (
@@ -319,7 +326,7 @@ export default function SessionAccessPage() {
                                             </div>
                                             <div className="min-w-0">
                                                 <p className="font-medium text-sm truncate">
-                                                    {entry.user.name || "User"}
+                                                    {entry.user.name || t("sessions.access.list.fallbackName")}
                                                 </p>
                                                 <p className="text-xs text-muted-foreground truncate">
                                                     {entry.user.email}
@@ -332,14 +339,14 @@ export default function SessionAccessPage() {
                                                 {entry.user.role}
                                             </Badge>
                                             <span className="text-xs text-muted-foreground hidden md:inline">
-                                                {new Date(entry.createdAt).toLocaleDateString()}
+                                                {new Date(entry.createdAt).toLocaleDateString(intlLocale[locale])}
                                             </span>
                                             <Button
                                                 size="sm"
                                                 variant="ghost"
                                                 className="text-destructive hover:text-destructive hover:bg-destructive/10 h-8 w-8 p-0"
                                                 onClick={() => setRevokeTarget(entry)}
-                                                title="Revoke access"
+                                                title={t("sessions.access.list.revokeTitle")}
                                             >
                                                 <Trash2 className="h-4 w-4" />
                                             </Button>
@@ -356,18 +363,17 @@ export default function SessionAccessPage() {
             <AlertDialog open={!!revokeTarget} onOpenChange={(open) => !open && setRevokeTarget(null)}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Revoke Access?</AlertDialogTitle>
+                        <AlertDialogTitle>{t("sessions.access.revokeDialog.title")}</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Are you sure you want to revoke access for{" "}
-                            <strong>{revokeTarget?.user.name || revokeTarget?.user.email}</strong>?
-                            They will no longer be able to view or use this session.
-                            This action can be undone by granting access again.
+                            {t("sessions.access.revokeDialog.intro")}{" "}
+                            <strong>{revokeTarget?.user.name || revokeTarget?.user.email}</strong>
+                            {" "}{t("sessions.access.revokeDialog.outro")}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel>{t("sessions.access.revokeDialog.cancel")}</AlertDialogCancel>
                         <AlertDialogAction onClick={confirmRevoke} className="bg-red-600 hover:bg-red-700">
-                            Revoke Access
+                            {t("sessions.access.revokeDialog.confirm")}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

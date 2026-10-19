@@ -41,23 +41,25 @@ interface WebhookConfig {
 }
 
 const AVAILABLE_EVENTS = [
-    { id: "message.received", label: "Message Received", description: "When a new message is received" },
-    { id: "message.sent", label: "Message Sent", description: "When a message is sent" },
-    { id: "message.status", label: "Message Status", description: "When message status changes (delivered, read)" },
-    { id: "connection.update", label: "Connection Update", description: "When session connects/disconnects" },
-    { id: "group.update", label: "Group Update", description: "When group info changes" },
-    { id: "group.upsert", label: "Group Joined", description: "When you join or are added to a new group" },
-    { id: "group.participant", label: "Group Member", description: "When participants join, leave, or change roles" },
-    { id: "contact.update", label: "Contact Update", description: "When contact info changes" },
-    { id: "status.update", label: "Status/Story", description: "When a status is posted or viewed" },
-    { id: "message.edited", label: "Message Edited", description: "When a message is edited" },
-    { id: "message.deleted", label: "Message Deleted", description: "When a message is revoked/deleted" },
+    { id: "message.received", key: "messageReceived" },
+    { id: "message.sent", key: "messageSent" },
+    { id: "message.status", key: "messageStatus" },
+    { id: "connection.update", key: "connectionUpdate" },
+    { id: "group.update", key: "groupUpdate" },
+    { id: "group.upsert", key: "groupJoined" },
+    { id: "group.participant", key: "groupParticipant" },
+    { id: "contact.update", key: "contactUpdate" },
+    { id: "status.update", key: "statusUpdate" },
+    { id: "message.edited", key: "messageEdited" },
+    { id: "message.deleted", key: "messageDeleted" },
 ];
 
 import { useSession } from "@/components/dashboard/session-provider";
+import { useTranslation } from "@/i18n/react";
 
 export default function WebhooksPage() {
     const { sessionId, sessions } = useSession(); // Get active session ID and list of sessions
+    const { t } = useTranslation();
     const [webhooks, setWebhooks] = useState<WebhookConfig[]>([]);
     const [apiKey, setApiKey] = useState<string | null>(null);
     const [apiKeySet, setApiKeySet] = useState(false);
@@ -131,10 +133,10 @@ export default function WebhooksPage() {
                 setApiKeySet(true);
                 setApiKeyHidden(false);
                 setShowApiKey(true); // tampilkan sekali, karena tidak bisa dilihat lagi nanti
-                toast.success("API key baru dibuat. Salin sekarang — tidak akan ditampilkan lagi!", { duration: 8000 });
+                toast.success(t("webhooks.apiKey.createdToast"), { duration: 8000 });
             }
         } catch (error) {
-            toast.error("Failed to generate API key");
+            toast.error(t("webhooks.apiKey.generateFail"));
         }
     };
 
@@ -157,12 +159,12 @@ export default function WebhooksPage() {
 
     const handleSaveWebhook = async () => {
         if (!newName || !newUrl || newEvents.length === 0) {
-            toast.error("Name, URL, and at least one event are required");
+            toast.error(t("webhooks.toasts.required"));
             return;
         }
 
         if (!sessionId) {
-            toast.error("No active session selected");
+            toast.error(t("webhooks.toasts.noSession"));
             return;
         }
 
@@ -184,7 +186,7 @@ export default function WebhooksPage() {
             });
 
             if (res.ok) {
-                toast.success("Webhook created!");
+                toast.success(t("webhooks.toasts.created"));
                 setShowNewForm(false);
                 setNewName("");
                 setNewUrl("");
@@ -192,21 +194,21 @@ export default function WebhooksPage() {
                 setNewEvents(["message.received", "message.sent"]);
                 fetchWebhooks();
             } else {
-                toast.error("Failed to create webhook");
+                toast.error(t("webhooks.toasts.createFail"));
             }
         } catch (error) {
-            toast.error("An error occurred");
+            toast.error(t("webhooks.toasts.error"));
         }
     };
 
     const handleUpdateWebhook = async () => {
         if (!editName || !editUrl || editEvents.length === 0) {
-            toast.error("Name, URL, and at least one event are required");
+            toast.error(t("webhooks.toasts.required"));
             return;
         }
 
         if (!sessionId || !editingId) {
-            toast.error("No active session selected");
+            toast.error(t("webhooks.toasts.noSession"));
             return;
         }
 
@@ -231,15 +233,15 @@ export default function WebhooksPage() {
             });
 
             if (res.ok) {
-                toast.success("Webhook updated!");
+                toast.success(t("webhooks.toasts.updated"));
                 setIsEditOpen(false);
                 setEditingId(null);
                 fetchWebhooks();
             } else {
-                toast.error("Failed to update webhook");
+                toast.error(t("webhooks.toasts.updateFail"));
             }
         } catch (error) {
-            toast.error("An error occurred");
+            toast.error(t("webhooks.toasts.error"));
         }
     };
 
@@ -256,7 +258,7 @@ export default function WebhooksPage() {
             });
             setWebhooks(webhooks.map(w => w.id === id ? { ...w, isActive } : w));
         } catch (error) {
-            toast.error("Failed to update webhook");
+            toast.error(t("webhooks.toasts.updateFail"));
         }
     };
 
@@ -266,12 +268,12 @@ export default function WebhooksPage() {
             const res = await fetch(`/api/webhooks/${sessionId}/${webhook.id}/test`, { method: "POST" });
             const data = await res.json();
             if (data?.ok) {
-                toast.success(data.message || "Webhook berhasil!");
+                toast.success(data.message || t("webhooks.toasts.testOk"));
             } else {
-                toast.error(data?.message || "Test webhook gagal", { duration: 6000 });
+                toast.error(data?.message || t("webhooks.toasts.testFail"), { duration: 6000 });
             }
         } catch {
-            toast.error("Gagal menjalankan test webhook");
+            toast.error(t("webhooks.toasts.testError"));
         } finally {
             setTestingId(null);
         }
@@ -296,7 +298,7 @@ export default function WebhooksPage() {
             });
             setWebhooks(webhooks.map(w => w.id === webhookId ? { ...w, events: newEvents } : w));
         } catch (error) {
-            toast.error("Failed to update webhook events");
+            toast.error(t("webhooks.toasts.eventsFail"));
         }
     };
 
@@ -314,9 +316,9 @@ export default function WebhooksPage() {
             const targetSessionId = webhook?.sessionId || sessionId;
             await fetch(`/api/webhooks/${targetSessionId}/${deleteId}`, { method: "DELETE" });
             setWebhooks(webhooks.filter(w => w.id !== deleteId));
-            toast.success("Webhook deleted");
+            toast.success(t("webhooks.toasts.deleted"));
         } catch (error) {
-            toast.error("Failed to delete webhook");
+            toast.error(t("webhooks.toasts.deleteFail"));
         } finally {
             setDeleteId(null);
         }
@@ -324,23 +326,23 @@ export default function WebhooksPage() {
 
     const copyToClipboard = (text: string) => {
         navigator.clipboard.writeText(text);
-        toast.success("Copied to clipboard!");
+        toast.success(t("webhooks.toasts.copied"));
     };
 
     return (
         <div className="space-y-6">
             <div>
-                <h1 className="text-xl sm:text-2xl font-bold">Webhooks & API</h1>
+                <h1 className="text-xl sm:text-2xl font-bold">{t("webhooks.title")}</h1>
             </div>
 
             {/* API Key Section */}
             <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                        <Key className="h-5 w-5" /> API Key
+                        <Key className="h-5 w-5" /> {t("webhooks.apiKey.title")}
                     </CardTitle>
                     <CardDescription>
-                        Use this key to authenticate API requests. Include it in the X-API-Key header.
+                        {t("webhooks.apiKey.description")}
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -349,9 +351,9 @@ export default function WebhooksPage() {
                             {apiKey ? (
                                 showApiKey ? apiKey : "••••••••••••••••••••••••••••••••"
                             ) : apiKeySet && apiKeyHidden ? (
-                                <span className="text-muted-foreground">•••••••• (key tersembunyi — hanya ditampilkan sekali saat dibuat)</span>
+                                <span className="text-muted-foreground">{t("webhooks.apiKey.hidden")}</span>
                             ) : (
-                                <span className="text-muted-foreground">No API key generated</span>
+                                <span className="text-muted-foreground">{t("webhooks.apiKey.none")}</span>
                             )}
                         </div>
                         {apiKey && (
@@ -372,17 +374,17 @@ export default function WebhooksPage() {
                             }
                         }}>
                             <RefreshCw className="h-4 w-4 mr-2" />
-                            {apiKeySet ? "Regenerate" : "Generate"}
+                            {apiKeySet ? t("webhooks.apiKey.regenerate") : t("webhooks.apiKey.generate")}
                         </Button>
                     </div>
                     {apiKey && (
                         <p className="text-xs text-muted-foreground mt-2">
-                            Example: <code className="bg-slate-100 px-1 py-0.5 rounded">curl -H "X-API-Key: {apiKey?.slice(0, 10)}..." http://your-server/api/sessions</code>
+                            {t("webhooks.apiKey.exampleLabel")} <code className="bg-slate-100 px-1 py-0.5 rounded">curl -H "X-API-Key: {apiKey?.slice(0, 10)}..." http://your-server/api/sessions</code>
                         </p>
                     )}
                     {!apiKey && apiKeySet && apiKeyHidden && (
                         <p className="text-xs text-muted-foreground mt-2">
-                            Demi keamanan, API key disimpan ter-enkripsi dan tidak bisa ditampilkan lagi. Klik <b>Regenerate</b> kalau kamu lupa/kehilangan key-nya.
+                            {t("webhooks.apiKey.hiddenNoteA")}<b>{t("webhooks.apiKey.regenerate")}</b>{t("webhooks.apiKey.hiddenNoteB")}
                         </p>
                     )}
                 </CardContent>
@@ -391,14 +393,14 @@ export default function WebhooksPage() {
                 <AlertDialog open={showRegenConfirm} onOpenChange={setShowRegenConfirm}>
                     <AlertDialogContent>
                         <AlertDialogHeader>
-                            <AlertDialogTitle>Regenerate API Key?</AlertDialogTitle>
+                            <AlertDialogTitle>{t("webhooks.apiKey.regenTitle")}</AlertDialogTitle>
                             <AlertDialogDescription>
-                                This will invalidate your current API key. All existing integrations using the old key will stop working immediately. This action cannot be undone.
+                                {t("webhooks.apiKey.regenDescription")}
                             </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => { setShowRegenConfirm(false); generateNewApiKey(); }} className="bg-red-600 hover:bg-red-700">Regenerate</AlertDialogAction>
+                            <AlertDialogCancel>{t("webhooks.apiKey.cancel")}</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => { setShowRegenConfirm(false); generateNewApiKey(); }} className="bg-red-600 hover:bg-red-700">{t("webhooks.apiKey.regenerate")}</AlertDialogAction>
                         </AlertDialogFooter>
                     </AlertDialogContent>
                 </AlertDialog>
@@ -411,10 +413,10 @@ export default function WebhooksPage() {
                         <div className="flex justify-between items-center">
                             <div>
                                 <CardTitle className="flex items-center gap-2">
-                                    <Webhook className="h-5 w-5" /> Webhooks
+                                    <Webhook className="h-5 w-5" /> {t("webhooks.section.title")}
                                 </CardTitle>
                                 <CardDescription>
-                                    Send real-time events to external URLs when activities happen in WhatsApp.
+                                    {t("webhooks.section.description")}
                                 </CardDescription>
                             </div>
                             <Button onClick={() => {
@@ -424,7 +426,7 @@ export default function WebhooksPage() {
                                 setNewEvents(["message.received", "message.sent"]);
                                 setShowNewForm(!showNewForm);
                             }}>
-                                <Plus className="h-4 w-4 mr-2" /> Add Webhook
+                                <Plus className="h-4 w-4 mr-2" /> {t("webhooks.section.add")}
                             </Button>
                         </div>
                     </CardHeader>
@@ -433,20 +435,20 @@ export default function WebhooksPage() {
                         {showNewForm && (
                             <Card className="border-dashed border-2">
                                 <CardHeader>
-                                    <CardTitle>New Webhook</CardTitle>
+                                    <CardTitle>{t("webhooks.form.newTitle")}</CardTitle>
                                 </CardHeader>
                                 <CardContent className="pt-4 space-y-4">
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div className="space-y-2">
-                                            <Label>Name</Label>
+                                            <Label>{t("webhooks.form.name")}</Label>
                                             <Input
-                                                placeholder="My Server"
+                                                placeholder={t("webhooks.form.namePlaceholder")}
                                                 value={newName}
                                                 onChange={(e) => setNewName(e.target.value)}
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label>Webhook URL</Label>
+                                            <Label>{t("webhooks.form.url")}</Label>
                                             <Input
                                                 placeholder="https://example.com/webhook"
                                                 value={newUrl}
@@ -455,7 +457,7 @@ export default function WebhooksPage() {
                                         </div>
                                     </div>
                                     <div className="space-y-2">
-                                        <Label>Secret (optional, for HMAC signature)</Label>
+                                        <Label>{t("webhooks.form.secret")}</Label>
                                         <Input
                                             placeholder="your-secret-key"
                                             value={newSecret}
@@ -463,7 +465,7 @@ export default function WebhooksPage() {
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <Label>Events</Label>
+                                        <Label>{t("webhooks.form.events")}</Label>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                             {AVAILABLE_EVENTS.map(event => (
                                                 <div key={event.id} className="flex items-center gap-2 p-2 rounded border">
@@ -478,8 +480,8 @@ export default function WebhooksPage() {
                                                         }}
                                                     />
                                                     <div>
-                                                        <p className="text-sm font-medium">{event.label}</p>
-                                                        <p className="text-xs text-muted-foreground">{event.description}</p>
+                                                        <p className="text-sm font-medium">{t(`webhooks.events.${event.key}.label`)}</p>
+                                                        <p className="text-xs text-muted-foreground">{t(`webhooks.events.${event.key}.description`)}</p>
                                                     </div>
                                                 </div>
                                             ))}
@@ -491,8 +493,8 @@ export default function WebhooksPage() {
                                             setNewName("");
                                             setNewUrl("");
                                             setNewSecret("");
-                                        }}>Cancel</Button>
-                                        <Button onClick={handleSaveWebhook}>Create Webhook</Button>
+                                        }}>{t("webhooks.form.cancel")}</Button>
+                                        <Button onClick={handleSaveWebhook}>{t("webhooks.form.create")}</Button>
                                     </div>
                                 </CardContent>
                             </Card>
@@ -500,10 +502,10 @@ export default function WebhooksPage() {
 
                         {/* Existing Webhooks */}
                         {loading ? (
-                            <p className="text-center text-muted-foreground py-8">Loading...</p>
+                            <p className="text-center text-muted-foreground py-8">{t("webhooks.list.loading")}</p>
                         ) : webhooks.length === 0 ? (
                             <p className="text-center text-muted-foreground py-8">
-                                No webhooks configured for this session. Click "Add Webhook" to create one.
+                                {t("webhooks.list.empty", { name: t("webhooks.section.add") })}
                             </p>
                         ) : (
                             webhooks.map((webhook) => (
@@ -514,7 +516,7 @@ export default function WebhooksPage() {
                                                 <h3 className="font-semibold flex items-center gap-2 flex-wrap">
                                                     <span className="truncate max-w-full">{webhook.name}</span>
                                                     <Badge variant={webhook.isActive ? "default" : "secondary"}>
-                                                        {webhook.isActive ? "Active" : "Inactive"}
+                                                        {webhook.isActive ? t("webhooks.list.active") : t("webhooks.list.inactive")}
                                                     </Badge>
                                                     {webhook.sessionId && (
                                                         <Badge variant="outline" className="text-xs">
@@ -530,10 +532,10 @@ export default function WebhooksPage() {
                                                     onCheckedChange={(checked) => toggleWebhookActive(webhook.id, checked)}
                                                 />
                                                 <Button variant="ghost" size="sm" onClick={() => handleTestWebhook(webhook)} disabled={testingId === webhook.id} className="h-8 px-2">
-                                                    {testingId === webhook.id ? "Testing..." : "Test"}
+                                                    {testingId === webhook.id ? t("webhooks.list.testing") : t("webhooks.list.test")}
                                                 </Button>
                                                 <Button variant="ghost" size="sm" onClick={() => handleEdit(webhook)} className="h-8 px-2">
-                                                    Edit
+                                                    {t("webhooks.list.edit")}
                                                 </Button>
                                                 <Button variant="ghost" size="icon" onClick={() => deleteWebhook(webhook.id)} className="h-8 w-8">
                                                     <Trash2 className="h-4 w-4 text-destructive" />
@@ -543,7 +545,7 @@ export default function WebhooksPage() {
 
                                         {/* Event Toggles */}
                                         <div className="space-y-2">
-                                            <Label className="text-xs">Events (click to toggle)</Label>
+                                            <Label className="text-xs">{t("webhooks.list.eventsToggle")}</Label>
                                             <div className="flex flex-wrap gap-2">
                                                 {AVAILABLE_EVENTS.map(event => (
                                                     <Badge
@@ -552,7 +554,7 @@ export default function WebhooksPage() {
                                                         className="cursor-pointer"
                                                         onClick={() => toggleEventForWebhook(webhook.id, event.id)}
                                                     >
-                                                        {event.label}
+                                                        {t(`webhooks.events.${event.key}.label`)}
                                                     </Badge>
                                                 ))}
                                             </div>
@@ -569,21 +571,21 @@ export default function WebhooksPage() {
             <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
                 <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
-                        <DialogTitle>Edit Webhook</DialogTitle>
-                        <DialogDescription>Modify the webhook endpoint configuration and subscribed events.</DialogDescription>
+                        <DialogTitle>{t("webhooks.form.editTitle")}</DialogTitle>
+                        <DialogDescription>{t("webhooks.form.editDescription")}</DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label>Name</Label>
+                                <Label>{t("webhooks.form.name")}</Label>
                                 <Input
-                                    placeholder="My Server"
+                                    placeholder={t("webhooks.form.namePlaceholder")}
                                     value={editName}
                                     onChange={(e) => setEditName(e.target.value)}
                                 />
                             </div>
                             <div className="space-y-2">
-                                <Label>Webhook URL</Label>
+                                <Label>{t("webhooks.form.url")}</Label>
                                 <Input
                                     placeholder="https://example.com/webhook"
                                     value={editUrl}
@@ -592,7 +594,7 @@ export default function WebhooksPage() {
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <Label>Secret (optional, for HMAC signature)</Label>
+                            <Label>{t("webhooks.form.secret")}</Label>
                             <Input
                                 placeholder="your-secret-key"
                                 value={editSecret}
@@ -600,7 +602,7 @@ export default function WebhooksPage() {
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label>Events</Label>
+                            <Label>{t("webhooks.form.events")}</Label>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                 {AVAILABLE_EVENTS.map(event => (
                                     <div key={event.id} className="flex items-center gap-2 p-2 rounded border">
@@ -615,8 +617,8 @@ export default function WebhooksPage() {
                                             }}
                                         />
                                         <div>
-                                            <p className="text-sm font-medium">{event.label}</p>
-                                            <p className="text-xs text-muted-foreground">{event.description}</p>
+                                            <p className="text-sm font-medium">{t(`webhooks.events.${event.key}.label`)}</p>
+                                            <p className="text-xs text-muted-foreground">{t(`webhooks.events.${event.key}.description`)}</p>
                                         </div>
                                     </div>
                                 ))}
@@ -624,8 +626,8 @@ export default function WebhooksPage() {
                         </div>
                     </div>
                     <DialogFooter className="gap-2">
-                        <Button variant="ghost" onClick={() => setIsEditOpen(false)}>Cancel</Button>
-                        <Button onClick={handleUpdateWebhook}>Save Changes</Button>
+                        <Button variant="ghost" onClick={() => setIsEditOpen(false)}>{t("webhooks.form.cancel")}</Button>
+                        <Button onClick={handleUpdateWebhook}>{t("webhooks.form.save")}</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
@@ -633,14 +635,14 @@ export default function WebhooksPage() {
             <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                        <AlertDialogTitle>{t("webhooks.delete.title")}</AlertDialogTitle>
                         <AlertDialogDescription>
-                            This action cannot be undone. This will permanently delete the webhook configuration.
+                            {t("webhooks.delete.description")}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700">Delete</AlertDialogAction>
+                        <AlertDialogCancel>{t("webhooks.delete.cancel")}</AlertDialogCancel>
+                        <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700">{t("webhooks.delete.confirm")}</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>

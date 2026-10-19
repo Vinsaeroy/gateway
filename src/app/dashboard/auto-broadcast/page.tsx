@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Trash2, Edit, Radio, Clock, Users, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { useSession } from "@/components/dashboard/session-provider";
+import { useTranslation } from "@/i18n/react";
 
 interface AutoBroadcast {
     id: string;
@@ -49,6 +50,7 @@ export default function AutoBroadcastPage() {
     const [intervalMin, setIntervalMin] = useState(60);
 
     const { sessionId } = useSession();
+    const { t } = useTranslation();
 
     useEffect(() => {
         if (sessionId) {
@@ -63,7 +65,7 @@ export default function AutoBroadcastPage() {
             const data = await res.json();
             if (data.status) setBroadcasts(data.data);
         } catch (_error) {
-            toast.error("Failed to fetch auto broadcasts");
+            toast.error(t("broadcast.auto.toasts.fetchFail"));
         }
     };
 
@@ -76,9 +78,9 @@ export default function AutoBroadcastPage() {
             const res = await fetch(url);
             const data = await res.json();
             if (data.status) setGroups(data.data || []);
-            if (forceRefresh) toast.success("Group list refreshed");
+            if (forceRefresh) toast.success(t("broadcast.auto.toasts.groupsRefreshed"));
         } catch (_error) {
-            if (forceRefresh) toast.error("Failed to refresh groups");
+            if (forceRefresh) toast.error(t("broadcast.auto.toasts.groupsRefreshFail"));
         } finally {
             if (forceRefresh) setGroupRefreshing(false);
         }
@@ -97,7 +99,7 @@ export default function AutoBroadcastPage() {
 
     const handleSave = async () => {
         if (!name || !message) {
-            toast.error("Name and message are required");
+            toast.error(t("broadcast.auto.toasts.required"));
             return;
         }
         setLoading(true);
@@ -121,7 +123,7 @@ export default function AutoBroadcastPage() {
 
             const data = await res.json();
             if (data.status) {
-                toast.success(editingId ? "Broadcast updated" : "Broadcast created");
+                toast.success(editingId ? t("broadcast.auto.toasts.updated") : t("broadcast.auto.toasts.created"));
                 resetForm();
                 setShowForm(false);
                 fetchBroadcasts();
@@ -129,14 +131,14 @@ export default function AutoBroadcastPage() {
                 toast.error(data.message);
             }
         } catch (_error) {
-            toast.error("Failed to save broadcast");
+            toast.error(t("broadcast.auto.toasts.saveFail"));
         } finally {
             setLoading(false);
         }
     };
 
     const handleDelete = async (id: string) => {
-        if (!confirm("Delete this auto broadcast?")) return;
+        if (!confirm(t("broadcast.auto.toasts.deleteConfirm"))) return;
         try {
             const res = await fetch(`/api/autobroadcast/${sessionId}`, {
                 method: "DELETE",
@@ -145,11 +147,11 @@ export default function AutoBroadcastPage() {
             });
             const data = await res.json();
             if (data.status) {
-                toast.success("Deleted");
+                toast.success(t("broadcast.auto.toasts.deleted"));
                 fetchBroadcasts();
             }
         } catch (_error) {
-            toast.error("Failed to delete");
+            toast.error(t("broadcast.auto.toasts.deleteFail"));
         }
     };
 
@@ -162,11 +164,11 @@ export default function AutoBroadcastPage() {
             });
             const data = await res.json();
             if (data.status) {
-                toast.success(isActive ? "Activated" : "Paused");
+                toast.success(isActive ? t("broadcast.auto.toasts.activated") : t("broadcast.auto.toasts.paused"));
                 fetchBroadcasts();
             }
         } catch (_error) {
-            toast.error("Failed to update");
+            toast.error(t("broadcast.auto.toasts.updateFail"));
         }
     };
 
@@ -185,7 +187,7 @@ export default function AutoBroadcastPage() {
         if (targets.includes("ALL")) {
             setTargets([jid]);
         } else if (targets.includes(jid)) {
-            const newTargets = targets.filter(t => t !== jid);
+            const newTargets = targets.filter(item => item !== jid);
             setTargets(newTargets.length === 0 ? ["ALL"] : newTargets);
         } else {
             setTargets([...targets, jid]);
@@ -195,7 +197,7 @@ export default function AutoBroadcastPage() {
     if (!sessionId) {
         return (
             <div className="p-6 text-center text-muted-foreground">
-                Please select a session first.
+                {t("broadcast.auto.noSession")}
             </div>
         );
     }
@@ -204,11 +206,11 @@ export default function AutoBroadcastPage() {
         <div className="p-4 md:p-6 space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
-                    <h1 className="text-xl sm:text-2xl font-bold">Auto Broadcast</h1>
-                    <p className="text-sm text-muted-foreground">Send recurring messages to groups automatically</p>
+                    <h1 className="text-xl sm:text-2xl font-bold">{t("broadcast.auto.title")}</h1>
+                    <p className="text-sm text-muted-foreground">{t("broadcast.auto.subtitle")}</p>
                 </div>
                 <Button onClick={() => { resetForm(); setShowForm(true); }} className="w-full sm:w-auto">
-                    <Plus className="h-4 w-4 mr-2" /> New Broadcast
+                    <Plus className="h-4 w-4 mr-2" /> {t("broadcast.auto.newBroadcast")}
                 </Button>
             </div>
 
@@ -217,7 +219,7 @@ export default function AutoBroadcastPage() {
                 {broadcasts.length === 0 && (
                     <Card>
                         <CardContent className="p-8 text-center text-muted-foreground">
-                            No auto broadcasts configured. Click &quot;New Broadcast&quot; to create one.
+                            {t("broadcast.auto.empty", { name: t("broadcast.auto.newBroadcast") })}
                         </CardContent>
                     </Card>
                 )}
@@ -230,7 +232,7 @@ export default function AutoBroadcastPage() {
                                     <div className="flex items-center gap-2 flex-wrap">
                                         <h3 className="font-semibold truncate max-w-full">{b.name}</h3>
                                         <Badge variant={b.isActive ? "default" : "secondary"}>
-                                            {b.isActive ? "Active" : "Paused"}
+                                            {b.isActive ? t("broadcast.auto.active") : t("broadcast.auto.paused")}
                                         </Badge>
                                         {b.mediaType && (
                                             <Badge variant="outline">{b.mediaType}</Badge>
@@ -239,14 +241,14 @@ export default function AutoBroadcastPage() {
                                     <p className="text-sm text-muted-foreground line-clamp-2 break-words">{b.message}</p>
                                     <div className="flex items-center flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground mt-2">
                                         <span className="flex items-center gap-1">
-                                            <Clock className="h-3 w-3" /> Every {b.intervalMin} min
+                                            <Clock className="h-3 w-3" /> {t("broadcast.auto.everyMinutes", { min: b.intervalMin })}
                                         </span>
                                         <span className="flex items-center gap-1">
                                             <Users className="h-3 w-3" />
-                                            {b.targets.includes("ALL") ? "All Groups" : `${b.targets.length} groups`}
+                                            {b.targets.includes("ALL") ? t("broadcast.auto.allGroups") : t("broadcast.auto.groupsCount", { count: b.targets.length })}
                                         </span>
                                         {b.lastSentAt && (
-                                            <span className="break-all">Last sent: {new Date(b.lastSentAt).toLocaleString()}</span>
+                                            <span className="break-all">{t("broadcast.auto.lastSent", { date: new Date(b.lastSentAt).toLocaleString() })}</span>
                                         )}
                                     </div>
                                 </div>
@@ -272,22 +274,22 @@ export default function AutoBroadcastPage() {
             <Dialog open={showForm} onOpenChange={setShowForm}>
                 <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
-                        <DialogTitle>{editingId ? "Edit" : "New"} Auto Broadcast</DialogTitle>
+                        <DialogTitle>{editingId ? t("broadcast.auto.dialog.editTitle") : t("broadcast.auto.dialog.newTitle")}</DialogTitle>
                     </DialogHeader>
 
                     <div className="space-y-4">
                         <div>
-                            <Label>Name</Label>
-                            <Input value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Promo Pagi" />
+                            <Label>{t("broadcast.auto.dialog.name")}</Label>
+                            <Input value={name} onChange={e => setName(e.target.value)} placeholder={t("broadcast.auto.dialog.namePlaceholder")} />
                         </div>
 
                         <div>
-                            <Label>Message / Caption</Label>
-                            <Textarea value={message} onChange={e => setMessage(e.target.value)} placeholder="Message text..." rows={4} />
+                            <Label>{t("broadcast.auto.dialog.messageLabel")}</Label>
+                            <Textarea value={message} onChange={e => setMessage(e.target.value)} placeholder={t("broadcast.auto.dialog.messagePlaceholder")} rows={4} />
                         </div>
 
                         <div>
-                            <Label>Media (optional)</Label>
+                            <Label>{t("broadcast.auto.dialog.mediaLabel")}</Label>
                             <div className="mt-2 space-y-2">
                                 <Input
                                     type="file"
@@ -307,20 +309,20 @@ export default function AutoBroadcastPage() {
                                             if (data.status) {
                                                 setMediaUrl(data.data.url);
                                                 setMediaType(data.data.type);
-                                                toast.success("Image uploaded");
+                                                toast.success(t("broadcast.auto.toasts.uploaded"));
                                             } else {
                                                 toast.error(data.message);
                                             }
                                         } catch (_err) {
-                                            toast.error("Upload failed");
+                                            toast.error(t("broadcast.auto.toasts.uploadFail"));
                                         }
                                     }}
                                 />
                                 {mediaUrl && (
                                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                        <span>✅ {mediaType} siap dikirim</span>
+                                        <span>{t("broadcast.auto.dialog.mediaReady", { type: mediaType })}</span>
                                         <Button size="sm" variant="ghost" onClick={() => { setMediaUrl(""); setMediaType(""); }}>
-                                            Remove
+                                            {t("broadcast.auto.dialog.remove")}
                                         </Button>
                                     </div>
                                 )}
@@ -328,7 +330,7 @@ export default function AutoBroadcastPage() {
                         </div>
 
                         <div>
-                            <Label>Interval (minutes)</Label>
+                            <Label>{t("broadcast.auto.dialog.intervalLabel")}</Label>
                             <Input
                                 type="number"
                                 min={10}
@@ -338,15 +340,19 @@ export default function AutoBroadcastPage() {
                                 className="mt-1"
                             />
                             <p className="text-xs text-muted-foreground mt-1">
-                                {intervalMin >= 60 ? `Every ${Math.floor(intervalMin / 60)}h ${intervalMin % 60 > 0 ? `${intervalMin % 60}m` : ""}` : `Every ${intervalMin} minutes`}
+                                {intervalMin >= 60
+                                    ? (intervalMin % 60 > 0
+                                        ? t("broadcast.auto.dialog.intervalHoursMinutes", { hours: Math.floor(intervalMin / 60), minutes: intervalMin % 60 })
+                                        : t("broadcast.auto.dialog.intervalHours", { hours: Math.floor(intervalMin / 60) }))
+                                    : t("broadcast.auto.dialog.intervalMinutes", { minutes: intervalMin })}
                             </p>
                         </div>
 
                         <div>
-                            <Label>Target Groups</Label>
+                            <Label>{t("broadcast.auto.dialog.targetGroups")}</Label>
                             <div className="flex gap-2 mt-2 mb-2">
                                 <Input
-                                    placeholder="Search groups..."
+                                    placeholder={t("broadcast.auto.dialog.searchPlaceholder")}
                                     value={groupSearch}
                                     onChange={e => setGroupSearch(e.target.value)}
                                     className="flex-1"
@@ -357,7 +363,7 @@ export default function AutoBroadcastPage() {
                                     size="icon"
                                     onClick={() => fetchGroups(true)}
                                     disabled={groupRefreshing}
-                                    title="Refresh group list from WhatsApp"
+                                    title={t("broadcast.auto.dialog.refreshTitle")}
                                 >
                                     <RefreshCw className={`h-4 w-4 ${groupRefreshing ? "animate-spin" : ""}`} />
                                 </Button>
@@ -368,7 +374,7 @@ export default function AutoBroadcastPage() {
                                     onClick={() => setTargets(["ALL"])}
                                 >
                                     <Radio className="h-4 w-4" />
-                                    <span className="text-sm font-medium">All Groups</span>
+                                    <span className="text-sm font-medium">{t("broadcast.auto.dialog.allGroups")}</span>
                                 </div>
 
                                 {/* Regular Groups */}
@@ -377,7 +383,7 @@ export default function AutoBroadcastPage() {
                                     if (filtered.length === 0 && !groupSearch) return null;
                                     return (
                                         <>
-                                            <div className="text-xs font-semibold text-muted-foreground mt-3 mb-1 px-2 uppercase tracking-wide">Groups</div>
+                                            <div className="text-xs font-semibold text-muted-foreground mt-3 mb-1 px-2 uppercase tracking-wide">{t("broadcast.auto.dialog.groupsSection")}</div>
                                             {filtered.map(g => (
                                                 <div
                                                     key={g.jid}
@@ -398,7 +404,7 @@ export default function AutoBroadcastPage() {
                                     if (filtered.length === 0) return null;
                                     return (
                                         <>
-                                            <div className="text-xs font-semibold text-muted-foreground mt-3 mb-1 px-2 uppercase tracking-wide">Communities</div>
+                                            <div className="text-xs font-semibold text-muted-foreground mt-3 mb-1 px-2 uppercase tracking-wide">{t("broadcast.auto.dialog.communitiesSection")}</div>
                                             {filtered.map(g => (
                                                 <div
                                                     key={g.jid}
@@ -414,16 +420,16 @@ export default function AutoBroadcastPage() {
                                 })()}
 
                                 {groups.filter(g => (g.subject || g.jid).toLowerCase().includes(groupSearch.toLowerCase())).length === 0 && groupSearch && (
-                                    <p className="text-xs text-muted-foreground text-center py-2">No groups found</p>
+                                    <p className="text-xs text-muted-foreground text-center py-2">{t("broadcast.auto.dialog.noGroupsFound")}</p>
                                 )}
                             </div>
                             {!targets.includes("ALL") && targets.length > 0 && (
-                                <p className="text-xs text-muted-foreground mt-1">{targets.length} group(s) selected</p>
+                                <p className="text-xs text-muted-foreground mt-1">{t("broadcast.auto.dialog.selected", { count: targets.length })}</p>
                             )}
                         </div>
 
                         <Button onClick={handleSave} disabled={loading} className="w-full">
-                            {loading ? "Saving..." : (editingId ? "Update" : "Create")} Broadcast
+                            {loading ? t("broadcast.auto.dialog.saving") : (editingId ? t("broadcast.auto.dialog.update") : t("broadcast.auto.dialog.create"))}
                         </Button>
                     </div>
                 </DialogContent>

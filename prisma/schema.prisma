@@ -312,6 +312,8 @@ model SystemConfig {
   faviconUrl         String?
   timezone           String   @default("Asia/Jakarta")
   enableRegistration Boolean  @default(true)
+  // Interface language: "en" | "id" | "pt-BR" (src/i18n/config.ts)
+  language           String   @default("en")
 
   // Payment gateway (KlikQRIS) — diatur HANYA oleh SUPERADMIN
   klikqrisBaseUrl    String?  @default("https://klikqris.com/api")

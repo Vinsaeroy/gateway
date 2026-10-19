@@ -12,6 +12,7 @@ import { formatDistanceToNow } from "date-fns";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { createAppSocket } from "@/lib/socket-client";
+import { useTranslation } from "@/i18n/react";
 import type { Socket } from "socket.io-client";
 
 interface NavbarProps {
@@ -29,6 +30,7 @@ interface Notification {
 }
 
 export function Navbar({ appName }: NavbarProps) {
+    const { t } = useTranslation();
     const router = useRouter();
     const { data: session, status } = useSession();
     const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -80,7 +82,7 @@ export function Navbar({ appName }: NavbarProps) {
                 toast.info(notification.title, {
                     description: notification.message,
                     action: notification.href ? {
-                        label: "View",
+                        label: t("nav.notifications.view"),
                         onClick: () => router.push(notification.href!)
                     } : undefined,
                 });
@@ -127,20 +129,20 @@ export function Navbar({ appName }: NavbarProps) {
                     const notification = notifications.find(n => n.id === id);
                     return notification && !notification.read ? Math.max(0, prev - 1) : prev;
                 });
-                toast.success("Notification deleted");
+                toast.success(t("nav.notifications.deleted"));
             } else {
                 // Show server error so the user knows it didn't actually delete
                 const data = await res.json().catch(() => ({}));
-                toast.error(data.message || `Delete failed (HTTP ${res.status})`);
+                toast.error(data.message || t("nav.notifications.deleteFailedHttp", { status: res.status }));
             }
         } catch (e) {
             console.error("Failed to delete notification", e);
-            toast.error("Failed to delete notification");
+            toast.error(t("nav.notifications.deleteFailed"));
         }
     };
 
     const deleteAllNotifications = async () => {
-        if (!confirm("Delete all notifications? This cannot be undone.")) return;
+        if (!confirm(t("nav.notifications.deleteAllConfirm"))) return;
         try {
             const res = await fetch(`/api/notifications/delete?all=1`, {
                 method: "DELETE"
@@ -148,14 +150,14 @@ export function Navbar({ appName }: NavbarProps) {
             if (res.ok) {
                 setNotifications([]);
                 setUnreadCount(0);
-                toast.success("All notifications cleared");
+                toast.success(t("nav.notifications.allCleared"));
             } else {
                 const data = await res.json().catch(() => ({}));
-                toast.error(data.message || `Failed (HTTP ${res.status})`);
+                toast.error(data.message || t("nav.notifications.failedHttp", { status: res.status }));
             }
         } catch (e) {
             console.error("Failed to clear notifications", e);
-            toast.error("Failed to clear notifications");
+            toast.error(t("nav.notifications.clearFailed"));
         }
     };
 
@@ -188,20 +190,20 @@ export function Navbar({ appName }: NavbarProps) {
                     <PopoverContent className="w-80 p-0 rounded-2xl border border-border/50 shadow-2xl glass-panel" align="end">
                         <div className="p-4 border-b border-border/50 flex justify-between items-center bg-background/50">
                             <div>
-                                <h4 className="font-semibold leading-none text-foreground">Notifications</h4>
+                                <h4 className="font-semibold leading-none text-foreground">{t("nav.notifications.title")}</h4>
                                 <p className="text-xs text-muted-foreground mt-1">
-                                    {unreadCount > 0 ? `You have ${unreadCount} unread updates.` : "No new notifications."}
+                                    {unreadCount > 0 ? t("nav.notifications.unreadCount", { count: unreadCount }) : t("nav.notifications.noNew")}
                                 </p>
                             </div>
                             <div className="flex items-center gap-1">
                                 {unreadCount > 0 && (
                                     <Button variant="ghost" size="sm" onClick={() => markAsRead()} className="h-auto py-1 px-2 text-xs">
-                                        Mark all read
+                                        {t("nav.notifications.markAllRead")}
                                     </Button>
                                 )}
                                 {notifications.length > 0 && (
                                     <Button variant="ghost" size="sm" onClick={deleteAllNotifications} className="h-auto py-1 px-2 text-xs text-destructive hover:text-destructive">
-                                        Clear all
+                                        {t("nav.notifications.clearAll")}
                                     </Button>
                                 )}
                             </div>
@@ -212,8 +214,8 @@ export function Navbar({ appName }: NavbarProps) {
                                     <div className="bg-slate-100 p-3 rounded-full mb-3">
                                         <Inbox className="h-6 w-6 text-slate-400" />
                                     </div>
-                                    <p className="text-sm font-medium">No new notifications</p>
-                                    <p className="text-xs text-muted-foreground max-w-[180px]">We'll notify you when something important arrives.</p>
+                                    <p className="text-sm font-medium">{t("nav.notifications.emptyTitle")}</p>
+                                    <p className="text-xs text-muted-foreground max-w-[180px]">{t("nav.notifications.emptyDescription")}</p>
                                 </div>
                             ) : (
                                 <div className="divide-y">

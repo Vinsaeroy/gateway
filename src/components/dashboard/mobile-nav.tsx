@@ -32,77 +32,79 @@ import {
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
+import { useTranslation } from "@/i18n/react";
 import pkg from "../../../package.json";
 
 interface NavGroup {
-    label: string;
-    items: { href: string; label: string; icon: React.ElementType; external?: boolean; superadminOnly?: boolean; capability?: string }[];
+    labelKey: string;
+    items: { href: string; labelKey: string; icon: React.ElementType; external?: boolean; superadminOnly?: boolean; capability?: string }[];
 }
 
 // Keep in sync with sidebar-nav.tsx
 const navGroups: NavGroup[] = [
     {
-        label: "Main",
+        labelKey: "nav.groups.main",
         items: [
-            { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-            { href: "/dashboard/sessions", label: "Sessions / QR", icon: QrCode },
+            { href: "/dashboard", labelKey: "nav.items.dashboard", icon: LayoutDashboard },
+            { href: "/dashboard/sessions", labelKey: "nav.items.sessions", icon: QrCode },
         ],
     },
     {
-        label: "Messaging",
+        labelKey: "nav.groups.messaging",
         items: [
-            { href: "/dashboard/chat", label: "Chat", icon: MessageSquare },
-            { href: "/dashboard/broadcast", label: "Broadcast", icon: Megaphone, capability: "broadcast" },
-            { href: "/dashboard/sticker", label: "Sticker Maker", icon: ImageIcon, capability: "sticker" },
+            { href: "/dashboard/chat", labelKey: "nav.items.chat", icon: MessageSquare },
+            { href: "/dashboard/broadcast", labelKey: "nav.items.broadcast", icon: Megaphone, capability: "broadcast" },
+            { href: "/dashboard/sticker", labelKey: "nav.items.stickerMaker", icon: ImageIcon, capability: "sticker" },
         ],
     },
     {
-        label: "Contacts",
+        labelKey: "nav.groups.contacts",
         items: [
-            { href: "/dashboard/contacts", label: "Contacts", icon: UserCheck },
-            { href: "/dashboard/groups", label: "Groups", icon: Users },
-            { href: "/dashboard/labels", label: "Labels", icon: Tag },
+            { href: "/dashboard/contacts", labelKey: "nav.items.contacts", icon: UserCheck },
+            { href: "/dashboard/groups", labelKey: "nav.items.groups", icon: Users },
+            { href: "/dashboard/labels", labelKey: "nav.items.labels", icon: Tag },
         ],
     },
     {
-        label: "Automation",
+        labelKey: "nav.groups.automation",
         items: [
-            { href: "/dashboard/bot-settings", label: "Bot Settings", icon: Bot },
-            { href: "/dashboard/autoreply", label: "Auto Reply", icon: MessageCircleReply, capability: "autoReply" },
-            { href: "/dashboard/profile", label: "Bot Profile", icon: UserCircle },
-            { href: "/dashboard/scheduler", label: "Scheduler", icon: CalendarClock, capability: "scheduler" },
-            { href: "/dashboard/auto-broadcast", label: "Auto Broadcast", icon: Radio, capability: "autoBroadcast" },
-            { href: "/dashboard/jpm-swgc", label: "JPM SWGC", icon: Megaphone, capability: "jpm" },
-            { href: "/dashboard/webhooks", label: "Webhooks & API", icon: Webhook, capability: "webhook" },
+            { href: "/dashboard/bot-settings", labelKey: "nav.items.botSettings", icon: Bot },
+            { href: "/dashboard/autoreply", labelKey: "nav.items.autoReply", icon: MessageCircleReply, capability: "autoReply" },
+            { href: "/dashboard/profile", labelKey: "nav.items.botProfile", icon: UserCircle },
+            { href: "/dashboard/scheduler", labelKey: "nav.items.scheduler", icon: CalendarClock, capability: "scheduler" },
+            { href: "/dashboard/auto-broadcast", labelKey: "nav.items.autoBroadcast", icon: Radio, capability: "autoBroadcast" },
+            { href: "/dashboard/jpm-swgc", labelKey: "nav.items.jpmSwgc", icon: Megaphone, capability: "jpm" },
+            { href: "/dashboard/webhooks", labelKey: "nav.items.webhooks", icon: Webhook, capability: "webhook" },
         ],
     },
     {
-        label: "Developer",
+        labelKey: "nav.groups.developer",
         items: [
-            { href: "/docs", label: "API Docs", icon: FileText },
-            { href: "/swagger", label: "Swagger UI", icon: Code, external: true },
+            { href: "/docs", labelKey: "nav.items.apiDocs", icon: FileText },
+            { href: "/swagger", labelKey: "nav.items.swagger", icon: Code, external: true },
         ],
     },
     {
-        label: "Account",
+        labelKey: "nav.groups.account",
         items: [
-            { href: "/dashboard/billing", label: "Billing & Plan", icon: CreditCard },
+            { href: "/dashboard/billing", labelKey: "nav.items.billing", icon: CreditCard },
         ],
     },
     {
-        label: "Administration",
+        labelKey: "nav.groups.administration",
         items: [
-            { href: "/dashboard/media", label: "Media Manager", icon: HardDrive },
-            { href: "/dashboard/sessions/access", label: "Session Access", icon: UserPlus },
-            { href: "/dashboard/users", label: "Users", icon: Users, superadminOnly: true },
-            { href: "/dashboard/settings", label: "Settings", icon: Settings },
-            { href: "/dashboard/system-monitor", label: "System Monitor", icon: Activity, superadminOnly: true },
-            { href: "/dashboard/notifications", label: "Notifications", icon: Bell, superadminOnly: true },
+            { href: "/dashboard/media", labelKey: "nav.items.mediaManager", icon: HardDrive },
+            { href: "/dashboard/sessions/access", labelKey: "nav.items.sessionAccess", icon: UserPlus },
+            { href: "/dashboard/users", labelKey: "nav.items.users", icon: Users, superadminOnly: true },
+            { href: "/dashboard/settings", labelKey: "nav.items.settings", icon: Settings },
+            { href: "/dashboard/system-monitor", labelKey: "nav.items.systemMonitor", icon: Activity, superadminOnly: true },
+            { href: "/dashboard/notifications", labelKey: "nav.items.notifications", icon: Bell, superadminOnly: true },
         ],
     },
 ];
 
 export function MobileNav({ appName = "WA-AKG" }: { appName?: string }) {
+    const { t } = useTranslation();
     const [open, setOpen] = useState(false);
     const pathname = usePathname();
     const { data: session } = useSession();
@@ -138,7 +140,7 @@ export function MobileNav({ appName = "WA-AKG" }: { appName?: string }) {
             <SheetContent side="left" className="w-[85vw] sm:w-[320px] p-0 flex flex-col">
                 <SheetHeader className="px-5 py-4 text-left border-b border-slate-100">
                     <SheetTitle className="text-xl font-bold text-slate-800" translate="no">{appName}</SheetTitle>
-                    <SheetDescription className="text-[11px] text-slate-400 -mt-1">WhatsApp Gateway</SheetDescription>
+                    <SheetDescription className="text-[11px] text-slate-400 -mt-1">{t("nav.tagline")}</SheetDescription>
                 </SheetHeader>
 
                 <nav className="flex-1 px-3 py-3 overflow-y-auto space-y-1">
@@ -151,14 +153,14 @@ export function MobileNav({ appName = "WA-AKG" }: { appName?: string }) {
                         if (visibleItems.length === 0) return null;
 
                         return (
-                            <div key={group.label} className="mb-1">
-                                {group.label !== "Main" && (
+                            <div key={group.labelKey} className="mb-1">
+                                {group.labelKey !== "nav.groups.main" && (
                                     <p className="px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-                                        {group.label}
+                                        {t(group.labelKey)}
                                     </p>
                                 )}
                                 <div className="space-y-0.5">
-                                    {visibleItems.map(({ href, label, icon: Icon, external }) => (
+                                    {visibleItems.map(({ href, labelKey, icon: Icon, external }) => (
                                         <Link
                                             key={href}
                                             href={href}
@@ -181,7 +183,7 @@ export function MobileNav({ appName = "WA-AKG" }: { appName?: string }) {
                                                 size={17}
                                                 className={`flex-shrink-0 transition-colors duration-200 ${isActive(href) ? "text-primary" : "text-muted-foreground/70 group-hover:text-foreground"}`}
                                             />
-                                            <span className="truncate">{label}</span>
+                                            <span className="truncate">{t(labelKey)}</span>
                                         </Link>
                                     ))}
                                 </div>
@@ -196,7 +198,7 @@ export function MobileNav({ appName = "WA-AKG" }: { appName?: string }) {
                             {session?.user?.name?.charAt(0)?.toUpperCase() || "U"}
                         </div>
                         <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-slate-700 truncate" translate="no">{session?.user?.name || "User"}</p>
+                            <p className="text-sm font-medium text-slate-700 truncate" translate="no">{session?.user?.name || t("common.user")}</p>
                             <p className="text-[11px] text-slate-400 truncate" translate="no">{session?.user?.email}</p>
                         </div>
                     </div>
@@ -219,7 +221,7 @@ export function MobileNav({ appName = "WA-AKG" }: { appName?: string }) {
                             window.location.replace("/auth/login");
                         }}
                     >
-                        <LogOut size={14} /> Sign Out
+                        <LogOut size={14} /> {t("nav.signOut")}
                     </Button>
                     <p className="text-[10px] text-slate-300 text-center mt-2 font-mono" translate="no">v{pkg.version}</p>
                 </div>

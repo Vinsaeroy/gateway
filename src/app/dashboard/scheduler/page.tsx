@@ -31,6 +31,7 @@ import {
 import { SearchFilter } from "@/components/dashboard/search-filter";
 import { useSession } from "@/components/dashboard/session-provider";
 import { SessionGuard } from "@/components/dashboard/session-guard";
+import { useTranslation } from "@/i18n/react";
 
 interface ScheduledMessage {
     id: string;
@@ -44,6 +45,7 @@ interface ScheduledMessage {
 
 export default function SchedulerPage() {
     const { sessionId: selectedSessionId } = useSession();
+    const { t } = useTranslation();
 
     // ... rest of state
     const [messages, setMessages] = useState<ScheduledMessage[]>([]);
@@ -102,7 +104,7 @@ export default function SchedulerPage() {
                 setMessages([]);
             }
         } catch (error) {
-            toast.error("Failed to fetch scheduled messages");
+            toast.error(t("scheduler.toasts.fetchFail"));
         } finally {
             setLoading(false);
         }
@@ -145,7 +147,7 @@ export default function SchedulerPage() {
             });
 
             if (res.ok) {
-                toast.success("Message scheduled");
+                toast.success(t("scheduler.toasts.created"));
                 setShowForm(false);
                 setNewJid("");
                 setNewContent("");
@@ -154,10 +156,10 @@ export default function SchedulerPage() {
                 setNewMediaType("image");
                 fetchMessages(selectedSessionId);
             } else {
-                toast.error("Failed to schedule message");
+                toast.error(t("scheduler.toasts.createFail"));
             }
         } catch (error) {
-            toast.error("An error occurred");
+            toast.error(t("scheduler.toasts.error"));
         }
     };
 
@@ -183,7 +185,7 @@ export default function SchedulerPage() {
             });
 
             if (res.ok) {
-                toast.success("Schedule updated");
+                toast.success(t("scheduler.toasts.updated"));
                 setIsEditOpen(false);
                 setEditId(null);
                 setEditJid("");
@@ -193,10 +195,10 @@ export default function SchedulerPage() {
                 setEditMediaType("image");
                 fetchMessages(selectedSessionId);
             } else {
-                toast.error("Failed to update schedule");
+                toast.error(t("scheduler.toasts.updateFail"));
             }
         } catch (error) {
-            toast.error("An error occurred");
+            toast.error(t("scheduler.toasts.error"));
         }
     };
 
@@ -205,13 +207,13 @@ export default function SchedulerPage() {
         try {
             const res = await fetch(`/api/scheduler/${selectedSessionId}/${deleteId}`, { method: "DELETE" });
             if (res.ok) {
-                toast.success("Schedule cancelled");
+                toast.success(t("scheduler.toasts.cancelled"));
                 setMessages(messages.filter(m => m.id !== deleteId));
             } else {
-                toast.error("Failed to cancel schedule");
+                toast.error(t("scheduler.toasts.cancelFail"));
             }
         } catch (error) {
-            toast.error("Failed to cancel schedule");
+            toast.error(t("scheduler.toasts.cancelFail"));
         } finally {
             setDeleteId(null);
         }
@@ -228,17 +230,17 @@ export default function SchedulerPage() {
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                     <div>
                         <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
-                            <CalendarClock className="h-5 w-5 sm:h-6 sm:w-6" /> Scheduler
+                            <CalendarClock className="h-5 w-5 sm:h-6 sm:w-6" /> {t("scheduler.title")}
                         </h1>
                         <p className="text-sm text-muted-foreground">
-                            {selectedSessionId ? "Schedule messages for active session." : "Select a session from the top bar."}
+                            {selectedSessionId ? t("scheduler.subtitleActive") : t("scheduler.subtitleNoSession")}
                         </p>
                     </div>
 
                     <div className="flex items-center gap-2 w-full sm:w-auto">
                         <Button variant="outline" size="sm" className="flex-1 sm:flex-none" onClick={() => selectedSessionId && fetchMessages(selectedSessionId)} disabled={loading || !selectedSessionId}>
                             <RefreshCw className={`h-4 w-4 mr-1 sm:mr-2 ${loading ? 'animate-spin' : ''}`} />
-                            Refresh
+                            {t("scheduler.refresh")}
                         </Button>
                         <Button size="sm" className="flex-1 sm:flex-none" onClick={() => {
                             setNewJid("");
@@ -248,13 +250,13 @@ export default function SchedulerPage() {
                             setNewMediaType("image");
                             setShowForm(!showForm);
                         }} disabled={!selectedSessionId}>
-                            <Plus className="h-4 w-4 mr-1 sm:mr-2" /> Schedule
+                            <Plus className="h-4 w-4 mr-1 sm:mr-2" /> {t("scheduler.schedule")}
                         </Button>
                     </div>
                 </div>
 
                 <SearchFilter
-                    placeholder="Search schedules..."
+                    placeholder={t("scheduler.searchPlaceholder")}
                     onSearch={setSearchTerm}
                 />
 
@@ -262,12 +264,12 @@ export default function SchedulerPage() {
                 {showForm && (
                     <Card className="border-2 border-primary/20">
                         <CardHeader>
-                            <CardTitle>Schedule New Message</CardTitle>
+                            <CardTitle>{t("scheduler.form.title")}</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                                 <div className="space-y-2">
-                                    <Label>Recipient JID</Label>
+                                    <Label>{t("scheduler.form.recipientJid")}</Label>
                                     <div className="flex gap-2">
                                         <Select onValueChange={(val) => {
                                             if (val === "GROUP" && !newJid.endsWith("@g.us")) setNewJid(newJid + "@g.us");
@@ -275,25 +277,25 @@ export default function SchedulerPage() {
                                             if (val === "NEWSLETTER" && !newJid.endsWith("@newsletter")) setNewJid(newJid + "@newsletter");
                                         }}>
                                             <SelectTrigger className="w-[120px]">
-                                                <SelectValue placeholder="Type" />
+                                                <SelectValue placeholder={t("scheduler.form.typePlaceholder")} />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                <SelectItem value="PRIVATE">Private</SelectItem>
-                                                <SelectItem value="GROUP">Group</SelectItem>
-                                                <SelectItem value="NEWSLETTER">Channel</SelectItem>
+                                                <SelectItem value="PRIVATE">{t("scheduler.form.typePrivate")}</SelectItem>
+                                                <SelectItem value="GROUP">{t("scheduler.form.typeGroup")}</SelectItem>
+                                                <SelectItem value="NEWSLETTER">{t("scheduler.form.typeChannel")}</SelectItem>
                                             </SelectContent>
                                         </Select>
                                         <Input
                                             value={newJid}
                                             onChange={e => setNewJid(e.target.value)}
-                                            placeholder="e.g. 62812345678@s.whatsapp.net"
+                                            placeholder={t("scheduler.form.jidPlaceholder")}
                                             className="flex-1"
                                         />
                                     </div>
-                                    <p className="text-xs text-muted-foreground">Select type to auto-append suffix, or type full JID.</p>
+                                    <p className="text-xs text-muted-foreground">{t("scheduler.form.jidHint")}</p>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>Send At</Label>
+                                    <Label>{t("scheduler.form.sendAt")}</Label>
                                     <Input
                                         type="datetime-local"
                                         value={newSendAt}
@@ -302,18 +304,18 @@ export default function SchedulerPage() {
                                 </div>
                             </div>
                             <div className="space-y-2">
-                                <Label>Message</Label>
+                                <Label>{t("scheduler.form.message")}</Label>
                                 <Textarea
                                     value={newContent}
                                     onChange={e => setNewContent(e.target.value)}
-                                    placeholder="Hello there!"
+                                    placeholder={t("scheduler.form.messagePlaceholder")}
                                     rows={4}
                                 />
                             </div>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                                 <div className="space-y-2">
-                                    <Label>Media URL (Optional)</Label>
+                                    <Label>{t("scheduler.form.mediaUrl")}</Label>
                                     <Input
                                         value={newMediaUrl}
                                         onChange={e => setNewMediaUrl(e.target.value)}
@@ -321,15 +323,15 @@ export default function SchedulerPage() {
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>Media Type</Label>
+                                    <Label>{t("scheduler.form.mediaType")}</Label>
                                     <Select value={newMediaType} onValueChange={setNewMediaType}>
                                         <SelectTrigger>
                                             <SelectValue />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="image">Image</SelectItem>
-                                            <SelectItem value="video">Video</SelectItem>
-                                            <SelectItem value="document">Document</SelectItem>
+                                            <SelectItem value="image">{t("scheduler.form.mediaImage")}</SelectItem>
+                                            <SelectItem value="video">{t("scheduler.form.mediaVideo")}</SelectItem>
+                                            <SelectItem value="document">{t("scheduler.form.mediaDocument")}</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
@@ -342,8 +344,8 @@ export default function SchedulerPage() {
                                     setNewSendAt("");
                                     setNewMediaUrl("");
                                     setNewMediaType("image");
-                                }}>Cancel</Button>
-                                <Button onClick={handleSaveSchedule}>Schedule</Button>
+                                }}>{t("scheduler.form.cancel")}</Button>
+                                <Button onClick={handleSaveSchedule}>{t("scheduler.form.submit")}</Button>
                             </div>
                         </CardContent>
                     </Card>
@@ -351,10 +353,10 @@ export default function SchedulerPage() {
 
                 {/* Messages List */}
                 {loading ? (
-                    <div className="text-center p-8">Loading...</div>
+                    <div className="text-center p-8">{t("scheduler.list.loading")}</div>
                 ) : filteredMessages.length === 0 ? (
                     <div className="text-center p-8 text-muted-foreground border rounded-lg bg-slate-50">
-                        {selectedSessionId ? "No scheduled messages found matching criteria." : "No session selected."}
+                        {selectedSessionId ? t("scheduler.list.empty") : t("scheduler.list.noSession")}
                     </div>
                 ) : (
                     <div className="grid gap-4">
@@ -372,12 +374,12 @@ export default function SchedulerPage() {
                                         </div>
                                         <div className="text-sm font-medium mt-1">{msg.content}</div>
                                         <div className="text-xs text-muted-foreground mt-1">
-                                            Scheduled for: {new Date(msg.sendAt).toLocaleString()}
+                                            {t("scheduler.list.scheduledFor", { date: new Date(msg.sendAt).toLocaleString() })}
                                         </div>
                                     </div>
                                     <div className="flex gap-2">
                                         <Button variant="ghost" size="sm" onClick={() => handleEdit(msg)} disabled={msg.status !== 'PENDING'}>
-                                            Edit
+                                            {t("scheduler.list.edit")}
                                         </Button>
                                         <Button variant="ghost" size="icon" onClick={() => setDeleteId(msg.id)} className="text-destructive hover:text-destructive hover:bg-red-50">
                                             <Trash2 className="h-4 w-4" />
@@ -392,14 +394,14 @@ export default function SchedulerPage() {
                 <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
                     <AlertDialogContent>
                         <AlertDialogHeader>
-                            <AlertDialogTitle>Cancel Schedule?</AlertDialogTitle>
+                            <AlertDialogTitle>{t("scheduler.delete.title")}</AlertDialogTitle>
                             <AlertDialogDescription>
-                                This will permanently delete this scheduled message.
+                                {t("scheduler.delete.description")}
                             </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
-                            <AlertDialogCancel>Close</AlertDialogCancel>
-                            <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700">Delete</AlertDialogAction>
+                            <AlertDialogCancel>{t("scheduler.delete.close")}</AlertDialogCancel>
+                            <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700">{t("scheduler.delete.confirm")}</AlertDialogAction>
                         </AlertDialogFooter>
                     </AlertDialogContent>
                 </AlertDialog>
@@ -418,22 +420,22 @@ export default function SchedulerPage() {
                 }}>
                     <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                         <DialogHeader>
-                            <DialogTitle>Edit Scheduled Message</DialogTitle>
-                            <DialogDescription>Modify the recipient, schedule time, message content, or media attachments.</DialogDescription>
+                            <DialogTitle>{t("scheduler.edit.title")}</DialogTitle>
+                            <DialogDescription>{t("scheduler.edit.description")}</DialogDescription>
                         </DialogHeader>
                         <div className="space-y-4 py-4">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <Label>Recipient JID</Label>
+                                    <Label>{t("scheduler.form.recipientJid")}</Label>
                                     <Input
                                         value={editJid}
                                         onChange={e => setEditJid(e.target.value)}
-                                        placeholder="e.g. 62812345678"
+                                        placeholder={t("scheduler.edit.jidPlaceholder")}
                                     />
-                                    <p className="text-xs text-muted-foreground">Type full JID or number. Domain will be appended if missing.</p>
+                                    <p className="text-xs text-muted-foreground">{t("scheduler.edit.jidHint")}</p>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>Send At</Label>
+                                    <Label>{t("scheduler.form.sendAt")}</Label>
                                     <Input
                                         type="datetime-local"
                                         value={editSendAt}
@@ -442,17 +444,17 @@ export default function SchedulerPage() {
                                 </div>
                             </div>
                             <div className="space-y-2">
-                                <Label>Message</Label>
+                                <Label>{t("scheduler.form.message")}</Label>
                                 <Textarea
                                     value={editContent}
                                     onChange={e => setEditContent(e.target.value)}
-                                    placeholder="Hello there!"
+                                    placeholder={t("scheduler.form.messagePlaceholder")}
                                     rows={4}
                                 />
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <Label>Media URL (Optional)</Label>
+                                    <Label>{t("scheduler.form.mediaUrl")}</Label>
                                     <Input
                                         value={editMediaUrl}
                                         onChange={e => setEditMediaUrl(e.target.value)}
@@ -460,23 +462,23 @@ export default function SchedulerPage() {
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>Media Type</Label>
+                                    <Label>{t("scheduler.form.mediaType")}</Label>
                                     <Select value={editMediaType} onValueChange={setEditMediaType}>
                                         <SelectTrigger>
                                             <SelectValue />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="image">Image</SelectItem>
-                                            <SelectItem value="video">Video</SelectItem>
-                                            <SelectItem value="document">Document</SelectItem>
+                                            <SelectItem value="image">{t("scheduler.form.mediaImage")}</SelectItem>
+                                            <SelectItem value="video">{t("scheduler.form.mediaVideo")}</SelectItem>
+                                            <SelectItem value="document">{t("scheduler.form.mediaDocument")}</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
                             </div>
                         </div>
                         <DialogFooter className="gap-2">
-                            <Button variant="ghost" onClick={() => setIsEditOpen(false)}>Cancel</Button>
-                            <Button onClick={handleUpdateSchedule}>Save Changes</Button>
+                            <Button variant="ghost" onClick={() => setIsEditOpen(false)}>{t("scheduler.form.cancel")}</Button>
+                            <Button onClick={handleUpdateSchedule}>{t("scheduler.edit.save")}</Button>
                         </DialogFooter>
                     </DialogContent>
                 </Dialog>

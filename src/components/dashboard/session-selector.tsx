@@ -4,18 +4,20 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSession } from "./session-provider";
+import { useTranslation } from "@/i18n/react";
 
 export function SessionSelector() {
+    const { t } = useTranslation();
     const { sessions, sessionId, setSessionId, loading, refreshSessions } = useSession();
     const selectedSession = sessions.find(s => s.sessionId === sessionId);
 
     return (
         <div className="flex items-center gap-1 sm:gap-2">
-            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground hidden lg:inline">Session:</span>
+            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground hidden lg:inline">{t("sessions.selector.label")}</span>
             <div className="w-[140px] sm:w-[200px]">
                 <Select value={sessionId} onValueChange={setSessionId} disabled={loading || sessions.length === 0}>
                     <SelectTrigger className="h-9 border border-border/60 bg-background/50 hover:bg-muted/30 transition-colors rounded-xl shadow-sm focus:ring-1 focus:ring-primary/20">
-                        <SelectValue placeholder={loading ? "Loading..." : "Select Session"}>
+                        <SelectValue placeholder={loading ? t("sessions.selector.loading") : t("sessions.selector.placeholder")}>
                             {selectedSession ? (
                                 <div className="flex items-center gap-2 text-left">
                                     <span className="relative flex h-2 w-2">
@@ -48,13 +50,13 @@ export function SessionSelector() {
                         ))}
                         {sessions.length === 0 && !loading && (
                             <div className="py-6 px-2 text-xs text-muted-foreground text-center">
-                                No connected sessions found.
+                                {t("sessions.selector.empty")}
                             </div>
                         )}
                     </SelectContent>
                 </Select>
             </div>
-            <Button variant="ghost" size="icon" className="h-9 w-9 hover:bg-muted/50 rounded-xl" onClick={refreshSessions} title="Refresh Sessions" disabled={loading}>
+            <Button variant="ghost" size="icon" className="h-9 w-9 hover:bg-muted/50 rounded-xl" onClick={refreshSessions} title={t("sessions.selector.refreshTitle")} disabled={loading}>
                 <RefreshCw className={`h-4 w-4 text-muted-foreground hover:text-foreground ${loading ? 'animate-spin' : ''}`} />
             </Button>
         </div>

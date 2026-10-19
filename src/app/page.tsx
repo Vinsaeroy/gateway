@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { LandingNav } from "@/components/landing/landing-nav";
 import { PricingCards } from "@/components/landing/pricing";
 import { headers } from "next/headers";
+import { getT } from "@/i18n/server";
 import fs from "fs";
 import path from "path";
 
@@ -11,17 +12,21 @@ import path from "path";
 // supaya selalu membaca harga terbaru, bukan versi statis hasil build.
 export const dynamic = "force-dynamic";
 
-export const metadata = {
-  title: "RifalosID | Premium WhatsApp Gateway",
-  description: "A powerful, self-hosted dashboard to manage your WhatsApp sessions, schedules, and auto-replies. Built for modern businesses.",
-  openGraph: {
-    title: "RifalosID | Premium WhatsApp Gateway",
-    description: "Self-hosted WhatsApp Gateway with Multi-device support, Auto-replies, and API integration.",
-    type: "website",
-  },
-};
+export async function generateMetadata() {
+  const t = await getT();
+  return {
+    title: t("landing.meta.title"),
+    description: t("landing.meta.description"),
+    openGraph: {
+      title: t("landing.meta.title"),
+      description: t("landing.meta.ogDescription"),
+      type: "website",
+    },
+  };
+}
 
 export default async function Home() {
+  const t = await getT();
   const packagePath = path.join(process.cwd(), "package.json");
   let version = "v1.2.0";
   try {
@@ -54,29 +59,29 @@ export default async function Home() {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
                 </span>
-                Release {version} sudah live
+                {t("landing.hero.release", { version })}
                 <ChevronRight className="h-4 w-4 ml-1 opacity-50" />
               </div>
 
               <h1 className="text-5xl font-extrabold tracking-tighter sm:text-6xl md:text-7xl lg:text-[5.5rem] leading-[0.95] animate-in fade-in slide-in-from-bottom-6 duration-700">
-                <span className="block text-foreground pb-1">WhatsApp Gateway</span>
-                <span className="text-gradient-animate block pb-2">untuk bisnis modern.</span>
+                <span className="block text-foreground pb-1">{t("landing.hero.titleLine1")}</span>
+                <span className="text-gradient-animate block pb-2">{t("landing.hero.titleLine2")}</span>
               </h1>
 
               <p className="mx-auto max-w-2xl text-muted-foreground text-lg sm:text-xl leading-relaxed animate-in fade-in slide-in-from-bottom-6 duration-700 delay-150">
-                Kelola banyak sesi WhatsApp, auto-reply pintar, broadcast terjadwal, dan integrasi REST API — semua dalam satu dashboard yang cepat dan elegan.
+                {t("landing.hero.subtitle")}
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 pt-2 w-full sm:w-auto px-4 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-300">
                 <Link href="/dashboard" className="w-full sm:w-auto">
                   <Button size="lg" className="w-full h-14 px-8 rounded-full text-base shadow-2xl shadow-primary/30 hover:shadow-primary/40 group">
-                    Mulai Sekarang
+                    {t("landing.hero.ctaPrimary")}
                     <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
                   </Button>
                 </Link>
                 <Link href="/docs" className="w-full sm:w-auto">
                   <Button size="lg" variant="glass" className="w-full h-14 px-8 rounded-full text-base transition-all hover:bg-white/40 dark:hover:bg-white/10">
-                    Lihat Dokumentasi
+                    {t("landing.hero.ctaSecondary")}
                   </Button>
                 </Link>
               </div>
@@ -95,9 +100,9 @@ export default async function Home() {
                     <span className="ml-3 text-xs text-muted-foreground font-mono truncate">{host}/dashboard</span>
                   </div>
                   <div className="grid grid-cols-3 gap-4 p-5 sm:p-7">
-                    <MockStat icon={<Activity className="h-4 w-4 text-emerald-500" />} label="Sesi Aktif" value="12" />
-                    <MockStat icon={<MessageSquare className="h-4 w-4 text-blue-500" />} label="Pesan Hari Ini" value="8,420" />
-                    <MockStat icon={<Users className="h-4 w-4 text-purple-500" />} label="Kontak" value="3,191" />
+                    <MockStat icon={<Activity className="h-4 w-4 text-emerald-500" />} label={t("landing.mock.activeSessions")} value="12" />
+                    <MockStat icon={<MessageSquare className="h-4 w-4 text-blue-500" />} label={t("landing.mock.todayMessages")} value="8,420" />
+                    <MockStat icon={<Users className="h-4 w-4 text-purple-500" />} label={t("landing.mock.contacts")} value="3,191" />
                     <div className="col-span-3 h-28 sm:h-36 rounded-xl bg-gradient-to-br from-primary/10 via-blue-500/5 to-transparent border border-border flex items-end gap-1.5 p-4">
                       {[40, 65, 35, 80, 55, 95, 60, 75, 45, 88, 70, 50].map((h, i) => (
                         <div key={i} className="flex-1 rounded-t bg-gradient-to-t from-primary to-emerald-400/60" style={{ height: `${h}%` }} />
@@ -114,10 +119,10 @@ export default async function Home() {
         <section className="relative border-y border-border bg-muted/30">
           <div className="container px-4 md:px-6 py-10">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-5xl mx-auto text-center">
-              <StatItem value="99.9%" label="Uptime" />
-              <StatItem value="<200ms" label="Latensi API" />
-              <StatItem value="Multi" label="Device Support" />
-              <StatItem value="24/7" label="Otomasi" />
+              <StatItem value="99.9%" label={t("landing.stats.uptime")} />
+              <StatItem value="<200ms" label={t("landing.stats.apiLatency")} />
+              <StatItem value="Multi" label={t("landing.stats.deviceSupport")} />
+              <StatItem value="24/7" label={t("landing.stats.automation")} />
             </div>
           </div>
         </section>
@@ -128,44 +133,44 @@ export default async function Home() {
           <div className="container px-4 md:px-6 relative z-10">
             <div className="text-center mb-16 max-w-2xl mx-auto">
               <div className="inline-flex items-center gap-2 rounded-full glass-panel px-4 py-1.5 text-sm font-medium text-primary mb-5">
-                <Sparkles className="h-4 w-4" /> Fitur Unggulan
+                <Sparkles className="h-4 w-4" /> {t("landing.features.badge")}
               </div>
-              <h2 className="text-3xl font-bold tracking-tight sm:text-5xl mb-5 text-foreground">Dirancang untuk skala</h2>
+              <h2 className="text-3xl font-bold tracking-tight sm:text-5xl mb-5 text-foreground">{t("landing.features.heading")}</h2>
               <p className="text-muted-foreground text-lg">
-                Fitur lengkap yang dikemas dalam antarmuka yang indah dan performan.
+                {t("landing.features.subheading")}
               </p>
             </div>
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
               <FeatureCard
                 icon={<Zap className="h-6 w-6 text-amber-500" />}
-                title="API & Webhook Instan"
-                description="Kirim pesan, media, dan tangani event masuk secara real-time lewat REST API yang andal."
+                title={t("landing.features.items.apiWebhooks.title")}
+                description={t("landing.features.items.apiWebhooks.description")}
               />
               <FeatureCard
                 icon={<MessageSquare className="h-6 w-6 text-blue-500" />}
-                title="Auto Reply Pintar"
-                description="Buat balasan otomatis berbasis kata kunci untuk melayani pelanggan 24/7 tanpa lelah."
+                title={t("landing.features.items.autoReply.title")}
+                description={t("landing.features.items.autoReply.description")}
               />
               <FeatureCard
                 icon={<Clock className="h-6 w-6 text-purple-500" />}
-                title="Scheduler Presisi"
-                description="Jadwalkan pesan untuk dikirim di waktu tertentu. Sempurna untuk kampanye dan pengingat."
+                title={t("landing.features.items.scheduler.title")}
+                description={t("landing.features.items.scheduler.description")}
               />
               <FeatureCard
                 icon={<Shield className="h-6 w-6 text-emerald-500" />}
-                title="Aman & Privat"
-                description="Arsitektur self-hosted memastikan data dan sesi Anda sepenuhnya dalam kendali Anda."
+                title={t("landing.features.items.security.title")}
+                description={t("landing.features.items.security.description")}
               />
               <FeatureCard
                 icon={<Code className="h-6 w-6 text-rose-500" />}
-                title="Developer Experience"
-                description="Dibangun dengan TypeScript, dokumentasi Swagger lengkap, dan typing yang ketat."
+                title={t("landing.features.items.developer.title")}
+                description={t("landing.features.items.developer.description")}
               />
               <FeatureCard
                 icon={<Globe className="h-6 w-6 text-cyan-500" />}
-                title="Multi-Session"
-                description="Hubungkan, pantau, dan kontrol banyak nomor WhatsApp dari satu dashboard terpadu."
+                title={t("landing.features.items.multiSession.title")}
+                description={t("landing.features.items.multiSession.description")}
               />
             </div>
           </div>
@@ -176,16 +181,16 @@ export default async function Home() {
           <div className="container px-4 md:px-6 relative z-10">
             <div className="text-center mb-14 max-w-2xl mx-auto">
               <div className="inline-flex items-center gap-2 rounded-full glass-panel px-4 py-1.5 text-sm font-medium text-primary mb-5">
-                <Sparkles className="h-4 w-4" /> Harga
+                <Sparkles className="h-4 w-4" /> {t("landing.pricingSection.badge")}
               </div>
-              <h2 className="text-3xl font-bold tracking-tight sm:text-5xl mb-5 text-foreground">Sederhana &amp; Transparan</h2>
+              <h2 className="text-3xl font-bold tracking-tight sm:text-5xl mb-5 text-foreground">{t("landing.pricingSection.heading")}</h2>
               <p className="text-muted-foreground text-lg">
-                Mulai gratis, upgrade kapan saja. Pembayaran cepat via QRIS (KlikQRIS).
+                {t("landing.pricingSection.subheading")}
               </p>
             </div>
             <PricingCards ctaHref="/auth/login" />
             <p className="text-center text-sm text-muted-foreground mt-8">
-              Semua plan termasuk akses REST API. Limit dihitung per request API.
+              {t("landing.pricingSection.footnote")}
             </p>
           </div>
         </section>
@@ -193,7 +198,7 @@ export default async function Home() {
         {/* ============ TECH STACK ============ */}
         <section className="py-20 relative overflow-hidden">
           <div className="container px-4 md:px-6 text-center">
-            <p className="text-sm font-semibold text-muted-foreground uppercase tracking-widest mb-10">Dibangun dengan teknologi standar industri</p>
+            <p className="text-sm font-semibold text-muted-foreground uppercase tracking-widest mb-10">{t("landing.tech.heading")}</p>
             <div className="flex flex-wrap justify-center gap-10 md:gap-16 opacity-60 hover:opacity-100 transition-opacity duration-500">
               <span className="text-xl md:text-2xl font-bold flex items-center gap-3 text-foreground tracking-tight"><div className="h-3 w-3 rounded-full bg-foreground shadow-[0_0_10px_currentColor]" />Next.js</span>
               <span className="text-xl md:text-2xl font-bold flex items-center gap-3 text-foreground tracking-tight"><div className="h-3 w-3 rounded-full bg-blue-500 shadow-[0_0_10px_currentColor]" />TypeScript</span>
@@ -210,14 +215,14 @@ export default async function Home() {
               <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-[30rem] h-[30rem] bg-primary/20 rounded-full blur-[120px] pointer-events-none" />
               <div className="relative z-10 flex flex-col items-center gap-6">
                 <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight text-foreground max-w-2xl">
-                  Siap otomasi WhatsApp bisnis Anda?
+                  {t("landing.cta.heading")}
                 </h2>
                 <p className="text-muted-foreground text-lg max-w-xl">
-                  Buat akun gratis dalam hitungan menit. Tanpa kartu kredit, langsung pakai.
+                  {t("landing.cta.subheading")}
                 </p>
                 <Link href="/auth/login">
                   <Button size="lg" className="h-14 px-10 rounded-full text-base shadow-2xl shadow-primary/30 hover:shadow-primary/40 group">
-                    Mulai Gratis Sekarang
+                    {t("landing.cta.button")}
                     <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
                   </Button>
                 </Link>
@@ -237,12 +242,12 @@ export default async function Home() {
               <span className="text-xl font-bold text-foreground" translate="no">RifalosID</span>
             </div>
             <div className="flex gap-8 text-sm font-medium">
-              <Link href="/privacy" className="text-muted-foreground hover:text-foreground transition-colors">Privacy</Link>
-              <Link href="/terms" className="text-muted-foreground hover:text-foreground transition-colors">Terms</Link>
-              <Link href="/docs" className="text-muted-foreground hover:text-foreground transition-colors">API &amp; Docs</Link>
+              <Link href="/privacy" className="text-muted-foreground hover:text-foreground transition-colors">{t("landing.footer.privacy")}</Link>
+              <Link href="/terms" className="text-muted-foreground hover:text-foreground transition-colors">{t("landing.footer.terms")}</Link>
+              <Link href="/docs" className="text-muted-foreground hover:text-foreground transition-colors">{t("landing.footer.docs")}</Link>
             </div>
             <p className="text-sm text-muted-foreground">
-              © {new Date().getFullYear()} <span translate="no">RifalosID</span>. All rights reserved.
+              © {new Date().getFullYear()} <span translate="no">RifalosID</span>. {t("landing.footer.rights")}
             </p>
           </div>
         </div>

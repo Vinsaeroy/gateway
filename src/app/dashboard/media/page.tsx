@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
+import { useTranslation } from "@/i18n/react";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -88,11 +89,11 @@ function getTypeIcon(type: string) {
     }
 }
 
-function getSenderDisplay(file: MediaFile): string {
-    if (file.fromMe) return "Me (Sent)";
+function getSenderDisplay(file: MediaFile, t: (key: string) => string): string {
+    if (file.fromMe) return t("media.sender.me");
     if (file.fromName) return file.fromName;
     if (file.from && file.from !== "Unknown") return file.from.split("@")[0];
-    return "Unknown";
+    return t("media.sender.unknown");
 }
 
 // --- Grouped types ---
@@ -118,6 +119,7 @@ interface UserGroup {
 }
 
 export default function MediaPage() {
+    const { t } = useTranslation();
     const [files, setFiles] = useState<MediaFile[]>([]);
     const [totalSize, setTotalSize] = useState(0);
     const [totalCount, setTotalCount] = useState(0);
@@ -141,7 +143,7 @@ export default function MediaPage() {
             setTotalCount(mediaData.totalCount || 0);
         } catch (error) {
             console.error("Failed to load media:", error);
-            toast.error("Failed to load media files");
+            toast.error(t("media.toast.loadFailed"));
         } finally {
             setLoading(false);
         }
@@ -200,7 +202,7 @@ export default function MediaPage() {
             if (!senderGroup) {
                 senderGroup = {
                     senderKey,
-                    senderDisplay: getSenderDisplay(file),
+                    senderDisplay: getSenderDisplay(file, t),
                     files: [],
                     totalSize: 0,
                 };
@@ -274,11 +276,11 @@ export default function MediaPage() {
             if (!res.ok) throw new Error("Failed to delete");
             const responseData = await res.json();
             const data = responseData?.data;
-            toast.success(`Deleted ${data?.deleted || 0} file(s)`);
-            if (data?.failed > 0) toast.warning(`Failed to delete ${data.failed} file(s)`);
+            toast.success(t("media.toast.deleted", { count: data?.deleted || 0 }));
+            if (data?.failed > 0) toast.warning(t("media.toast.deletePartialFailed", { count: data.failed }));
             setSelected(new Set());
             fetchMedia();
-        } catch { toast.error("Failed to delete files"); }
+        } catch { toast.error(t("media.toast.deleteFailed")); }
         finally { setDeleting(false); }
     };
 
@@ -296,21 +298,21 @@ export default function MediaPage() {
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div>
-                    <h1 className="text-xl font-bold text-foreground">Media Manager</h1>
-                    <p className="text-sm text-muted-foreground mt-0.5">Manage downloaded media files</p>
+                    <h1 className="text-xl font-bold text-foreground">{t("media.title")}</h1>
+                    <p className="text-sm text-muted-foreground mt-0.5">{t("media.subtitle")}</p>
                 </div>
                 <Button variant="outline" size="sm" className="gap-2 self-start" onClick={fetchMedia} disabled={loading}>
-                    <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} /> Refresh
+                    <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} /> {t("media.refresh")}
                 </Button>
             </div>
 
             {/* Stats */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {[
-                    { icon: <HardDrive className="h-4 w-4 text-primary" />, bg: "bg-primary/10", value: formatFileSize(totalSize), label: "Total Size" },
-                    { icon: <Files className="h-4 w-4 text-blue-500" />, bg: "bg-blue-500/10", value: totalCount, label: "Total Files" },
-                    { icon: <ImageIcon className="h-4 w-4 text-blue-500" />, bg: "bg-blue-500/10", value: stats.image, label: "Images" },
-                    { icon: <Video className="h-4 w-4 text-purple-500" />, bg: "bg-purple-500/10", value: stats.video + stats.audio + stats.document, label: "Other" },
+                    { icon: <HardDrive className="h-4 w-4 text-primary" />, bg: "bg-primary/10", value: formatFileSize(totalSize), label: t("media.stats.totalSize") },
+                    { icon: <Files className="h-4 w-4 text-blue-500" />, bg: "bg-blue-500/10", value: totalCount, label: t("media.stats.totalFiles") },
+                    { icon: <ImageIcon className="h-4 w-4 text-blue-500" />, bg: "bg-blue-500/10", value: stats.image, label: t("media.stats.images") },
+                    { icon: <Video className="h-4 w-4 text-purple-500" />, bg: "bg-purple-500/10", value: stats.video + stats.audio + stats.document, label: t("media.stats.other") },
                 ].map((s) => (
                     <Card key={s.label} className="border-border/40">
                         <CardContent className="p-3 flex items-center gap-3">
@@ -328,11 +330,17 @@ export default function MediaPage() {
             <div className="flex flex-col sm:flex-row gap-2">
                 <div className="relative flex-1">
                     <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-                    <Input placeholder="Search by filename, session, user, or sender..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="h-9 pl-8 text-sm" />
+                    <Input placeholder={t("media.searchPlaceholder")} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="h-9 pl-8 text-sm" />
                 </div>
                 <div className="flex gap-1.5 flex-wrap">
-                    {["all", "image", "video", "audio", "document"].map((t) => (
-                        <Button key={t} variant={filterType === t ? "default" : "outline"} size="sm" className="h-9 text-xs capitalize px-3" onClick={() => setFilterType(t)}>{t}</Button>
+                    {([
+                        { value: "all", label: t("media.filters.all") },
+                        { value: "image", label: t("media.filters.image") },
+                        { value: "video", label: t("media.filters.video") },
+                        { value: "audio", label: t("media.filters.audio") },
+                        { value: "document", label: t("media.filters.document") },
+                    ]).map((ft) => (
+                        <Button key={ft.value} variant={filterType === ft.value ? "default" : "outline"} size="sm" className="h-9 text-xs capitalize px-3" onClick={() => setFilterType(ft.value)}>{ft.label}</Button>
                     ))}
                 </div>
             </div>
@@ -340,11 +348,11 @@ export default function MediaPage() {
             {/* Selection Bar */}
             {selected.size > 0 && (
                 <div className="flex items-center gap-3 p-2.5 bg-destructive/5 border border-destructive/20 rounded-lg">
-                    <span className="text-sm font-medium">{selected.size} selected</span>
+                    <span className="text-sm font-medium">{t("media.selectedCount", { count: selected.size })}</span>
                     <Button variant="destructive" size="sm" className="gap-1.5 h-8" onClick={() => setShowDeleteConfirm(true)} disabled={deleting}>
-                        <Trash2 className="h-3.5 w-3.5" /> {deleting ? "Deleting..." : "Delete"}
+                        <Trash2 className="h-3.5 w-3.5" /> {deleting ? t("media.delete.deleting") : t("media.delete.button")}
                     </Button>
-                    <Button variant="ghost" size="sm" className="h-8" onClick={() => setSelected(new Set())}><X className="h-3.5 w-3.5 mr-1" /> Clear</Button>
+                    <Button variant="ghost" size="sm" className="h-8" onClick={() => setSelected(new Set())}><X className="h-3.5 w-3.5 mr-1" /> {t("media.clear")}</Button>
                 </div>
             )}
 
@@ -366,7 +374,7 @@ export default function MediaPage() {
                         <FolderOpen className="h-7 w-7 text-muted-foreground/40" />
                     </div>
                     <p className="text-sm text-muted-foreground">
-                        {searchQuery || filterType !== "all" ? "No media files match your filters" : "No media files downloaded yet"}
+                        {searchQuery || filterType !== "all" ? t("media.empty.filtered") : t("media.empty.none")}
                     </p>
                 </div>
             ) : (
@@ -387,13 +395,13 @@ export default function MediaPage() {
                                         </div>
                                         <div>
                                             <h2 className="text-sm font-bold text-foreground leading-tight text-left">{userGroup.ownerName}</h2>
-                                            <p className="text-[10px] text-muted-foreground text-left">User Account</p>
+                                            <p className="text-[10px] text-muted-foreground text-left">{t("media.group.userAccount")}</p>
                                         </div>
                                     </button>
                                     <div className="flex items-center gap-3 text-xs text-muted-foreground bg-muted/30 px-3 py-1 rounded-full">
-                                        <span>{userGroup.sessions.length} Session{userGroup.sessions.length !== 1 ? "s" : ""}</span>
+                                        <span>{userGroup.sessions.length !== 1 ? t("media.group.sessions", { count: userGroup.sessions.length }) : t("media.group.sessionOne", { count: userGroup.sessions.length })}</span>
                                         <span className="w-1 h-1 rounded-full bg-border"></span>
-                                        <span>{userFileCount} Media</span>
+                                        <span>{t("media.group.mediaCount", { count: userFileCount })}</span>
                                         <span className="w-1 h-1 rounded-full bg-border"></span>
                                         <span className="font-semibold">{formatFileSize(userGroup.totalSize)}</span>
                                     </div>
@@ -421,7 +429,7 @@ export default function MediaPage() {
                                                             </div>
                                                         </button>
                                                         <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                                                            <span>{sessionFileCount} Media</span>
+                                                            <span>{t("media.group.mediaCount", { count: sessionFileCount })}</span>
                                                             <span className="w-1 h-1 rounded-full bg-border"></span>
                                                             <span className="font-medium text-foreground">{formatFileSize(sessionGroup.totalSize)}</span>
                                                         </div>
@@ -447,7 +455,7 @@ export default function MediaPage() {
                                                                                     {sender.files.length} • {formatFileSize(sender.totalSize)}
                                                                                 </span>
                                                                             </button>
-                                                                            <button onClick={() => selectAllInGroup(sender.files)} className="p-1 hover:bg-muted rounded transition-colors" title={allSelected ? "Deselect All" : "Select All"}>
+                                                                            <button onClick={() => selectAllInGroup(sender.files)} className="p-1 hover:bg-muted rounded transition-colors" title={allSelected ? t("media.deselectAll") : t("media.selectAll")}>
                                                                                 {allSelected ? <CheckSquare className="h-4 w-4 text-primary" /> : <Square className="h-4 w-4 text-muted-foreground/40" />}
                                                                             </button>
                                                                         </div>
@@ -533,14 +541,14 @@ export default function MediaPage() {
             <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Delete {selected.size} file(s)?</AlertDialogTitle>
+                        <AlertDialogTitle>{t("media.delete.confirmTitle", { count: selected.size })}</AlertDialogTitle>
                         <AlertDialogDescription>
-                            This action cannot be undone. The selected files will be permanently removed from the server.
+                            {t("media.delete.confirmDescription")}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700">Delete</AlertDialogAction>
+                        <AlertDialogCancel>{t("media.delete.cancel")}</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700">{t("media.delete.button")}</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>

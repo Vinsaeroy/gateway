@@ -1,6 +1,8 @@
 import { prisma } from "./prisma";
 import { getPlanConfig } from "./plans";
 import { logger } from "./logger";
+import { getT, getServerLocale } from "@/i18n/server";
+import { intlLocale } from "@/i18n/config";
 
 /**
  * Tandai sebuah Payment sebagai PAID lalu aktifkan plan user.
@@ -49,12 +51,17 @@ export async function markPaymentPaidAndActivate(paymentId: string): Promise<boo
             data: { plan: payment.plan, planExpiresAt: newExpiry }
         });
 
-        // Notifikasi in-app
+        // Notifikasi in-app (idioma global do sistema)
+        const t = await getT();
+        const locale = await getServerLocale();
         await tx.notification.create({
             data: {
                 userId: payment.userId,
-                title: `Plan ${cfg.name} aktif 🎉`,
-                message: `Pembayaran berhasil. Plan ${cfg.name} aktif sampai ${newExpiry.toLocaleString("id-ID")}.`,
+                title: t("billing.paymentActivated.title", { plan: cfg.name }),
+                message: t("billing.paymentActivated.message", {
+                    plan: cfg.name,
+                    date: newExpiry.toLocaleString(intlLocale[locale]),
+                }),
                 type: "SUCCESS",
                 href: "/dashboard/billing"
             }

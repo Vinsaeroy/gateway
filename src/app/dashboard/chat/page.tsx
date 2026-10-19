@@ -4,12 +4,16 @@ import { ChatLayoutClient } from "@/components/chat/chat-layout-client";
 import { cookies } from "next/headers";
 import { canAccessSession } from "@/lib/api-auth";
 import { SessionGuard } from "@/components/dashboard/session-guard";
+import { getT } from "@/i18n/server";
 
 export default async function ChatPage() {
     const session = await auth();
     console.log("ChatPage Session (Role debug):", session?.user?.role);
 
-    if (!session?.user?.id) return <div>Unauthorized</div>;
+    if (!session?.user?.id) {
+        const t = await getT();
+        return <div>{t("chat.page.unauthorized")}</div>;
+    }
 
     const cookieStore = await cookies();
     const sessionId = cookieStore.get("sessionId")?.value;

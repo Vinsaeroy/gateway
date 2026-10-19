@@ -12,11 +12,13 @@ import { Switch } from "@/components/ui/switch";
 import { Bell, Send, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react"; // Use client session for Role check UI-side
+import { useTranslation } from "@/i18n/react";
 
 export default function NotificationAdminPage() {
     // Note: Server-side protection is also needed.
     // For now assuming Layout or Middleware handles role check, or API sends 403.
 
+    const { t } = useTranslation();
     const [title, setTitle] = useState("");
     const [message, setMessage] = useState("");
     const [type, setType] = useState("INFO");
@@ -26,8 +28,8 @@ export default function NotificationAdminPage() {
     const [loading, setLoading] = useState(false);
 
     const handleSend = async () => {
-        if (!title || !message) return toast.error("Title and Message are required");
-        if (!broadcast && !targetUserId) return toast.error("Target User ID is required for non-broadcast");
+        if (!title || !message) return toast.error(t("notifications.toast.titleMessageRequired"));
+        if (!broadcast && !targetUserId) return toast.error(t("notifications.toast.targetRequired"));
 
         setLoading(true);
         try {
@@ -47,16 +49,16 @@ export default function NotificationAdminPage() {
             if (res.ok) {
                 const responseData = await res.json();
                 const data = responseData?.data || {};
-                toast.success(`Notification sent successfully! (Count: ${data.count || 1})`);
+                toast.success(t("notifications.toast.sent", { count: data.count || 1 }));
                 // Reset form
                 setTitle("");
                 setMessage("");
                 setHref("");
             } else {
-                toast.error("Failed to send notification");
+                toast.error(t("notifications.toast.sendFailed"));
             }
         } catch (e) {
-            toast.error("Error sending notification");
+            toast.error(t("notifications.toast.sendError"));
         } finally {
             setLoading(false);
         }
@@ -66,65 +68,65 @@ export default function NotificationAdminPage() {
         <div className="space-y-6">
             <div>
                 <h1 className="text-xl sm:text-3xl font-bold flex items-center gap-2">
-                    <Bell className="h-6 w-6 sm:h-8 sm:w-8" /> Notification Manager
+                    <Bell className="h-6 w-6 sm:h-8 sm:w-8" /> {t("notifications.page.title")}
                 </h1>
             </div>
 
             <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2">
                 <Card>
                     <CardHeader>
-                        <CardTitle>Compose Notification</CardTitle>
-                        <CardDescription>Send alerts to users or system-wide broadcasts.</CardDescription>
+                        <CardTitle>{t("notifications.compose.title")}</CardTitle>
+                        <CardDescription>{t("notifications.compose.description")}</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="space-y-2">
-                            <Label>Title</Label>
-                            <Input value={title} onChange={e => setTitle(e.target.value)} placeholder="e.g. System Maintenance" />
+                            <Label>{t("notifications.form.titleLabel")}</Label>
+                            <Input value={title} onChange={e => setTitle(e.target.value)} placeholder={t("notifications.form.titlePlaceholder")} />
                         </div>
 
                         <div className="space-y-2">
-                            <Label>Message</Label>
-                            <Textarea value={message} onChange={e => setMessage(e.target.value)} placeholder="Detailed message..." />
+                            <Label>{t("notifications.form.messageLabel")}</Label>
+                            <Textarea value={message} onChange={e => setMessage(e.target.value)} placeholder={t("notifications.form.messagePlaceholder")} />
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                             <div className="space-y-2">
-                                <Label>Type</Label>
+                                <Label>{t("notifications.form.typeLabel")}</Label>
                                 <Select value={type} onValueChange={setType}>
                                     <SelectTrigger>
                                         <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="INFO">Info</SelectItem>
-                                        <SelectItem value="WARNING">Warning</SelectItem>
-                                        <SelectItem value="SUCCESS">Success</SelectItem>
-                                        <SelectItem value="SYSTEM">System</SelectItem>
+                                        <SelectItem value="INFO">{t("notifications.form.types.info")}</SelectItem>
+                                        <SelectItem value="WARNING">{t("notifications.form.types.warning")}</SelectItem>
+                                        <SelectItem value="SUCCESS">{t("notifications.form.types.success")}</SelectItem>
+                                        <SelectItem value="SYSTEM">{t("notifications.form.types.system")}</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
 
                             <div className="space-y-2">
-                                <Label>Action Link (Optional)</Label>
+                                <Label>{t("notifications.form.actionLinkLabel")}</Label>
                                 <Input value={href} onChange={e => setHref(e.target.value)} placeholder="/dashboard/settings" />
                             </div>
                         </div>
 
                         <div className="flex items-center space-x-2 py-2">
                             <Switch id="broadcast" checked={broadcast} onCheckedChange={setBroadcast} />
-                            <Label htmlFor="broadcast">Broadcast to ALL Users</Label>
+                            <Label htmlFor="broadcast">{t("notifications.form.broadcastLabel")}</Label>
                         </div>
 
                         {!broadcast && (
                             <div className="space-y-2 animate-in fade-in slide-in-from-top-2">
-                                <Label>Target User ID</Label>
-                                <Input value={targetUserId} onChange={e => setTargetUserId(e.target.value)} placeholder="User ID (cuid)" />
+                                <Label>{t("notifications.form.targetUserLabel")}</Label>
+                                <Input value={targetUserId} onChange={e => setTargetUserId(e.target.value)} placeholder={t("notifications.form.targetUserPlaceholder")} />
                             </div>
                         )}
 
                         <div className="pt-4">
                             <Button className="w-full" onClick={handleSend} disabled={loading}>
                                 {loading ? <CheckCircle2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
-                                Send Notification
+                                {t("notifications.send")}
                             </Button>
                         </div>
                     </CardContent>
@@ -133,7 +135,7 @@ export default function NotificationAdminPage() {
                 <div className="space-y-6">
                     <Card className="bg-slate-50 border-dashed">
                         <CardHeader>
-                            <CardTitle className="text-base text-muted-foreground">Preview</CardTitle>
+                            <CardTitle className="text-base text-muted-foreground">{t("notifications.preview.title")}</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <div className="bg-white p-4 rounded-lg shadow-sm border flex gap-3 items-start">
@@ -141,9 +143,9 @@ export default function NotificationAdminPage() {
                                     <Bell className="h-5 w-5" />
                                 </div>
                                 <div>
-                                    <h4 className="font-semibold text-sm">{title || "Notification Title"}</h4>
-                                    <p className="text-xs text-muted-foreground mt-1">{message || "Notification message content will appear here."}</p>
-                                    <p className="text-[10px] text-slate-400 mt-2">Just now</p>
+                                    <h4 className="font-semibold text-sm">{title || t("notifications.preview.defaultTitle")}</h4>
+                                    <p className="text-xs text-muted-foreground mt-1">{message || t("notifications.preview.defaultMessage")}</p>
+                                    <p className="text-[10px] text-slate-400 mt-2">{t("notifications.preview.justNow")}</p>
                                 </div>
                             </div>
                         </CardContent>

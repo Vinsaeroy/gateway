@@ -14,6 +14,7 @@ import type { Socket } from "socket.io-client";
 import { toast } from "sonner";
 import { getChatMessages, sendChatMessage, sendMediaMessage, getContactProfilePic } from "@/app/dashboard/chat/actions";
 import { ChatAudioPlayer } from "./chat-audio-player";
+import { useTranslation } from "@/i18n/react";
 
 interface Message {
     keyId: string;
@@ -46,6 +47,7 @@ interface ImagePreviewModal {
 const chatMessagesCache = new Map<string, Message[]>();
 
 export function ChatWindow({ sessionId, jid, name, profilePic, onProfilePicLoaded, onBack }: ChatWindowProps) {
+    const { t } = useTranslation();
     const [messages, setMessages] = useState<Message[]>(() => chatMessagesCache.get(jid) || []);
     const [loading, setLoading] = useState<boolean>(() => !chatMessagesCache.has(jid));
     const [newMessage, setNewMessage] = useState("");
@@ -236,7 +238,7 @@ export function ChatWindow({ sessionId, jid, name, profilePic, onProfilePicLoade
             }
         } catch (e: any) {
             console.error("Send error:", e);
-            toast.error(e.message || "Failed to send message");
+            toast.error(e.message || t("chat.window.toast.sendFailed"));
             // Revert optimistic message and restore text
             setMessages((prev) => {
                 const updated = prev.filter((m) => m.keyId !== tempKeyId);
@@ -264,14 +266,18 @@ export function ChatWindow({ sessionId, jid, name, profilePic, onProfilePicLoade
         formData.append("jid", jid);
 
         try {
-            toast.info(`Sending ${type === 'voice' ? 'voice message' : file.name}...`);
+            if (type === 'voice') {
+                toast.info(t("chat.window.toast.sendingVoice"));
+            } else {
+                toast.info(t("chat.window.toast.sendingFile", { name: file.name }));
+            }
             await sendMediaMessage(formData);
-            toast.success("Sent!");
+            toast.success(t("chat.window.toast.sent"));
             // Refresh messages immediately
             fetchMessages();
         } catch (error: any) {
             console.error(error);
-            toast.error(error.message || "Failed to send media");
+            toast.error(error.message || t("chat.window.toast.sendMediaFailed"));
         }
     };
 
@@ -321,10 +327,10 @@ export function ChatWindow({ sessionId, jid, name, profilePic, onProfilePicLoade
                     window.location.hostname !== "localhost" &&
                     window.location.hostname !== "127.0.0.1"
                 ) {
-                    toast.error("Microphone requires HTTPS or http://localhost. Please access via localhost.");
+                    toast.error(t("chat.window.toast.micHttps"));
                     return;
                 }
-                toast.error("Microphone recording is not supported in this browser.");
+                toast.error(t("chat.window.toast.micUnsupported"));
                 return;
             }
 
@@ -395,15 +401,15 @@ export function ChatWindow({ sessionId, jid, name, profilePic, onProfilePicLoade
             console.error("Microphone access error:", err);
             const errName = err?.name || "";
             if (errName === "NotAllowedError" || errName === "PermissionDeniedError") {
-                toast.error("Microphone permission was denied. Please click the icon in your browser URL bar and allow Microphone access, then refresh.");
+                toast.error(t("chat.window.toast.micDenied"));
             } else if (errName === "NotFoundError" || errName === "DevicesNotFoundError") {
-                toast.error("No microphone device found on your computer.");
+                toast.error(t("chat.window.toast.micNotFound"));
             } else if (errName === "NotReadableError" || errName === "TrackStartError") {
-                toast.error("Microphone is currently in use by another application.");
+                toast.error(t("chat.window.toast.micInUse"));
             } else if (errName === "SecurityError") {
-                toast.error("Microphone requires http://localhost or HTTPS.");
+                toast.error(t("chat.window.toast.micSecurity"));
             } else {
-                toast.error(err.message || "Could not access microphone. Please check permissions.");
+                toast.error(err.message || t("chat.window.toast.micGeneric"));
             }
         }
     };
@@ -421,7 +427,7 @@ export function ChatWindow({ sessionId, jid, name, profilePic, onProfilePicLoade
         audioChunksRef.current = [];
         setIsRecording(false);
         setRecordingDuration(0);
-        toast.info("Voice recording cancelled");
+        toast.info(t("chat.window.toast.recordingCancelled"));
     };
 
     const stopAndSendVoiceRecording = async () => {
@@ -447,7 +453,7 @@ export function ChatWindow({ sessionId, jid, name, profilePic, onProfilePicLoade
                 await processFileUpload(file, 'voice');
             } catch (err: any) {
                 console.error("Error sending voice recording:", err);
-                toast.error("Failed to send voice message");
+                toast.error(t("chat.window.toast.sendVoiceFailed"));
             } finally {
                 audioChunksRef.current = [];
                 setIsRecording(false);
@@ -484,7 +490,7 @@ export function ChatWindow({ sessionId, jid, name, profilePic, onProfilePicLoade
 
     const handleDownload = async (url: string, fileName: string) => {
         try {
-            toast.info("Downloading file...");
+            toast.info(t("chat.window.toast.downloading"));
             const response = await fetch(url);
             if (!response.ok) throw new Error("File not found or unreachable");
             const blob = await response.blob();
@@ -498,7 +504,7 @@ export function ChatWindow({ sessionId, jid, name, profilePic, onProfilePicLoade
             window.URL.revokeObjectURL(downloadUrl);
         } catch (error) {
             console.error("Download failed", error);
-            toast.error("Download failed! Ensure the file URL is accessible.");
+            toast.error(t("chat.window.toast.downloadFailed"));
         }
     };
 
@@ -524,8 +530,8 @@ export function ChatWindow({ sessionId, jid, name, profilePic, onProfilePicLoade
         const date = new Date(timestamp);
         const now = new Date();
         const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
-        if (diffDays === 0) return "Today";
-        if (diffDays === 1) return "Yesterday";
+        if (diffDays === 0) return t("chat.window.today");
+        if (diffDays === 1) return t("chat.window.yesterday");
         return date.toLocaleDateString([], { year: 'numeric', month: 'long', day: 'numeric' });
     };
 
@@ -544,7 +550,7 @@ export function ChatWindow({ sessionId, jid, name, profilePic, onProfilePicLoade
                     <div className="h-16 w-16 bg-primary/20 rounded-full flex items-center justify-center">
                         <Paperclip className="h-8 w-8 text-primary" />
                     </div>
-                    <p className="text-lg font-semibold text-primary">Drop files to send here</p>
+                    <p className="text-lg font-semibold text-primary">{t("chat.window.dropHere")}</p>
                 </div>
             )}
 
@@ -599,8 +605,8 @@ export function ChatWindow({ sessionId, jid, name, profilePic, onProfilePicLoade
                                 <div className="h-12 w-12 rounded-2xl bg-muted/50 flex items-center justify-center mx-auto mb-3">
                                     <MessageCircle className="h-6 w-6 text-muted-foreground/50" />
                                 </div>
-                                <p className="text-sm font-semibold text-foreground/80">No messages yet</p>
-                                <p className="text-xs text-muted-foreground mt-1">Send a message to start the conversation</p>
+                                <p className="text-sm font-semibold text-foreground/80">{t("chat.window.emptyTitle")}</p>
+                                <p className="text-xs text-muted-foreground mt-1">{t("chat.window.emptySubtitle")}</p>
                             </div>
                         </div>
                     ) : (
@@ -638,7 +644,7 @@ export function ChatWindow({ sessionId, jid, name, profilePic, onProfilePicLoade
                                                 <div className="relative group/media mb-1.5 rounded-xl overflow-hidden bg-black/5">
                                                     <img 
                                                         src={msg.mediaUrl} 
-                                                        alt="Image" 
+                                                        alt={t("chat.window.imageAlt")}
                                                         className="rounded-xl max-h-72 object-cover w-full cursor-pointer hover:opacity-95 transition-opacity"
                                                         onClick={() => setPreviewImage({ url: msg.mediaUrl!, caption: msg.content, keyId: msg.keyId })}
                                                         onError={(e) => {
@@ -655,7 +661,7 @@ export function ChatWindow({ sessionId, jid, name, profilePic, onProfilePicLoade
                                                                 e.stopPropagation();
                                                                 setPreviewImage({ url: msg.mediaUrl!, caption: msg.content, keyId: msg.keyId });
                                                             }}
-                                                            title="View full image"
+                                                            title={t("chat.window.viewFullImage")}
                                                         >
                                                             <Maximize2 className="h-4 w-4" />
                                                         </Button>
@@ -667,7 +673,7 @@ export function ChatWindow({ sessionId, jid, name, profilePic, onProfilePicLoade
                                                                 e.stopPropagation();
                                                                 handleDownload(msg.mediaUrl!, `IMAGE-${msg.keyId}.jpg`);
                                                             }}
-                                                            title="Download image"
+                                                            title={t("chat.window.downloadImage")}
                                                         >
                                                             <Download className="h-4 w-4" />
                                                         </Button>
@@ -684,7 +690,7 @@ export function ChatWindow({ sessionId, jid, name, profilePic, onProfilePicLoade
                                                         variant="secondary"
                                                         className="absolute top-2 right-2 h-8 w-8 rounded-full opacity-100 sm:opacity-0 sm:group-hover/media:opacity-100 transition-opacity bg-background/80 backdrop-blur-sm z-10"
                                                         onClick={() => handleDownload(msg.mediaUrl!, `VIDEO-${msg.keyId}.mp4`)}
-                                                        title="Download video"
+                                                        title={t("chat.window.downloadVideo")}
                                                     >
                                                         <Download className="h-4 w-4" />
                                                     </Button>
@@ -708,7 +714,7 @@ export function ChatWindow({ sessionId, jid, name, profilePic, onProfilePicLoade
                                                 <div className="relative group/media mb-1">
                                                     <img 
                                                         src={msg.mediaUrl} 
-                                                        alt="Sticker" 
+                                                        alt={t("chat.window.stickerAlt")}
                                                         className="rounded-lg max-h-36 object-contain"
                                                         onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                                                     />
@@ -731,7 +737,7 @@ export function ChatWindow({ sessionId, jid, name, profilePic, onProfilePicLoade
                                                 )}>
                                                     <div className="flex items-center gap-2 truncate">
                                                         <FileText className="h-4 w-4 flex-shrink-0" />
-                                                        <span className="font-medium truncate">{msg.content || `${msg.type} File`}</span>
+                                                        <span className="font-medium truncate">{msg.content || t("chat.window.fileAttachment", { type: msg.type })}</span>
                                                     </div>
                                                     {msg.mediaUrl && (
                                                         <Button
@@ -739,7 +745,7 @@ export function ChatWindow({ sessionId, jid, name, profilePic, onProfilePicLoade
                                                             variant="ghost"
                                                             className={cn("h-7 w-7 rounded-full flex-shrink-0", msg.fromMe ? "hover:bg-white/20 text-white" : "hover:bg-muted")}
                                                             onClick={() => handleDownload(msg.mediaUrl!, `${msg.type}-${msg.keyId}`)}
-                                                            title="Download file"
+                                                            title={t("chat.window.downloadFile")}
                                                         >
                                                             <Download className="h-3.5 w-3.5" />
                                                         </Button>
@@ -789,7 +795,7 @@ export function ChatWindow({ sessionId, jid, name, profilePic, onProfilePicLoade
                                     <span className="h-2.5 w-2.5 rounded-full bg-red-600" />
                                 </div>
                                 <span className="text-xs font-semibold text-red-600 dark:text-red-400 tabular-nums">
-                                    Recording {formatDuration(recordingDuration)}
+                                    {t("chat.window.recording", { duration: formatDuration(recordingDuration) })}
                                 </span>
                             </div>
 
@@ -811,7 +817,7 @@ export function ChatWindow({ sessionId, jid, name, profilePic, onProfilePicLoade
                                     onClick={cancelVoiceRecording}
                                     disabled={isSendingVoice}
                                     className="h-8 w-8 rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                                    title="Cancel recording"
+                                    title={t("chat.window.cancelRecording")}
                                 >
                                     <Trash2 className="h-4 w-4" />
                                 </Button>
@@ -823,7 +829,7 @@ export function ChatWindow({ sessionId, jid, name, profilePic, onProfilePicLoade
                                     onClick={stopAndSendVoiceRecording}
                                     disabled={isSendingVoice}
                                     className="h-8 w-8 rounded-full bg-red-600 hover:bg-red-700 text-white shadow-xs"
-                                    title="Send voice message"
+                                    title={t("chat.window.sendVoice")}
                                 >
                                     {isSendingVoice ? (
                                         <Loader2 className="h-4 w-4 animate-spin" />
@@ -845,26 +851,26 @@ export function ChatWindow({ sessionId, jid, name, profilePic, onProfilePicLoade
                                 <PopoverContent className="w-44 p-1.5" side="top" align="start">
                                     <div className="flex flex-col gap-0.5">
                                         <Button variant="ghost" size="sm" className="justify-start gap-2 h-8 text-xs" onClick={() => triggerUpload('image')}>
-                                            <ImageIcon className="h-3.5 w-3.5 text-blue-500" /> Image
+                                            <ImageIcon className="h-3.5 w-3.5 text-blue-500" /> {t("chat.window.attach.image")}
                                         </Button>
                                         <Button variant="ghost" size="sm" className="justify-start gap-2 h-8 text-xs" onClick={() => triggerUpload('video')}>
-                                            <Video className="h-3.5 w-3.5 text-purple-500" /> Video
+                                            <Video className="h-3.5 w-3.5 text-purple-500" /> {t("chat.window.attach.video")}
                                         </Button>
                                         <Button variant="ghost" size="sm" className="justify-start gap-2 h-8 text-xs" onClick={() => triggerUpload('audio')}>
-                                            <Music className="h-3.5 w-3.5 text-orange-500" /> Audio
+                                            <Music className="h-3.5 w-3.5 text-orange-500" /> {t("chat.window.attach.audio")}
                                         </Button>
                                         <Button variant="ghost" size="sm" className="justify-start gap-2 h-8 text-xs" onClick={() => triggerUpload('document')}>
-                                            <FileText className="h-3.5 w-3.5 text-emerald-500" /> Document
+                                            <FileText className="h-3.5 w-3.5 text-emerald-500" /> {t("chat.window.attach.document")}
                                         </Button>
                                         <Button variant="ghost" size="sm" className="justify-start gap-2 h-8 text-xs" onClick={() => triggerUpload('sticker')}>
-                                            <StickerIcon className="h-3.5 w-3.5 text-pink-500" /> Sticker
+                                            <StickerIcon className="h-3.5 w-3.5 text-pink-500" /> {t("chat.window.attach.sticker")}
                                         </Button>
                                     </div>
                                 </PopoverContent>
                             </Popover>
 
                             <Input
-                                placeholder="Type a message..."
+                                placeholder={t("chat.window.messagePlaceholder")}
                                 value={newMessage}
                                 onChange={(e) => setNewMessage(e.target.value)}
                                 onKeyDown={(e) => {
@@ -883,7 +889,7 @@ export function ChatWindow({ sessionId, jid, name, profilePic, onProfilePicLoade
                                 size="icon"
                                 onClick={startVoiceRecording}
                                 className="h-9 w-9 rounded-full flex-shrink-0 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-                                title="Record Voice Message"
+                                title={t("chat.window.recordVoice")}
                             >
                                 <Mic className="h-4.5 w-4.5" />
                             </Button>
@@ -906,12 +912,12 @@ export function ChatWindow({ sessionId, jid, name, profilePic, onProfilePicLoade
             {previewImage && (
                 <Dialog open={!!previewImage} onOpenChange={(open) => !open && setPreviewImage(null)}>
                     <DialogContent className="max-w-4xl p-2 sm:p-4 bg-background/95 backdrop-blur-xl border-border/50">
-                        <DialogTitle className="sr-only">Image Preview</DialogTitle>
+                        <DialogTitle className="sr-only">{t("chat.window.imagePreviewTitle")}</DialogTitle>
                         <div className="flex flex-col items-center justify-center gap-3">
                             <div className="relative max-h-[75vh] w-full flex items-center justify-center overflow-hidden rounded-lg bg-black/5">
                                 <img
                                     src={previewImage.url}
-                                    alt="Preview"
+                                    alt={t("chat.window.previewAlt")}
                                     className="max-h-[75vh] w-auto object-contain rounded-lg shadow-md"
                                 />
                             </div>
@@ -927,14 +933,14 @@ export function ChatWindow({ sessionId, jid, name, profilePic, onProfilePicLoade
                                     className="gap-1.5"
                                     onClick={() => handleDownload(previewImage.url, `IMAGE-${previewImage.keyId}.jpg`)}
                                 >
-                                    <Download className="h-4 w-4" /> Download
+                                    <Download className="h-4 w-4" /> {t("chat.window.download")}
                                 </Button>
                                 <Button
                                     variant="outline"
                                     size="sm"
                                     onClick={() => setPreviewImage(null)}
                                 >
-                                    Close
+                                    {t("chat.window.close")}
                                 </Button>
                             </div>
                         </div>

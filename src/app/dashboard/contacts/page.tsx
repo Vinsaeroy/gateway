@@ -33,6 +33,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { SessionGuard } from "@/components/dashboard/session-guard";
+import { useTranslation } from "@/i18n/react";
 
 interface Contact {
     id: string;
@@ -45,6 +46,7 @@ interface Contact {
 }
 
 export default function ContactListPage() {
+    const { t } = useTranslation();
     const { sessionId } = useSession();
     const [contacts, setContacts] = useState<Contact[]>([]);
     const [loading, setLoading] = useState(false);
@@ -100,9 +102,9 @@ export default function ContactListPage() {
             <div className="space-y-6">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
-                        <h2 className="text-3xl font-bold tracking-tight">Contacts</h2>
+                        <h2 className="text-3xl font-bold tracking-tight">{t("contacts.page.title")}</h2>
                         <p className="text-muted-foreground">
-                            Manage and view your saved contacts.
+                            {t("contacts.page.subtitle")}
                         </p>
                     </div>
                 </div>
@@ -111,29 +113,29 @@ export default function ContactListPage() {
                     <CardHeader>
                         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                             <div className="space-y-1">
-                                <CardTitle>Contact List</CardTitle>
+                                <CardTitle>{t("contacts.list.title")}</CardTitle>
                                 <CardDescription>
-                                    Total: {meta.total} contacts found
+                                    {t("contacts.list.total", { total: meta.total })}
                                 </CardDescription>
                             </div>
                             <div className="flex items-center gap-2 w-full md:w-auto">
                                 <Select value={limit} onValueChange={(val) => { setLimit(val); setPage(1); }}>
                                     <SelectTrigger className="w-[120px]">
-                                        <SelectValue placeholder="Per page" />
+                                        <SelectValue placeholder={t("contacts.perPagePlaceholder")} />
                                     </SelectTrigger>
                                     <SelectContent>
                                         {[10, 25, 50, 100].map((l) => (
                                             <SelectItem key={l} value={l.toString()}>
-                                                {l} / page
+                                                {t("contacts.perPageOption", { limit: l })}
                                             </SelectItem>
                                         ))}
-                                        <SelectItem value="all">Show All</SelectItem>
+                                        <SelectItem value="all">{t("contacts.showAll")}</SelectItem>
                                     </SelectContent>
                                 </Select>
                                 <div className="relative w-full md:w-64">
                                     <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                                     <Input
-                                        placeholder="Search contacts..."
+                                        placeholder={t("contacts.searchPlaceholder")}
                                         className="pl-8"
                                         value={search}
                                         onChange={(e) => setSearch(e.target.value)}
@@ -147,10 +149,10 @@ export default function ContactListPage() {
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead className="w-[80px]">Image</TableHead>
-                                        <TableHead>Name / Pushname</TableHead>
-                                        <TableHead className="hidden md:table-cell">JID (ID)</TableHead>
-                                        <TableHead className="hidden md:table-cell">Phone / Alt</TableHead>
+                                        <TableHead className="w-[80px]">{t("contacts.table.image")}</TableHead>
+                                        <TableHead>{t("contacts.table.name")}</TableHead>
+                                        <TableHead className="hidden md:table-cell">{t("contacts.table.jid")}</TableHead>
+                                        <TableHead className="hidden md:table-cell">{t("contacts.table.phone")}</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -159,14 +161,14 @@ export default function ContactListPage() {
                                             <TableCell colSpan={4} className="h-24 text-center">
                                                 <div className="flex justify-center items-center gap-2">
                                                     <Loader2 className="h-4 w-4 animate-spin" />
-                                                    Loading...
+                                                    {t("contacts.loading")}
                                                 </div>
                                             </TableCell>
                                         </TableRow>
                                     ) : contacts.length === 0 ? (
                                         <TableRow>
                                             <TableCell colSpan={4} className="h-24 text-center">
-                                                No contacts found.
+                                                {t("contacts.empty")}
                                             </TableCell>
                                         </TableRow>
                                     ) : (
@@ -180,7 +182,7 @@ export default function ContactListPage() {
                                                 </TableCell>
                                                 <TableCell>
                                                     <div className="flex flex-col">
-                                                        <span className="font-medium">{contact.name || contact.notify || "Unknown"}</span>
+                                                        <span className="font-medium">{contact.name || contact.notify || t("contacts.unknown")}</span>
                                                         {contact.verifiedName && (
                                                             <span className="text-xs text-green-600 flex items-center gap-1">
                                                                 ✓ {contact.verifiedName}
@@ -212,13 +214,13 @@ export default function ContactListPage() {
                                                 disabled={page <= 1}
                                                 onClick={() => setPage(p => Math.max(1, p - 1))}
                                             >
-                                                Previous
+                                                {t("contacts.pagination.previous")}
                                             </Button>
                                         </PaginationItem>
 
                                         <PaginationItem>
                                             <span className="text-sm text-muted-foreground mx-4">
-                                                Page {page} of {meta.totalPages}
+                                                {t("contacts.pagination.pageOf", { page, totalPages: meta.totalPages })}
                                             </span>
                                         </PaginationItem>
 
@@ -228,7 +230,7 @@ export default function ContactListPage() {
                                                 disabled={page >= meta.totalPages}
                                                 onClick={() => setPage(p => Math.min(meta.totalPages, p + 1))}
                                             >
-                                                Next
+                                                {t("contacts.pagination.next")}
                                             </Button>
                                         </PaginationItem>
                                     </PaginationContent>

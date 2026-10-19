@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Radio, Send, RefreshCw, Users, Clock } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslation } from "@/i18n/react";
 import { SessionGuard } from "@/components/dashboard/session-guard";
 
 interface Group {
@@ -20,6 +21,7 @@ interface Group {
 
 export default function JpmSwgcPage() {
     const { sessionId } = useSession();
+    const { t } = useTranslation();
 
     const [text, setText] = useState("");
     const [mediaType, setMediaType] = useState<"text" | "image" | "video">("text");
@@ -51,9 +53,9 @@ export default function JpmSwgcPage() {
                     }))
                 );
             }
-            if (forceRefresh) toast.success("Group list refreshed");
+            if (forceRefresh) toast.success(t("jpmSwgc.toast.groupsRefreshed"));
         } catch {
-            if (forceRefresh) toast.error("Failed to refresh groups");
+            if (forceRefresh) toast.error(t("jpmSwgc.toast.refreshFailed"));
         } finally {
             if (forceRefresh) setRefreshing(false);
         }
@@ -74,12 +76,12 @@ export default function JpmSwgcPage() {
             if (data.status) {
                 setMediaUrl(data.data.url);
                 setMediaType(data.data.type === "video" ? "video" : "image");
-                toast.success("Media uploaded");
+                toast.success(t("jpmSwgc.toast.mediaUploaded"));
             } else {
-                toast.error(data.message || "Upload failed");
+                toast.error(data.message || t("jpmSwgc.toast.uploadFailed"));
             }
         } catch {
-            toast.error("Upload failed");
+            toast.error(t("jpmSwgc.toast.uploadFailed"));
         } finally {
             setUploading(false);
         }
@@ -100,22 +102,22 @@ export default function JpmSwgcPage() {
 
     const handleSend = async () => {
         if (!sessionId) {
-            toast.error("No active session");
+            toast.error(t("jpmSwgc.toast.noSession"));
             return;
         }
         if (!text.trim() && !mediaUrl) {
-            toast.error("Provide text or media");
+            toast.error(t("jpmSwgc.toast.provideTextOrMedia"));
             return;
         }
         if (scope === "SPECIFIC" && targets.length === 0) {
-            toast.error("Pick at least one target group");
+            toast.error(t("jpmSwgc.toast.pickTarget"));
             return;
         }
 
         const confirmed = confirm(
             scope === "ALL"
-                ? `Kirim status ke SEMUA grup (${groups.length} grup)? Action ini cukup berat.`
-                : `Kirim status ke ${targets.length} grup terpilih?`
+                ? t("jpmSwgc.confirm.sendAll", { count: groups.length })
+                : t("jpmSwgc.confirm.sendSelected", { count: targets.length })
         );
         if (!confirmed) return;
 
@@ -135,24 +137,24 @@ export default function JpmSwgcPage() {
             });
             const data = await res.json();
             if (data.status) {
-                toast.success(`Dispatch dimulai untuk ${data.data?.total || 0} grup. Cek log di Railway.`);
+                toast.success(t("jpmSwgc.toast.dispatchStarted", { count: data.data?.total || 0 }));
             } else if (res.status === 409) {
                 // Locked — let user clear it manually
-                toast.warning(data.message || "A dispatch is already running", {
+                toast.warning(data.message || t("jpmSwgc.toast.dispatchRunning"), {
                     action: {
-                        label: "Force reset",
+                        label: t("jpmSwgc.toast.forceResetAction"),
                         onClick: async () => {
                             await fetch(`/api/jpm-swgc/${sessionId}`, { method: "DELETE" });
-                            toast.success("Lock cleared. Try Send again.");
+                            toast.success(t("jpmSwgc.toast.lockCleared"));
                         },
                     },
                     duration: 10000,
                 });
             } else {
-                toast.error(data.message || "Failed to dispatch");
+                toast.error(data.message || t("jpmSwgc.toast.dispatchFailed"));
             }
         } catch (e: any) {
-            toast.error(e?.message || "Failed to dispatch");
+            toast.error(e?.message || t("jpmSwgc.toast.dispatchFailed"));
         } finally {
             setSending(false);
         }
@@ -160,14 +162,14 @@ export default function JpmSwgcPage() {
 
     const handleForceReset = async () => {
         if (!sessionId) return;
-        if (!confirm("Force-clear any stuck dispatch lock for this session?")) return;
+        if (!confirm(t("jpmSwgc.confirm.forceReset"))) return;
         try {
             const res = await fetch(`/api/jpm-swgc/${sessionId}`, { method: "DELETE" });
             const data = await res.json();
             if (data.status) toast.success(data.message);
-            else toast.error(data.message || "Reset failed");
+            else toast.error(data.message || t("jpmSwgc.toast.resetFailed"));
         } catch (e: any) {
-            toast.error(e?.message || "Reset failed");
+            toast.error(e?.message || t("jpmSwgc.toast.resetFailed"));
         }
     };
 
@@ -182,34 +184,34 @@ export default function JpmSwgcPage() {
             <div className="max-w-4xl space-y-6">
                 <div>
                     <h1 className="text-xl sm:text-2xl font-bold tracking-tight flex items-center gap-2">
-                        <Radio className="h-5 w-5 sm:h-6 sm:w-6" /> JPM SWGC
+                        <Radio className="h-5 w-5 sm:h-6 sm:w-6" /> {t("jpmSwgc.title")}
                     </h1>
                     <p className="text-sm text-muted-foreground mt-1">
-                        Bulk Status Group Channel — broadcast pesan/foto/video sebagai status grup ke semua atau grup terpilih.
+                        {t("jpmSwgc.subtitle")}
                     </p>
                 </div>
 
                 <Card>
                     <CardHeader>
-                        <CardTitle>Compose Status</CardTitle>
+                        <CardTitle>{t("jpmSwgc.compose.title")}</CardTitle>
                         <CardDescription>
-                            Status akan terkirim sebagai <code>groupStatusMessageV2</code> via <code>relayMessage</code>.
+                            {t("jpmSwgc.compose.descPrefix")} <code>groupStatusMessageV2</code> {t("jpmSwgc.compose.descSuffix")} <code>relayMessage</code>.
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="grid gap-2">
-                            <Label>Text / Caption</Label>
+                            <Label>{t("jpmSwgc.compose.textLabel")}</Label>
                             <Textarea
                                 value={text}
                                 onChange={(e) => setText(e.target.value)}
-                                placeholder="Tulis pesan untuk dijadikan status grup..."
+                                placeholder={t("jpmSwgc.compose.textPlaceholder")}
                                 rows={4}
                             />
                         </div>
 
                         <div className="grid sm:grid-cols-2 gap-4">
                             <div className="grid gap-2">
-                                <Label>Media Type</Label>
+                                <Label>{t("jpmSwgc.compose.mediaTypeLabel")}</Label>
                                 <Select
                                     value={mediaType}
                                     onValueChange={(v) => setMediaType(v as any)}
@@ -218,15 +220,15 @@ export default function JpmSwgcPage() {
                                         <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="text">Text only</SelectItem>
-                                        <SelectItem value="image">Image</SelectItem>
-                                        <SelectItem value="video">Video</SelectItem>
+                                        <SelectItem value="text">{t("jpmSwgc.compose.mediaText")}</SelectItem>
+                                        <SelectItem value="image">{t("jpmSwgc.compose.mediaImage")}</SelectItem>
+                                        <SelectItem value="video">{t("jpmSwgc.compose.mediaVideo")}</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
 
                             <div className="grid gap-2">
-                                <Label>Delay between groups (ms)</Label>
+                                <Label>{t("jpmSwgc.compose.delayLabel")}</Label>
                                 <Input
                                     type="number"
                                     min={0}
@@ -237,14 +239,14 @@ export default function JpmSwgcPage() {
                                     }
                                 />
                                 <p className="text-xs text-muted-foreground">
-                                    Recommended: 2000–5000ms to avoid spam detection.
+                                    {t("jpmSwgc.compose.delayHint")}
                                 </p>
                             </div>
                         </div>
 
                         {mediaType !== "text" && (
                             <div className="grid gap-2">
-                                <Label>Upload Media (or paste URL below)</Label>
+                                <Label>{t("jpmSwgc.compose.uploadLabel")}</Label>
                                 <Input
                                     type="file"
                                     accept={mediaType === "video" ? "video/mp4" : "image/jpeg,image/png,image/webp"}
@@ -256,7 +258,7 @@ export default function JpmSwgcPage() {
                                     className="text-xs sm:text-sm"
                                 />
                                 <Input
-                                    placeholder="https://example.com/image.jpg or /api/media/xxx.jpg"
+                                    placeholder={t("jpmSwgc.compose.uploadPlaceholder")}
                                     value={mediaUrl}
                                     onChange={(e) => setMediaUrl(e.target.value)}
                                 />
@@ -269,14 +271,14 @@ export default function JpmSwgcPage() {
                         )}
 
                         <div className="grid gap-2">
-                            <Label>Target Scope</Label>
+                            <Label>{t("jpmSwgc.compose.scopeLabel")}</Label>
                             <Select value={scope} onValueChange={(v) => setScope(v as any)}>
                                 <SelectTrigger>
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="ALL">All groups ({groups.length})</SelectItem>
-                                    <SelectItem value="SPECIFIC">Selected groups only</SelectItem>
+                                    <SelectItem value="ALL">{t("jpmSwgc.compose.scopeAll", { count: groups.length })}</SelectItem>
+                                    <SelectItem value="SPECIFIC">{t("jpmSwgc.compose.scopeSpecific")}</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
@@ -286,7 +288,7 @@ export default function JpmSwgcPage() {
                                 <div className="flex items-center justify-between gap-2 flex-wrap">
                                     <Label className="flex items-center gap-2">
                                         <Users className="h-4 w-4" />
-                                        Selected: {targets.length} / {groups.length}
+                                        {t("jpmSwgc.compose.selectedCount", { selected: targets.length, total: groups.length })}
                                     </Label>
                                     <div className="flex gap-2">
                                         <Button
@@ -296,7 +298,7 @@ export default function JpmSwgcPage() {
                                             onClick={selectAllVisible}
                                             disabled={filteredGroups.length === 0}
                                         >
-                                            Select all visible
+                                            {t("jpmSwgc.compose.selectAllVisible")}
                                         </Button>
                                         <Button
                                             type="button"
@@ -305,7 +307,7 @@ export default function JpmSwgcPage() {
                                             onClick={clearTargets}
                                             disabled={targets.length === 0}
                                         >
-                                            Clear
+                                            {t("jpmSwgc.compose.clear")}
                                         </Button>
                                         <Button
                                             type="button"
@@ -319,14 +321,14 @@ export default function JpmSwgcPage() {
                                     </div>
                                 </div>
                                 <Input
-                                    placeholder="Search groups..."
+                                    placeholder={t("jpmSwgc.compose.searchPlaceholder")}
                                     value={groupSearch}
                                     onChange={(e) => setGroupSearch(e.target.value)}
                                 />
                                 <div className="max-h-72 overflow-y-auto border rounded-lg p-2 space-y-1 bg-muted/20">
                                     {filteredGroups.length === 0 ? (
                                         <p className="text-xs text-muted-foreground text-center py-3">
-                                            No groups. Click Refresh to sync from WhatsApp.
+                                            {t("jpmSwgc.compose.noGroups")}
                                         </p>
                                     ) : (
                                         filteredGroups.map((g) => {
@@ -347,7 +349,7 @@ export default function JpmSwgcPage() {
                                                     </span>
                                                     {g.isCommunity && (
                                                         <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-600">
-                                                            Community
+                                                            {t("jpmSwgc.compose.community")}
                                                         </span>
                                                     )}
                                                 </label>
@@ -360,11 +362,10 @@ export default function JpmSwgcPage() {
 
                         <div className="border-l-2 border-amber-500/50 pl-3 py-2 bg-amber-500/5 rounded text-xs space-y-1">
                             <p className="font-medium flex items-center gap-1">
-                                <Clock className="h-3.5 w-3.5" /> Catatan
+                                <Clock className="h-3.5 w-3.5" /> {t("jpmSwgc.compose.noteTitle")}
                             </p>
                             <p className="text-muted-foreground">
-                                Status grup hanya tampil ke anggota grup itu. Group dengan &lt;2 member otomatis di-skip.
-                                Gunakan delay 2000ms+ untuk hindari spam detection oleh WhatsApp.
+                                {t("jpmSwgc.compose.noteBody")}
                             </p>
                         </div>
 
@@ -381,8 +382,8 @@ export default function JpmSwgcPage() {
                                     <Send className="mr-2 h-4 w-4" />
                                 )}
                                 {sending
-                                    ? "Mengirim..."
-                                    : `Send to ${scope === "ALL" ? `${groups.length} groups` : `${targets.length} groups`}`}
+                                    ? t("jpmSwgc.compose.sending")
+                                    : t("jpmSwgc.compose.sendTo", { count: scope === "ALL" ? groups.length : targets.length })}
                             </Button>
                             <Button
                                 type="button"
@@ -390,9 +391,9 @@ export default function JpmSwgcPage() {
                                 size="lg"
                                 onClick={handleForceReset}
                                 disabled={!sessionId}
-                                title="Clear stuck lock if Send keeps showing 409"
+                                title={t("jpmSwgc.compose.forceResetTitle")}
                             >
-                                Force reset
+                                {t("jpmSwgc.compose.forceReset")}
                             </Button>
                         </div>
                     </CardContent>

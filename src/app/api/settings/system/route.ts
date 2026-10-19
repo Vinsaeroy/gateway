@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthenticatedUser } from "@/lib/api-auth";
+import { isLocale } from "@/i18n/config";
 
 export async function GET(request: NextRequest) {
     try {
@@ -11,6 +12,7 @@ export async function GET(request: NextRequest) {
                 faviconUrl: true,
                 logoUrl: true,
                 timezone: true,
+                language: true,
                 enableRegistration: true
             }
         });
@@ -21,7 +23,8 @@ export async function GET(request: NextRequest) {
             faviconUrl: config.faviconUrl,
             logoUrl: config.logoUrl,
             timezone: config.timezone,
-        } : { appName: "WA-AKG", faviconUrl: "/favicon.ico", timezone: "Asia/Jakarta" };
+            language: config.language,
+        } : { appName: "WA-AKG", faviconUrl: "/favicon.ico", timezone: "Asia/Jakarta", language: "en" };
 
         // Admin-only sensitive fields — return only when caller is SUPERADMIN
         try {
@@ -54,7 +57,7 @@ export async function POST(req: NextRequest) {
         }
 
         const body = await req.json();
-        const { appName, logoUrl, faviconUrl, timezone, enableRegistration } = body;
+        const { appName, logoUrl, faviconUrl, timezone, language, enableRegistration } = body;
 
         // Build patch object only with provided fields, so partial updates don't wipe others
         const patch: Record<string, unknown> = {};
@@ -62,6 +65,12 @@ export async function POST(req: NextRequest) {
         if (logoUrl !== undefined) patch.logoUrl = logoUrl;
         if (faviconUrl !== undefined) patch.faviconUrl = faviconUrl;
         if (timezone !== undefined) patch.timezone = timezone;
+        if (language !== undefined) {
+            if (!isLocale(language)) {
+                return NextResponse.json({ status: false, message: "Invalid language", error: "Invalid language" }, { status: 400 });
+            }
+            patch.language = language;
+        }
         if (enableRegistration !== undefined) patch.enableRegistration = enableRegistration;
 
         const config = await prisma.systemConfig.upsert({
@@ -73,6 +82,7 @@ export async function POST(req: NextRequest) {
                 logoUrl: logoUrl ?? "",
                 faviconUrl: faviconUrl ?? "/favicon.ico",
                 timezone: timezone ?? "Asia/Jakarta",
+                language: isLocale(language) ? language : "en",
                 enableRegistration: enableRegistration ?? true,
             },
         });

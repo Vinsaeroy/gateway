@@ -5,6 +5,7 @@ import remarkGfm from 'remark-gfm';
 import Link from 'next/link';
 import { DocsClient } from './docs-client';
 import { prisma } from '@/lib/prisma';
+import { getT } from '@/i18n/server';
 import type { Metadata } from 'next';
 
 // Nama app dari Settings (DB) → env APP_NAME → fallback "WA-AKG".
@@ -21,9 +22,10 @@ async function getAppName(): Promise<string> {
 
 export async function generateMetadata(): Promise<Metadata> {
     const appName = await getAppName();
+    const t = await getT();
     return {
-        title: `Public API Documentation - ${appName}`,
-        description: `Complete API reference for ${appName} WhatsApp Gateway`,
+        title: t("docs.page.metaTitle", { appName }),
+        description: t("docs.page.metaDescription", { appName }),
     };
 }
 
@@ -43,6 +45,7 @@ export default async function PublicDocsPage() {
     const filePath = path.join(process.cwd(), 'docs', 'API_DOCUMENTATION.md');
     const packagePath = path.join(process.cwd(), 'package.json');
     const appName = await getAppName();
+    const t = await getT();
     let content = '';
     let version = 'v1.0.0';
 
@@ -51,12 +54,7 @@ export default async function PublicDocsPage() {
         const packageJson = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
         version = `v${packageJson.version}`;
     } catch (err) {
-        content =
-            '# Dokumentasi sedang tidak tersedia\n\n' +
-            'File dokumentasi tidak dapat dimuat di server ini.\n\n' +
-            'Sementara itu, kamu bisa pakai:\n\n' +
-            '- **[Swagger UI](/swagger)** — referensi API interaktif & uji coba endpoint\n' +
-            '- **[Dashboard API Docs](/dashboard/api-docs)**\n';
+        content = t("docs.page.fallback");
         console.error("Error loading docs:", err);
     }
 
@@ -111,13 +109,13 @@ export default async function PublicDocsPage() {
                             href="/swagger"
                             className="text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors"
                         >
-                            Swagger UI
+                            {t("docs.page.swaggerLink")}
                         </Link>
                         <Link
                             href="/dashboard"
                             className="text-sm font-medium px-4 py-2 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-all shadow-md hover:shadow-lg"
                         >
-                            Dashboard
+                            {t("docs.page.dashboardLink")}
                         </Link>
                     </div>
                 </div>

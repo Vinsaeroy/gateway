@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Trash2, Plus, Edit, User, Shield, ShieldAlert, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
+import { useTranslation } from "@/i18n/react";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -36,6 +37,7 @@ interface UserProfile {
 
 export default function UsersPage() {
     const { data: session } = useSession();
+    const { t } = useTranslation();
     const [users, setUsers] = useState<UserProfile[]>([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
@@ -61,7 +63,7 @@ export default function UsersPage() {
                 const responseData = await res.json();
                 setUsers(responseData?.data || []);
             } else if (res.status === 403) {
-                toast.error("Unauthorized. Only Super Admin can view users.");
+                toast.error(t("users.toast.unauthorized"));
             }
         } catch (error) {
             console.error("Failed to fetch users", error);
@@ -84,17 +86,17 @@ export default function UsersPage() {
             });
 
             if (res.ok) {
-                toast.success(editingUser ? "User updated" : "User created");
+                toast.success(editingUser ? t("users.toast.updated") : t("users.toast.created"));
                 setShowForm(false);
                 setEditingUser(null);
                 setFormData({ name: "", email: "", password: "", role: "STAFF", plan: "FREE" });
                 fetchUsers();
             } else {
                 const error = await res.json();
-                toast.error(error.error || "Operation failed");
+                toast.error(error.error || t("users.toast.operationFailed"));
             }
         } catch (error) {
-            toast.error("Operation failed");
+            toast.error(t("users.toast.operationFailed"));
         }
     };
 
@@ -110,14 +112,14 @@ export default function UsersPage() {
         try {
             const res = await fetch(`/api/users/${deleteId}`, { method: "DELETE" });
             if (res.ok) {
-                toast.success("User deleted");
+                toast.success(t("users.toast.deleted"));
                 fetchUsers();
             } else {
                 const error = await res.json();
-                toast.error(error.error || "Failed to delete");
+                toast.error(error.error || t("users.toast.deleteRejected"));
             }
         } catch (error) {
-            toast.error("Failed to delete user");
+            toast.error(t("users.toast.deleteFailed"));
         } finally {
             setDeleteId(null);
         }
@@ -131,7 +133,7 @@ export default function UsersPage() {
         }
     };
 
-    if (loading) return <div className="p-8 text-center text-muted-foreground">Loading...</div>;
+    if (loading) return <div className="p-8 text-center text-muted-foreground">{t("users.loading")}</div>;
 
     // TODO: Improve RBAC check here if strictly needed, but API protects it.
     // If empty list and not loading, likely unauthorized or empty.
@@ -141,16 +143,16 @@ export default function UsersPage() {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <div>
                     <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
-                        <UsersIcon className="h-5 w-5 sm:h-6 sm:w-6" /> User Management
+                        <UsersIcon className="h-5 w-5 sm:h-6 sm:w-6" /> {t("users.title")}
                     </h1>
-                    <p className="text-sm text-muted-foreground">Manage users and roles</p>
+                    <p className="text-sm text-muted-foreground">{t("users.subtitle")}</p>
                 </div>
                 <Button size="sm" onClick={() => {
                     setEditingUser(null);
                     setFormData({ name: "", email: "", password: "", role: "STAFF", plan: "FREE" });
                     setShowForm(true);
                 }}>
-                    <Plus className="h-4 w-4 mr-1 sm:mr-2" /> Add User
+                    <Plus className="h-4 w-4 mr-1 sm:mr-2" /> {t("users.addUser")}
                 </Button>
             </div>
 
@@ -158,13 +160,13 @@ export default function UsersPage() {
             {showForm && (
                 <Card className="border-2 border-primary/20">
                     <CardHeader>
-                        <CardTitle>{editingUser ? "Edit User" : "New User"}</CardTitle>
+                        <CardTitle>{editingUser ? t("users.form.editTitle") : t("users.form.newTitle")}</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                                 <div className="space-y-2">
-                                    <Label>Name</Label>
+                                    <Label>{t("users.form.name")}</Label>
                                     <Input
                                         value={formData.name}
                                         onChange={e => setFormData({ ...formData, name: e.target.value })}
@@ -172,7 +174,7 @@ export default function UsersPage() {
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>Email</Label>
+                                    <Label>{t("users.form.email")}</Label>
                                     <Input
                                         type="email"
                                         value={formData.email}
@@ -183,7 +185,7 @@ export default function UsersPage() {
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                                 <div className="space-y-2">
-                                    <Label>{editingUser ? "New Password (leave blank to keep)" : "Password"}</Label>
+                                    <Label>{editingUser ? t("users.form.newPassword") : t("users.form.password")}</Label>
                                     <Input
                                         type="password"
                                         value={formData.password}
@@ -192,7 +194,7 @@ export default function UsersPage() {
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>Role</Label>
+                                    <Label>{t("users.form.role")}</Label>
                                     <Select
                                         value={formData.role}
                                         onValueChange={(v: string) => setFormData({ ...formData, role: v })}
@@ -201,16 +203,16 @@ export default function UsersPage() {
                                             <SelectValue />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="SUPERADMIN">Super Admin</SelectItem>
-                                            <SelectItem value="OWNER">Owner</SelectItem>
-                                            <SelectItem value="STAFF">Staff</SelectItem>
+                                            <SelectItem value="SUPERADMIN">{t("users.roles.SUPERADMIN")}</SelectItem>
+                                            <SelectItem value="OWNER">{t("users.roles.OWNER")}</SelectItem>
+                                            <SelectItem value="STAFF">{t("users.roles.STAFF")}</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
                             </div>
                             {editingUser && (
                                 <div className="space-y-2">
-                                    <Label>Plan</Label>
+                                    <Label>{t("users.form.plan")}</Label>
                                     <Select
                                         value={formData.plan}
                                         onValueChange={(v: string) => setFormData({ ...formData, plan: v })}
@@ -219,20 +221,20 @@ export default function UsersPage() {
                                             <SelectValue />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="FREE">Free</SelectItem>
-                                            <SelectItem value="STANDARD">Standard</SelectItem>
-                                            <SelectItem value="PRO">Pro</SelectItem>
-                                            <SelectItem value="ENTERPRISE">Enterprise</SelectItem>
+                                            <SelectItem value="FREE">{t("users.plans.FREE")}</SelectItem>
+                                            <SelectItem value="STANDARD">{t("users.plans.STANDARD")}</SelectItem>
+                                            <SelectItem value="PRO">{t("users.plans.PRO")}</SelectItem>
+                                            <SelectItem value="ENTERPRISE">{t("users.plans.ENTERPRISE")}</SelectItem>
                                         </SelectContent>
                                     </Select>
                                     <p className="text-xs text-muted-foreground">
-                                        Ubah plan user ini. Masa aktif memakai durasi default plan (FREE = tanpa batas).
+                                        {t("users.form.planHint")}
                                     </p>
                                 </div>
                             )}
                             <div className="flex justify-end gap-2">
-                                <Button type="button" variant="ghost" onClick={() => setShowForm(false)}>Cancel</Button>
-                                <Button type="submit">{editingUser ? "Update" : "Create"}</Button>
+                                <Button type="button" variant="ghost" onClick={() => setShowForm(false)}>{t("users.form.cancel")}</Button>
+                                <Button type="submit">{editingUser ? t("users.form.update") : t("users.form.create")}</Button>
                             </div>
                         </form>
                     </CardContent>
@@ -251,7 +253,7 @@ export default function UsersPage() {
                                             {user.name?.charAt(0) || user.email.charAt(0)}
                                         </div>
                                         <div className="min-w-0 flex-1">
-                                            <h3 className="font-semibold truncate">{user.name || "User"}</h3>
+                                            <h3 className="font-semibold truncate">{user.name || t("users.card.fallbackName")}</h3>
                                             <p className="text-xs text-muted-foreground truncate">{user.email}</p>
                                         </div>
                                     </div>
@@ -263,14 +265,14 @@ export default function UsersPage() {
 
                                 <div className="mb-3">
                                     <Badge variant="secondary" className="text-xs">
-                                        Plan: {user.plan || "FREE"}
-                                        {user.planExpiresAt ? ` · s/d ${new Date(user.planExpiresAt).toLocaleDateString()}` : ""}
+                                        {t("users.card.planLabel", { plan: user.plan || "FREE" })}
+                                        {user.planExpiresAt ? ` ${t("users.card.planUntil", { date: new Date(user.planExpiresAt).toLocaleDateString() })}` : ""}
                                     </Badge>
                                 </div>
 
                                 <div className="flex justify-between items-center text-xs sm:text-sm text-muted-foreground gap-2">
-                                    <span className="truncate">{user._count?.sessions || 0} Sessions</span>
-                                    <span className="truncate">Joined {new Date(user.createdAt).toLocaleDateString()}</span>
+                                    <span className="truncate">{t("users.card.sessions", { count: user._count?.sessions || 0 })}</span>
+                                    <span className="truncate">{t("users.card.joined", { date: new Date(user.createdAt).toLocaleDateString() })}</span>
                                 </div>
                             </div>
                             <div className="bg-slate-50 p-3 flex justify-end gap-2 border-t">
@@ -285,10 +287,10 @@ export default function UsersPage() {
                                     });
                                     setShowForm(true);
                                 }}>
-                                    <Edit className="h-4 w-4 mr-1" /> Edit
+                                    <Edit className="h-4 w-4 mr-1" /> {t("users.card.edit")}
                                 </Button>
                                 <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive" onClick={() => handleDelete(user.id)}>
-                                    <Trash2 className="h-4 w-4 mr-1" /> Delete
+                                    <Trash2 className="h-4 w-4 mr-1" /> {t("users.card.delete")}
                                 </Button>
                             </div>
                         </CardContent>
@@ -299,14 +301,14 @@ export default function UsersPage() {
             <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                        <AlertDialogTitle>{t("users.dialog.title")}</AlertDialogTitle>
                         <AlertDialogDescription>
-                            This action cannot be undone. This will permanently delete the user request and remove their data from our servers.
+                            {t("users.dialog.description")}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700">Continue</AlertDialogAction>
+                        <AlertDialogCancel>{t("users.dialog.cancel")}</AlertDialogCancel>
+                        <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700">{t("users.dialog.continue")}</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>

@@ -4,8 +4,10 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Bot, Github, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/i18n/react";
 
 export function LandingNav() {
+    const { t } = useTranslation();
     const [open, setOpen] = useState(false);
     // null = belum tahu, true/false = status login. Pakai endpoint next-auth
     // (/api/auth/session) supaya tidak perlu SessionProvider di halaman publik.
@@ -27,7 +29,7 @@ export function LandingNav() {
     }, []);
 
     const ctaHref = authed ? "/dashboard" : "/auth/login";
-    const ctaLabel = authed ? "Dashboard" : "Sign In";
+    const ctaLabel = authed ? t("landing.nav.dashboard") : t("landing.nav.signIn");
 
     const close = () => setOpen(false);
 
@@ -45,11 +47,11 @@ export function LandingNav() {
 
                     {/* Desktop nav */}
                     <nav className="hidden md:flex items-center gap-6 lg:gap-8">
-                        <Link href="/#features" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Features</Link>
-                        <Link href="/#pricing" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Pricing</Link>
-                        <Link href="/docs" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap">API & Docs</Link>
+                        <Link href="/#features" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">{t("landing.nav.features")}</Link>
+                        <Link href="/#pricing" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">{t("landing.nav.pricing")}</Link>
+                        <Link href="/docs" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap">{t("landing.nav.docs")}</Link>
                         <Link href="https://github.com/vinsaeroy/WA-AKG" target="_blank" rel="noreferrer" className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                            <Github className="h-4 w-4" /> GitHub
+                            <Github className="h-4 w-4" /> {t("landing.nav.github")}
                         </Link>
                     </nav>
 
@@ -62,7 +64,7 @@ export function LandingNav() {
                         </Link>
                         <button
                             type="button"
-                            aria-label="Toggle menu"
+                            aria-label={t("landing.nav.toggleMenu")}
                             aria-expanded={open}
                             onClick={() => setOpen((v) => !v)}
                             className="md:hidden p-2 rounded-full hover:bg-foreground/5 transition-colors"
@@ -81,21 +83,21 @@ export function LandingNav() {
                                 onClick={close}
                                 className="px-4 py-3 text-sm font-medium text-foreground/80 hover:bg-foreground/5 rounded-xl transition-colors"
                             >
-                                Features
+                                {t("landing.nav.features")}
                             </Link>
                             <Link
                                 href="/#pricing"
                                 onClick={close}
                                 className="px-4 py-3 text-sm font-medium text-foreground/80 hover:bg-foreground/5 rounded-xl transition-colors"
                             >
-                                Pricing
+                                {t("landing.nav.pricing")}
                             </Link>
                             <Link
                                 href="/docs"
                                 onClick={close}
                                 className="px-4 py-3 text-sm font-medium text-foreground/80 hover:bg-foreground/5 rounded-xl transition-colors"
                             >
-                                API & Docs
+                                {t("landing.nav.docs")}
                             </Link>
                             <Link
                                 href="https://github.com/vinsaeroy/WA-AKG"
@@ -104,7 +106,7 @@ export function LandingNav() {
                                 onClick={close}
                                 className="px-4 py-3 text-sm font-medium text-foreground/80 hover:bg-foreground/5 rounded-xl transition-colors flex items-center gap-2"
                             >
-                                <Github className="h-4 w-4" /> GitHub
+                                <Github className="h-4 w-4" /> {t("landing.nav.github")}
                             </Link>
                             <Link
                                 href={ctaHref}

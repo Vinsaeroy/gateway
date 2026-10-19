@@ -5,6 +5,7 @@ import { useSidebar } from "./sidebar-context";
 import { Button } from "@/components/ui/button";
 import { LogOut } from "lucide-react";
 import { signOut } from "next-auth/react";
+import { useTranslation } from "@/i18n/react";
 
 interface SidebarShellProps {
     appName: string;
@@ -14,6 +15,7 @@ interface SidebarShellProps {
 }
 
 export function SidebarShell({ appName, userName, userEmail, version }: SidebarShellProps) {
+    const { t } = useTranslation();
     const { isCollapsed } = useSidebar();
 
     return (
@@ -39,7 +41,7 @@ export function SidebarShell({ appName, userName, userEmail, version }: SidebarS
                         <h1 className="text-xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-500" translate="no">
                             {appName}
                         </h1>
-                        <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">WhatsApp Gateway</p>
+                        <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t("nav.tagline")}</p>
                     </>
                 )}
             </div>
@@ -81,7 +83,7 @@ export function SidebarShell({ appName, userName, userEmail, version }: SidebarS
                                 {userName?.charAt(0)?.toUpperCase() || "U"}
                             </div>
                             <div className="flex-1 min-w-0">
-                                <p className="text-sm font-semibold text-foreground truncate" translate="no">{userName || "User"}</p>
+                                <p className="text-sm font-semibold text-foreground truncate" translate="no">{userName || t("common.user")}</p>
                                 <p className="text-[10px] text-muted-foreground truncate" translate="no">{userEmail}</p>
                             </div>
                         </div>
@@ -103,7 +105,7 @@ export function SidebarShell({ appName, userName, userEmail, version }: SidebarS
                                 window.location.replace("/auth/login");
                             }}
                         >
-                            <LogOut size={14} /> Sign Out
+                            <LogOut size={14} /> {t("nav.signOut")}
                         </Button>
                         <p className="text-[9px] text-muted-foreground/50 text-center mt-2 font-mono" translate="no">v{version}</p>
                     </>

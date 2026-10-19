@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { Label } from '@/components/ui/label';
 import { Smartphone, Plus, Trash2, Settings, RefreshCw, Power, UserPlus } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { useTranslation } from '@/i18n/react';
 
 type Session = {
     id: string;
@@ -22,6 +23,7 @@ type Session = {
 };
 
 export function SessionManager({ user }: { user: any }) {
+    const { t } = useTranslation();
     const [sessions, setSessions] = useState<Session[]>([]);
     const [newSessionName, setNewSessionName] = useState("");
     const [newSessionId, setNewSessionId] = useState("");
@@ -88,13 +90,13 @@ export function SessionManager({ user }: { user: any }) {
 
     const createSession = async () => {
         if (!newSessionName) {
-            toast.error("Session name is required");
+            toast.error(t("sessions.manager.toasts.nameRequired"));
             return;
         }
 
         // If ID matches existing
         if (newSessionId && sessions.some(s => s.sessionId === newSessionId)) {
-            toast.error("Session ID already exists");
+            toast.error(t("sessions.manager.toasts.idExists"));
             return;
         }
 
@@ -112,18 +114,18 @@ export function SessionManager({ user }: { user: any }) {
             const responseData = await res.json();
             const session = responseData?.data;
 
-            if (!res.ok || !session) throw new Error(responseData.error || responseData.message || "Failed to create");
+            if (!res.ok || !session) throw new Error(responseData.error || responseData.message || t("sessions.manager.toasts.createFailed"));
 
             setSessions([...sessions, session]);
             setNewSessionName("");
             setNewSessionId("");
-            toast.success("Session created successfully");
+            toast.success(t("sessions.manager.toasts.created"));
 
             // Optionally redirect immediately or let user choose
             // router.push(`/dashboard/sessions/${session.sessionId}`);
         } catch (e: any) {
             console.error(e);
-            toast.error(e.message || "Failed to create session");
+            toast.error(e.message || t("sessions.manager.toasts.createFailed"));
         } finally {
             setLoading(false);
         }
@@ -139,35 +141,35 @@ export function SessionManager({ user }: { user: any }) {
             <Card className="bg-slate-50 border-dashed border-2">
                 <CardHeader>
                     <CardTitle className="text-lg flex items-center gap-2">
-                        <Plus className="h-5 w-5" /> Create New Session
+                        <Plus className="h-5 w-5" /> {t("sessions.manager.create.title")}
                     </CardTitle>
                     <CardDescription>
-                        Add a new WhatsApp account to manage.
+                        {t("sessions.manager.create.description")}
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
                         <div className="space-y-2">
-                            <Label htmlFor="session-name">Session Name</Label>
+                            <Label htmlFor="session-name">{t("sessions.manager.create.nameLabel")}</Label>
                             <Input
                                 id="session-name"
                                 value={newSessionName}
                                 onChange={e => setNewSessionName(e.target.value)}
-                                placeholder="My Business WA"
+                                placeholder={t("sessions.manager.create.namePlaceholder")}
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="session-id">Custom Session ID (Optional)</Label>
+                            <Label htmlFor="session-id">{t("sessions.manager.create.idLabel")}</Label>
                             <Input
                                 id="session-id"
                                 value={newSessionId}
                                 onChange={e => setNewSessionId(e.target.value.replace(/[^a-zA-Z0-9-_]/g, ''))}
-                                placeholder="unique-id-123"
+                                placeholder={t("sessions.manager.create.idPlaceholder")}
                             />
-                            <p className="text-[10px] text-muted-foreground">Only letters, numbers, hyphens.</p>
+                            <p className="text-[10px] text-muted-foreground">{t("sessions.manager.create.idHint")}</p>
                         </div>
                         <Button onClick={createSession} disabled={loading}>
-                            {loading ? 'Creating...' : 'Create Session'}
+                            {loading ? t("sessions.manager.create.creating") : t("sessions.manager.create.submit")}
                         </Button>
                     </div>
                 </CardContent>
@@ -175,10 +177,10 @@ export function SessionManager({ user }: { user: any }) {
 
             {/* Sessions Grid */}
             <div>
-                <h2 className="text-xl font-semibold mb-4 text-slate-800">Active Sessions ({sessions.length})</h2>
+                <h2 className="text-xl font-semibold mb-4 text-slate-800">{t("sessions.manager.list.title", { count: sessions.length })}</h2>
                 {sessions.length === 0 ? (
                     <div className="text-center py-10 text-muted-foreground bg-slate-50 rounded-lg border">
-                        No sessions found. Create one above to get started.
+                        {t("sessions.manager.list.empty")}
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -201,10 +203,10 @@ export function SessionManager({ user }: { user: any }) {
                                 </CardContent>
                                 <CardFooter className="bg-slate-50/50 p-3 flex justify-end gap-2">
                                     <Button variant="outline" size="sm" onClick={() => router.push(`/dashboard/sessions/access?session=${session.sessionId}`)}>
-                                        <UserPlus className="h-4 w-4 mr-1" /> Share
+                                        <UserPlus className="h-4 w-4 mr-1" /> {t("sessions.manager.share")}
                                     </Button>
                                     <Button variant="outline" size="sm" onClick={() => handleManageSession(session.sessionId)}>
-                                        <Settings className="h-4 w-4 mr-1" /> Manage
+                                        <Settings className="h-4 w-4 mr-1" /> {t("sessions.manager.manage")}
                                     </Button>
                                 </CardFooter>
                             </Card>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { useTranslation } from "@/i18n/react";
 
 /**
  * Global error boundary for the App Router.
@@ -19,6 +20,7 @@ export default function GlobalError({
     error: Error & { digest?: string };
     reset: () => void;
 }) {
+    const { t } = useTranslation();
     useEffect(() => {
         // Log error lengkap ke console supaya akar masalah kelihatan di DevTools
         // (pesan generik di bawah menyembunyikan penyebab asli).
@@ -47,23 +49,22 @@ export default function GlobalError({
         <div className="min-h-screen flex items-center justify-center p-6 bg-background">
             <div className="max-w-md w-full text-center space-y-4">
                 <div className="text-5xl">⚠️</div>
-                <h1 className="text-2xl font-bold">Something went wrong</h1>
+                <h1 className="text-2xl font-bold">{t("common.somethingWentWrong")}</h1>
                 <p className="text-sm text-muted-foreground">
-                    The page hit an unexpected issue. This often happens when the browser
-                    translator interferes with the app, or when the network is unstable.
+                    {t("common.errorPageDescription")}
                 </p>
                 <div className="flex flex-col sm:flex-row gap-2 justify-center pt-2">
                     <button
                         onClick={() => reset()}
                         className="px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:opacity-90"
                     >
-                        Try again
+                        {t("common.tryAgain")}
                     </button>
                     <button
                         onClick={() => window.location.href = "/"}
                         className="px-4 py-2 rounded-md border text-sm font-medium hover:bg-muted"
                     >
-                        Go home
+                        {t("common.goHome")}
                     </button>
                 </div>
                 {error?.digest && (

@@ -1,0 +1,33 @@
+import type { Dict } from "../../translate";
+import common from "./common";
+import nav from "./nav";
+import auth from "./auth";
+import landing from "./landing";
+import legal from "./legal";
+import docs from "./docs";
+import dashboard from "./dashboard";
+import sessions from "./sessions";
+import profile from "./profile";
+import settings from "./settings";
+import billing from "./billing";
+import plans from "./plans";
+import users from "./users";
+import chat from "./chat";
+import contacts from "./contacts";
+import groups from "./groups";
+import labels from "./labels";
+import notifications from "./notifications";
+import scheduler from "./scheduler";
+import autoreply from "./autoreply";
+import broadcast from "./broadcast";
+import webhooks from "./webhooks";
+import botSettings from "./botSettings";
+import media from "./media";
+import sticker from "./sticker";
+import systemMonitor from "./systemMonitor";
+import jpmSwgc from "./jpmSwgc";
+import apiDocs from "./apiDocs";
+
+const dictionary = { common: common, nav: nav, auth: auth, landing: landing, legal: legal, docs: docs, dashboard: dashboard, sessions: sessions, profile: profile, settings: settings, billing: billing, plans: plans, users: users, chat: chat, contacts: contacts, groups: groups, labels: labels, notifications: notifications, scheduler: scheduler, autoreply: autoreply, broadcast: broadcast, webhooks: webhooks, botSettings: botSettings, media: media, sticker: sticker, systemMonitor: systemMonitor, jpmSwgc: jpmSwgc, apiDocs: apiDocs, } as unknown as Dict;
+
+export default dictionary;

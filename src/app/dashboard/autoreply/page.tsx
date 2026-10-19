@@ -33,6 +33,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getAutoReplies, createAutoReply, deleteAutoReply, updateAutoReply } from "./actions";
 import { SessionGuard } from "@/components/dashboard/session-guard";
+import { useTranslation } from "@/i18n/react";
 
 interface AutoReply {
     id: string;
@@ -47,6 +48,7 @@ interface AutoReply {
 
 export default function AutoReplyPage() {
     const { sessionId } = useSession();
+    const { t } = useTranslation();
     const [rules, setRules] = useState<AutoReply[]>([]);
     const [loading, setLoading] = useState(false);
     
@@ -97,7 +99,7 @@ export default function AutoReplyPage() {
             setRules(data as unknown as AutoReply[]);
         } catch (error: any) {
             console.error(error);
-            toast.error(error.message || "Error fetching auto-replies");
+            toast.error(error.message || t("autoreply.toasts.fetchFail"));
         } finally {
             setLoading(false);
         }
@@ -106,7 +108,7 @@ export default function AutoReplyPage() {
     const handleCreate = async () => {
         if (!sessionId) return;
         if (!keyword.trim() || !response.trim()) {
-            toast.error("Keyword and response are required");
+            toast.error(t("autoreply.toasts.required"));
             return;
         }
 
@@ -122,13 +124,13 @@ export default function AutoReplyPage() {
                 mediaUrl: null
             });
 
-            toast.success("Auto-reply rule created");
+            toast.success(t("autoreply.toasts.created"));
             setIsCreateOpen(false);
             fetchRules();
             resetForm();
         } catch (error: any) {
             console.error(error);
-            toast.error(error.message || "Error creating auto-reply");
+            toast.error(error.message || t("autoreply.toasts.createFail"));
         } finally {
             setSubmitting(false);
         }
@@ -139,11 +141,11 @@ export default function AutoReplyPage() {
         try {
             // Using direct Server Action
             await deleteAutoReply(sessionId, ruleId);
-            toast.success("Auto-reply deleted");
+            toast.success(t("autoreply.toasts.deleted"));
             fetchRules();
         } catch (error: any) {
             console.error(error);
-            toast.error(error.message || "Error deleting auto-reply");
+            toast.error(error.message || t("autoreply.toasts.deleteFail"));
         }
     };
 
@@ -166,7 +168,7 @@ export default function AutoReplyPage() {
     const handleUpdate = async () => {
         if (!sessionId || !editId) return;
         if (!editKeyword.trim() || !editResponse.trim()) {
-            toast.error("Keyword and response are required");
+            toast.error(t("autoreply.toasts.required"));
             return;
         }
 
@@ -181,12 +183,12 @@ export default function AutoReplyPage() {
                 mediaUrl: null
             });
 
-            toast.success("Auto-reply rule updated");
+            toast.success(t("autoreply.toasts.updated"));
             setIsEditOpen(false);
             fetchRules();
         } catch (error: any) {
             console.error(error);
-            toast.error(error.message || "Error updating auto-reply");
+            toast.error(error.message || t("autoreply.toasts.updateFail"));
         } finally {
             setSubmitting(false);
         }
@@ -197,8 +199,8 @@ export default function AutoReplyPage() {
             <div className="max-w-5xl space-y-6">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                    <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Auto Replies Builder</h1>
-                    <p className="text-muted-foreground text-sm">Setup rules to automatically respond to incoming messages.</p>
+                    <h1 className="text-xl sm:text-2xl font-bold tracking-tight">{t("autoreply.title")}</h1>
+                    <p className="text-muted-foreground text-sm">{t("autoreply.subtitle")}</p>
                 </div>
 
                 <Dialog open={isCreateOpen} onOpenChange={(open) => {
@@ -208,7 +210,7 @@ export default function AutoReplyPage() {
                     <DialogTrigger asChild>
                         <Button>
                             <Plus className="w-4 h-4 mr-2" />
-                            New Rule
+                            {t("autoreply.newRule")}
                         </Button>
                     </DialogTrigger>
 
@@ -216,90 +218,90 @@ export default function AutoReplyPage() {
             {botStatus && !botStatus.enabled && (
                 <div className="rounded-lg border border-amber-300/60 bg-amber-50 dark:bg-amber-500/10 p-3 text-sm flex flex-col sm:flex-row sm:items-center gap-2">
                     <span className="font-medium text-amber-800 dark:text-amber-200">
-                        ⚠️ Bot is currently disabled — auto-replies will not be sent.
+                        {t("autoreply.banner.disabled")}
                     </span>
                     <a
                         href="/dashboard/bot-settings"
                         className="text-amber-700 dark:text-amber-300 underline underline-offset-2 sm:ml-auto"
                     >
-                        Enable in Bot Settings →
+                        {t("autoreply.banner.enableLink")}
                     </a>
                 </div>
             )}
             {botStatus?.enabled && botStatus.autoReplyMode === "OWNER" && (
                 <div className="rounded-lg border border-blue-300/60 bg-blue-50 dark:bg-blue-500/10 p-3 text-sm">
                     <span className="font-medium text-blue-800 dark:text-blue-200">
-                        ℹ️ Auto-Reply mode is set to <strong>OWNER</strong> — rules only trigger on messages YOU send (Self / macros).
+                        {t("autoreply.banner.ownerPrefix")}<strong>OWNER</strong>{t("autoreply.banner.ownerSuffixAlt")}
                     </span>
                 </div>
             )}
             {botStatus?.enabled && botStatus.autoReplyMode === "SPECIFIC" && (
                 <div className="rounded-lg border border-blue-300/60 bg-blue-50 dark:bg-blue-500/10 p-3 text-sm">
                     <span className="font-medium text-blue-800 dark:text-blue-200">
-                        ℹ️ Auto-Reply mode is <strong>SPECIFIC</strong> — only allowed JIDs will trigger replies. Configure in Bot Settings.
+                        {t("autoreply.banner.specificPrefix")}<strong>SPECIFIC</strong>{t("autoreply.banner.specificSuffix")}
                     </span>
                 </div>
             )}
                     <DialogContent className="sm:max-w-[500px]">
                         <DialogHeader>
-                            <DialogTitle>Create Auto-Reply Rule</DialogTitle>
-                            <DialogDescription>Add a new keyword-based response.</DialogDescription>
+                            <DialogTitle>{t("autoreply.create.title")}</DialogTitle>
+                            <DialogDescription>{t("autoreply.create.description")}</DialogDescription>
                         </DialogHeader>
                         <div className="space-y-4 py-4">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                                 <div className="space-y-2">
-                                    <Label>Keyword</Label>
+                                    <Label>{t("autoreply.create.keyword")}</Label>
                                     <Input 
                                         value={keyword} 
                                         onChange={(e) => setKeyword(e.target.value)} 
-                                        placeholder="e.g. !help, ping" 
+                                        placeholder={t("autoreply.create.keywordPlaceholder")} 
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>Match Type</Label>
+                                    <Label>{t("autoreply.create.matchType")}</Label>
                                     <Select value={matchType} onValueChange={setMatchType}>
                                         <SelectTrigger>
                                             <SelectValue />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="EXACT">Exact Match</SelectItem>
-                                            <SelectItem value="CONTAINS">Contains</SelectItem>
-                                            <SelectItem value="STARTS_WITH">Starts With</SelectItem>
-                                            <SelectItem value="REGEX">Regex Pattern</SelectItem>
+                                            <SelectItem value="EXACT">{t("autoreply.create.matchExact")}</SelectItem>
+                                            <SelectItem value="CONTAINS">{t("autoreply.create.matchContains")}</SelectItem>
+                                            <SelectItem value="STARTS_WITH">{t("autoreply.create.matchStartsWith")}</SelectItem>
+                                            <SelectItem value="REGEX">{t("autoreply.create.matchRegex")}</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
                             </div>
 
                             <div className="space-y-2">
-                                <Label>Select Trigger Audience</Label>
+                                <Label>{t("autoreply.create.audience")}</Label>
                                 <Select value={triggerType} onValueChange={setTriggerType}>
                                     <SelectTrigger>
                                         <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="ALL">Everyone & Groups</SelectItem>
-                                        <SelectItem value="PRIVATE">Private Chats Only</SelectItem>
-                                        <SelectItem value="GROUP">Group Chats Only</SelectItem>
+                                        <SelectItem value="ALL">{t("autoreply.create.audienceAll")}</SelectItem>
+                                        <SelectItem value="PRIVATE">{t("autoreply.create.audiencePrivate")}</SelectItem>
+                                        <SelectItem value="GROUP">{t("autoreply.create.audienceGroup")}</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
 
                             <div className="space-y-2">
-                                <Label>Reply Message</Label>
+                                <Label>{t("autoreply.create.replyMessage")}</Label>
                                 <Textarea 
                                     value={response} 
                                     onChange={(e) => setResponse(e.target.value)} 
-                                    placeholder="Thank you for your message! Our team will get back to you shortly." 
+                                    placeholder={t("autoreply.create.replyPlaceholder")} 
                                     className="min-h-[120px]"
                                 />
-                                <p className="text-xs text-muted-foreground">You can use standard WhatsApp formatting (*bold*, _italic_, ~strikethrough~)</p>
+                                <p className="text-xs text-muted-foreground">{t("autoreply.create.replyHint")}</p>
                             </div>
                         </div>
                         <DialogFooter>
-                            <Button variant="outline" onClick={() => setIsCreateOpen(false)}>Cancel</Button>
+                            <Button variant="outline" onClick={() => setIsCreateOpen(false)}>{t("autoreply.create.cancel")}</Button>
                             <Button onClick={handleCreate} disabled={submitting || !keyword.trim() || !response.trim()}>
-                                {submitting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : "Save Rule"}
+                                {submitting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : t("autoreply.create.save")}
                             </Button>
                         </DialogFooter>
                     </DialogContent>
@@ -310,27 +312,27 @@ export default function AutoReplyPage() {
             {botStatus && !botStatus.enabled && (
                 <div className="rounded-lg border border-amber-300/60 bg-amber-50 dark:bg-amber-500/10 p-3 text-sm flex flex-col sm:flex-row sm:items-center gap-2">
                     <span className="font-medium text-amber-800 dark:text-amber-200">
-                        ⚠️ Bot is currently disabled — auto-replies will not be sent.
+                        {t("autoreply.banner.disabled")}
                     </span>
                     <a
                         href="/dashboard/bot-settings"
                         className="text-amber-700 dark:text-amber-300 underline underline-offset-2 sm:ml-auto"
                     >
-                        Enable in Bot Settings →
+                        {t("autoreply.banner.enableLink")}
                     </a>
                 </div>
             )}
             {botStatus?.enabled && botStatus.autoReplyMode === "OWNER" && (
                 <div className="rounded-lg border border-blue-300/60 bg-blue-50 dark:bg-blue-500/10 p-3 text-sm">
                     <span className="font-medium text-blue-800 dark:text-blue-200">
-                        ℹ️ Auto-Reply mode is set to <strong>OWNER</strong> — rules only trigger on messages YOU send (self mode / macros).
+                        {t("autoreply.banner.ownerPrefix")}<strong>OWNER</strong>{t("autoreply.banner.ownerSuffix")}
                     </span>
                 </div>
             )}
             {botStatus?.enabled && botStatus.autoReplyMode === "SPECIFIC" && (
                 <div className="rounded-lg border border-blue-300/60 bg-blue-50 dark:bg-blue-500/10 p-3 text-sm">
                     <span className="font-medium text-blue-800 dark:text-blue-200">
-                        ℹ️ Auto-Reply mode is <strong>SPECIFIC</strong> — only allowed JIDs will trigger replies. Configure in Bot Settings.
+                        {t("autoreply.banner.specificPrefix")}<strong>SPECIFIC</strong>{t("autoreply.banner.specificSuffix")}
                     </span>
                 </div>
             )}
@@ -343,9 +345,9 @@ export default function AutoReplyPage() {
                 <Card className="border-dashed shadow-none bg-muted/30">
                     <CardContent className="flex flex-col items-center justify-center py-12 text-center">
                         <BotMessageSquare className="w-12 h-12 text-muted-foreground/50 mb-4" />
-                        <h3 className="text-lg font-semibold">No auto-replies configured</h3>
-                        <p className="text-muted-foreground mb-4">You haven't set up any automated responses yet.</p>
-                        <Button variant="outline" onClick={() => setIsCreateOpen(true)}>Create your first rule</Button>
+                        <h3 className="text-lg font-semibold">{t("autoreply.empty.title")}</h3>
+                        <p className="text-muted-foreground mb-4">{t("autoreply.empty.description")}</p>
+                        <Button variant="outline" onClick={() => setIsCreateOpen(true)}>{t("autoreply.empty.action")}</Button>
                     </CardContent>
                 </Card>
             ) : (
@@ -375,15 +377,15 @@ export default function AutoReplyPage() {
                                             </AlertDialogTrigger>
                                             <AlertDialogContent>
                                                 <AlertDialogHeader>
-                                                    <AlertDialogTitle>Delete Rule?</AlertDialogTitle>
+                                                    <AlertDialogTitle>{t("autoreply.delete.title")}</AlertDialogTitle>
                                                     <AlertDialogDescription>
-                                                        Are you sure you want to delete the auto-reply for keyword <strong>{rule.keyword}</strong>? This action cannot be undone.
+                                                        {t("autoreply.delete.descPrefix")}<strong>{rule.keyword}</strong>{t("autoreply.delete.descSuffix")}
                                                     </AlertDialogDescription>
                                                 </AlertDialogHeader>
                                                 <AlertDialogFooter>
-                                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                    <AlertDialogCancel>{t("autoreply.delete.cancel")}</AlertDialogCancel>
                                                     <AlertDialogAction onClick={() => handleDelete(rule.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                                                        Delete
+                                                        {t("autoreply.delete.confirm")}
                                                     </AlertDialogAction>
                                                 </AlertDialogFooter>
                                             </AlertDialogContent>
@@ -397,7 +399,7 @@ export default function AutoReplyPage() {
                                 </div>
                                 {rule.isMedia && (
                                     <div className="mt-3 text-xs flex items-center gap-1 text-blue-600 bg-blue-50 px-2 py-1 rounded w-fit">
-                                        <ImageIcon className="w-3 h-3" /> Includes Media Attachment
+                                        <ImageIcon className="w-3 h-3" /> {t("autoreply.card.media")}
                                     </div>
                                 )}
                             </CardContent>
@@ -413,64 +415,64 @@ export default function AutoReplyPage() {
             }}>
                 <DialogContent className="sm:max-w-[500px]">
                     <DialogHeader>
-                        <DialogTitle>Edit Auto-Reply Rule</DialogTitle>
-                        <DialogDescription>Modify the keyword-based response rule.</DialogDescription>
+                        <DialogTitle>{t("autoreply.edit.title")}</DialogTitle>
+                        <DialogDescription>{t("autoreply.edit.description")}</DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                             <div className="space-y-2">
-                                <Label>Keyword</Label>
+                                <Label>{t("autoreply.create.keyword")}</Label>
                                 <Input 
                                     value={editKeyword} 
                                     onChange={(e) => setEditKeyword(e.target.value)} 
-                                    placeholder="e.g. !help, ping" 
+                                    placeholder={t("autoreply.create.keywordPlaceholder")} 
                                 />
                             </div>
                             <div className="space-y-2">
-                                <Label>Match Type</Label>
+                                <Label>{t("autoreply.create.matchType")}</Label>
                                 <Select value={editMatchType} onValueChange={setEditMatchType}>
                                     <SelectTrigger>
                                         <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="EXACT">Exact Match</SelectItem>
-                                        <SelectItem value="CONTAINS">Contains</SelectItem>
-                                        <SelectItem value="STARTS_WITH">Starts With</SelectItem>
-                                        <SelectItem value="REGEX">Regex Pattern</SelectItem>
+                                        <SelectItem value="EXACT">{t("autoreply.create.matchExact")}</SelectItem>
+                                        <SelectItem value="CONTAINS">{t("autoreply.create.matchContains")}</SelectItem>
+                                        <SelectItem value="STARTS_WITH">{t("autoreply.create.matchStartsWith")}</SelectItem>
+                                        <SelectItem value="REGEX">{t("autoreply.create.matchRegex")}</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
                         </div>
 
                         <div className="space-y-2">
-                            <Label>Select Trigger Audience</Label>
+                            <Label>{t("autoreply.create.audience")}</Label>
                             <Select value={editTriggerType} onValueChange={setEditTriggerType}>
                                 <SelectTrigger>
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="ALL">Everyone & Groups</SelectItem>
-                                    <SelectItem value="PRIVATE">Private Chats Only</SelectItem>
-                                    <SelectItem value="GROUP">Group Chats Only</SelectItem>
+                                    <SelectItem value="ALL">{t("autoreply.create.audienceAll")}</SelectItem>
+                                    <SelectItem value="PRIVATE">{t("autoreply.create.audiencePrivate")}</SelectItem>
+                                    <SelectItem value="GROUP">{t("autoreply.create.audienceGroup")}</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
 
                         <div className="space-y-2">
-                            <Label>Reply Message</Label>
+                            <Label>{t("autoreply.create.replyMessage")}</Label>
                             <Textarea 
                                 value={editResponse} 
                                 onChange={(e) => setEditResponse(e.target.value)} 
-                                placeholder="Response text..." 
+                                placeholder={t("autoreply.edit.replyPlaceholder")} 
                                 className="min-h-[120px]"
                             />
-                            <p className="text-xs text-muted-foreground">You can use standard WhatsApp formatting (*bold*, _italic_, ~strikethrough~)</p>
+                            <p className="text-xs text-muted-foreground">{t("autoreply.create.replyHint")}</p>
                         </div>
                     </div>
                     <DialogFooter>
-                        <Button variant="outline" onClick={() => setIsEditOpen(false)}>Cancel</Button>
+                        <Button variant="outline" onClick={() => setIsEditOpen(false)}>{t("autoreply.edit.cancel")}</Button>
                         <Button onClick={handleUpdate} disabled={submitting || !editKeyword.trim() || !editResponse.trim()}>
-                            {submitting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : "Save Changes"}
+                            {submitting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : t("autoreply.edit.save")}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

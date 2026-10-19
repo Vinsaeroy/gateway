@@ -1,0 +1,118 @@
+const webhooks = {
+    title: "Webhooks & API",
+    apiKey: {
+        title: "Chave de API",
+        description: "Use esta chave para autenticar solicitações da API. Inclua-a no cabeçalho X-API-Key.",
+        hidden: "•••••••• (chave oculta — exibida apenas uma vez, na criação)",
+        none: "Nenhuma chave de API gerada",
+        generate: "Gerar",
+        regenerate: "Gerar Novamente",
+        exampleLabel: "Exemplo:",
+        hiddenNoteA: "Por segurança, a chave de API é armazenada criptografada e não pode ser exibida novamente. Clique em ",
+        hiddenNoteB: " caso tenha esquecido/perdido a chave.",
+        regenTitle: "Gerar Novamente a Chave de API?",
+        regenDescription: "Isso invalidará sua chave de API atual. Todas as integrações existentes que usam a chave antiga deixarão de funcionar imediatamente. Esta ação não pode ser desfeita.",
+        cancel: "Cancelar",
+        createdToast: "Nova chave de API criada. Copie agora — ela não será exibida novamente!",
+        generateFail: "Falha ao gerar a chave de API",
+    },
+    events: {
+        messageReceived: {
+            label: "Mensagem Recebida",
+            description: "Quando uma nova mensagem é recebida",
+        },
+        messageSent: {
+            label: "Mensagem Enviada",
+            description: "Quando uma mensagem é enviada",
+        },
+        messageStatus: {
+            label: "Status da Mensagem",
+            description: "Quando o status da mensagem muda (entregue, lida)",
+        },
+        connectionUpdate: {
+            label: "Atualização de Conexão",
+            description: "Quando a sessão conecta/desconecta",
+        },
+        groupUpdate: {
+            label: "Atualização de Grupo",
+            description: "Quando as informações do grupo mudam",
+        },
+        groupJoined: {
+            label: "Entrada no Grupo",
+            description: "Quando você entra ou é adicionado a um novo grupo",
+        },
+        groupParticipant: {
+            label: "Membro do Grupo",
+            description: "Quando participantes entram, saem ou mudam de função",
+        },
+        contactUpdate: {
+            label: "Atualização de Contato",
+            description: "Quando as informações do contato mudam",
+        },
+        statusUpdate: {
+            label: "Status/História",
+            description: "Quando um status é publicado ou visualizado",
+        },
+        messageEdited: {
+            label: "Mensagem Editada",
+            description: "Quando uma mensagem é editada",
+        },
+        messageDeleted: {
+            label: "Mensagem Excluída",
+            description: "Quando uma mensagem é revogada/excluída",
+        },
+    },
+    section: {
+        title: "Webhooks",
+        description: "Envie eventos em tempo real para URLs externas quando houver atividade no WhatsApp.",
+        add: "Adicionar Webhook",
+    },
+    form: {
+        newTitle: "Novo Webhook",
+        name: "Nome",
+        namePlaceholder: "Meu Servidor",
+        url: "URL do Webhook",
+        secret: "Segredo (opcional, para assinatura HMAC)",
+        secretPlaceholder: "your-secret-key",
+        events: "Eventos",
+        cancel: "Cancelar",
+        create: "Criar Webhook",
+        editTitle: "Editar Webhook",
+        editDescription: "Modifique a configuração do endpoint do webhook e os eventos assinados.",
+        save: "Salvar Alterações",
+    },
+    list: {
+        loading: "Carregando...",
+        empty: "Nenhum webhook configurado para esta sessão. Clique em \"{name}\" para criar um.",
+        active: "Ativo",
+        inactive: "Inativo",
+        testing: "Testando...",
+        test: "Testar",
+        edit: "Editar",
+        eventsToggle: "Eventos (clique para alternar)",
+    },
+    delete: {
+        title: "Tem certeza absoluta?",
+        description: "Esta ação não pode ser desfeita. A configuração do webhook será excluída permanentemente.",
+        cancel: "Cancelar",
+        confirm: "Excluir",
+    },
+    toasts: {
+        required: "Nome, URL e pelo menos um evento são obrigatórios",
+        noSession: "Nenhuma sessão ativa selecionada",
+        created: "Webhook criado!",
+        createFail: "Falha ao criar o webhook",
+        error: "Ocorreu um erro",
+        updated: "Webhook atualizado!",
+        updateFail: "Falha ao atualizar o webhook",
+        testOk: "Webhook OK!",
+        testFail: "Falha no teste do webhook",
+        testError: "Falha ao executar o teste do webhook",
+        eventsFail: "Falha ao atualizar os eventos do webhook",
+        deleted: "Webhook excluído",
+        deleteFail: "Falha ao excluir o webhook",
+        copied: "Copiado para a área de transferência!",
+    },
+} as const;
+
+export default webhooks;
